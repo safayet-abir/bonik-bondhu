@@ -7,7 +7,9 @@ import { Harvest } from "./pages/farm/Harvest";
 import { SeasonDetail } from "./pages/farm/SeasonDetail";
 import { SeasonForm } from "./pages/farm/SeasonForm";
 import { SeasonSummary } from "./pages/farm/SeasonSummary";
+import { CaseFile } from "./pages/lender/CaseFile";
 import { Cases } from "./pages/lender/Cases";
+import { RequestAccess } from "./pages/lender/RequestAccess";
 import { NotFound } from "./pages/NotFound";
 import { AddEntry } from "./pages/owner/AddEntry";
 import { Assessment } from "./pages/owner/Assessment";
@@ -22,12 +24,13 @@ import { More } from "./pages/owner/More";
 import { OwnerLayout } from "./pages/owner/OwnerLayout";
 import { ProfileCreate } from "./pages/owner/ProfileCreate";
 import { Profiles } from "./pages/owner/Profiles";
+import { Sharing } from "./pages/owner/Sharing";
 import { Summary } from "./pages/owner/Summary";
 import { Suppliers } from "./pages/owner/Suppliers";
 import { GuestOnly, RequireRole } from "./state/Guards";
 
 // Routes per TRD §3. Only screens with working endpoints exist (MP §17 rule 10);
-// later phases add sharing (P5) and advisor (P6).
+// the advisor arrives in P6.
 export const router = createBrowserRouter([
   { path: "/", element: <GuestOnly><Welcome /></GuestOnly> },
   { path: "/register", element: <GuestOnly><Register /></GuestOnly> },
@@ -55,9 +58,12 @@ export const router = createBrowserRouter([
       { path: "financing/new", element: <FinancingWizard /> },
       { path: "financing/:rid/step/:n", element: <FinancingWizard /> },
       { path: "assessment/:aid", element: <Assessment /> },
+      { path: "sharing", element: <Sharing /> },
       { path: "more", element: <More /> },
     ],
   },
   { path: "/lender/cases", element: <RequireRole role="lender_officer"><Cases /></RequireRole> },
+  { path: "/lender/cases/:cid", element: <RequireRole role="lender_officer"><CaseFile /></RequireRole> },
+  { path: "/lender/request", element: <RequireRole role="lender_officer"><RequestAccess /></RequireRole> },
   { path: "*", element: <NotFound /> },
 ]);

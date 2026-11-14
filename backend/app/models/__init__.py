@@ -2,7 +2,7 @@
 models never create tables)."""
 from .audit import AuditLog
 from .base import Base
-from .consent import Consent
+from .consent import Consent, LenderReview, LenderReviewEvent, SharedReport
 from .debt import DebtFacility
 from .financing import FinancialAssessment, FinancingRequest, FinancingRequestItem, ForecastRun, RiskScenario
 from .ledger import Transaction
@@ -16,6 +16,7 @@ from .user import User, UserSession
 __all__ = [
     "AuditLog", "Base", "BusinessProfile", "Consent", "DebtFacility", "FarmingSeason",
     "FinancialAssessment", "FinancingRequest", "FinancingRequestItem", "ForecastRun",
-    "LenderOfficer", "LenderOrganization", "NewsEvent", "RiskScenario", "SeasonCostItem", "Supplier", "Transaction",
+    "LenderOfficer", "LenderOrganization", "LenderReview", "LenderReviewEvent", "NewsEvent", "RiskScenario",
+    "SeasonCostItem", "SharedReport", "Supplier", "Transaction",
     "User", "UserSession",
 ]

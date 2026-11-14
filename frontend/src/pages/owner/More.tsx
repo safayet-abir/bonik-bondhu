@@ -1,4 +1,4 @@
-import { ArrowLeftRight, BarChart3, ChevronRight, Landmark, LogOut, TrendingUp, Truck } from "lucide-react";
+import { ArrowLeftRight, BarChart3, ChevronRight, Landmark, LogOut, Share2, TrendingUp, Truck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router";
 
@@ -24,6 +24,7 @@ export function More() {
     ] : []),
     { to: `${base}/debts`, icon: Landmark, label: t("debt.title") },
     { to: `${base}/suppliers`, icon: Truck, label: t("supplier.title") },
+    { to: `${base}/sharing`, icon: Share2, label: t("share.title") },
   ];
   return (
     <PageShell title={t("nav.more")}>

@@ -84,6 +84,8 @@ def clean_db(migrated_db: str) -> Iterator[str]:
         conn.execute(text(f"TRUNCATE {TABLES} RESTART IDENTITY CASCADE"))
     engine.dispose()
     auth_ip_limiter.reset()
+    from app.services.lender_service import access_request_limiter
+    access_request_limiter.reset()
     clock.set_now(None)
     yield migrated_db
     clock.set_now(None)

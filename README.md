@@ -16,7 +16,8 @@ The full development blueprint is in [`docs/`](docs/README.md). Start there.
 | P2 Financial data engine | Done — all 12 entry types with supplier/loan/season links, duplicate warning, void, E1 golden summary, debts + "no current loans", suppliers, crop seasons (acre/decimal/sq ft/bigha), cost items, harvest, season summary; shop + farm screens; 143 backend tests + browser walkthrough (`frontend/e2e/p2-walkthrough.mjs`) |
 | P3 First working financial assessment | Done — forecast baseline (shop), financing requests + items + live gap preview, 5-step wizard with autosave, deterministic assessment (3 statuses, missing items, flags, "how calculated", inputs hash, stale detection), farm harvest check + loan-cover price, `seed-demo` / `reset-demo` CLI; D1–D4 golden through the API; 190 backend tests + browser walkthrough (`frontend/e2e/p3-walkthrough.mjs`). New suggestions SUG-30..36 await team approval (DECISIONS §2.1) |
 | P4 Deterministic risk signals (L1/L2) | Done — supplier concentration + dependency bars, auto what-ifs (shop delay 7/14 d, price +15%; farm price −15%, yield −20%, inputs +15%) that never change the status, curated news import (`import-news`) + matching + proposed scenarios with confirm/dismiss, Risks and News tabs; 7 real news events (10 sources, pending second-person review) in `data/news/`; 208 backend tests + browser walkthrough (`frontend/e2e/p4-walkthrough.mjs`). SUG-30..40 approved (DECISIONS §2.1) |
-| P5 Consent & lender review | Next |
+| P5 Consent & lender review | Done — lender access request by share code (identical 202, rate limit), owner approves chosen sections for 7/14/30 days, immutable snapshot + SHA-256 (supplier names → Supplier 1/2/3), lender case file with read audit, private notes, information requests, demo decision with reason, reshare (new version), revoke/expiry block access, other organisations get 404; owner Sharing screen + lender portal (case list, request access, case file); 221 backend tests + browser E2E-3 (`frontend/e2e/p5-walkthrough.mjs`) |
+| P6 AI (receipt draft, purpose parse, grounded advisor) | Next |
 
 ## Stack
 
@@ -81,6 +82,7 @@ cd frontend && node e2e/p2-walkthrough.mjs http://localhost:8000 e2e-shots-p2   
 # P3/P4 use the DEMO seed: run `python -m app.cli reset-demo` first; password from DEMO_PASSWORD
 cd frontend && node e2e/p3-walkthrough.mjs http://localhost:8000 e2e-shots-p3
 cd frontend && node e2e/p4-walkthrough.mjs http://localhost:8000 e2e-shots-p4
+cd frontend && node e2e/p5-walkthrough.mjs http://localhost:8000 e2e-shots-p5   # owner + lender (E2E-3)
 ```
 
 ## Admin CLI

@@ -376,12 +376,82 @@ export type Summary = {
   record_coverage: { weeks_with_records: number; window_weeks: number };
 };
 
+export type SectionKey = "profile_summary" | "money_summary" | "forecast" | "financing_request" | "obligations" |
+  "supplier_risk" | "news_signals" | "season_summary" | "transaction_list";
+export type ConsentStatus = "requested" | "approved" | "declined" | "revoked";
+export type ReviewStatus = "under_review" | "info_requested" | "decision_recorded";
+export type Decision = "proceed" | "decline" | "refer";
+
 export type LenderCase = {
   consent_id: string;
   applicant: { display_name: string; activity_type: ActivityType; is_demo: boolean } | null;
-  status: string;
+  status: ConsentStatus;
   is_expired: boolean;
   valid_until: string | null;
+  requested_sections: SectionKey[];
+  created_at: string;
+  assessment_status: AssessmentStatus | null;
+  requested_amount: string | null;
+  review_status: ReviewStatus | null;
+  decision: Decision | null;
+  last_read_at: string | null;
+};
+
+/** Owner view of one lender request / share (SCR-O14). */
+export type ConsentRow = {
+  id: string;
+  status: ConsentStatus;
+  is_expired: boolean;
+  lender_organization: { name: string; is_demo: boolean };
+  requested_by: string | null;
+  requested_sections: SectionKey[];
+  request_message: string | null;
+  approved_sections: SectionKey[] | null;
+  financing_request_id: string | null;
+  valid_until: string | null;
+  created_at: string;
+  latest_report: { version: number; snapshot_sha256: string; created_at: string } | null;
+  read_count: number;
+  open_info_requests: number;
+  review_status: ReviewStatus | null;
+  decision: { decision: Decision; reason: string; at: string } | null;
+};
+
+export type ConsentList = Page<ConsentRow> & {
+  allowed_sections: SectionKey[];
+  required_sections: SectionKey[];
+  valid_days: number[];
+};
+
+export type ConsentActivity = {
+  reads: { at: string; organization: string }[];
+  info_requests: { at: string; body: string }[];
+  decision: { decision: Decision; reason: string; at: string; organization: string } | null;
+};
+
+export type ReviewEvent = {
+  id: string; event_type: "status_change" | "note" | "info_request" | "decision"; body: string;
+  visible_to_owner: boolean; officer: string | null; at: string;
+};
+
+/** Immutable shared report (bb-report-v1). Only approved sections exist. */
+export type Snapshot = {
+  schema: string;
+  generated_at: string;
+  as_of_date: string;
+  is_demo: boolean;
+  sections: Partial<Record<SectionKey, unknown>>;
+};
+
+export type CaseFile = {
+  consent: { id: string; approved_sections: SectionKey[]; valid_until: string; approved_at: string; version: number;
+             snapshot_sha256: string; shared_at: string; hash_verified: boolean };
+  organization: { name: string; is_demo: boolean };
+  snapshot: Snapshot;
+  review: { status: ReviewStatus; decision: Decision | null; decision_reason: string | null; decided_by: string | null;
+            decided_at: string | null; events: ReviewEvent[] } | null;
+  cib_notice_key: string;
+  banner_key: string | null;
 };
 
 export type Page<T> = { items: T[]; total: number };
