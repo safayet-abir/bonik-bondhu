@@ -21,6 +21,8 @@ import { FinancingWizard } from "./pages/owner/FinancingWizard";
 import { Forecast } from "./pages/owner/Forecast";
 import { ProfileHome, ShopOnly } from "./pages/owner/Home";
 import { More } from "./pages/owner/More";
+import { Photo } from "./pages/owner/Photo";
+import { Advisor } from "./pages/owner/Advisor";
 import { OwnerLayout } from "./pages/owner/OwnerLayout";
 import { ProfileCreate } from "./pages/owner/ProfileCreate";
 import { Profiles } from "./pages/owner/Profiles";
@@ -60,6 +62,8 @@ export const router = createBrowserRouter([
       { path: "assessment/:aid", element: <Assessment /> },
       { path: "sharing", element: <Sharing /> },
       { path: "more", element: <More /> },
+      { path: "photo", element: <Photo /> },
+      { path: "advisor", element: <Advisor /> },
     ],
   },
   { path: "/lender/cases", element: <RequireRole role="lender_officer"><Cases /></RequireRole> },

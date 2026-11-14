@@ -1,5 +1,5 @@
 import type { TFunction } from "i18next";
-import { FileText, Paperclip, PlusCircle } from "lucide-react";
+import { Camera, FileText, Paperclip, PlusCircle } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router";
@@ -87,6 +87,9 @@ export function Entries() {
       {notice ? <StatusBanner tone="success" title={t(notice)} /> : null}
       <Button full icon={<PlusCircle aria-hidden className="size-5" />} onClick={() => navigate(`/p/${p.id}/entries/new?back=/p/${p.id}/entries`)}>
         {t("entry.new")}
+      </Button>
+      <Button full variant="secondary" icon={<Camera aria-hidden className="size-5" />} onClick={() => navigate(`/p/${p.id}/photo`)}>
+        {t("entries.photo")}
       </Button>
       <Chips label={t("entries.filter")} value={filter} onChange={setFilter}
              options={(Object.keys(LIST_FILTERS) as Filter[]).map((f) => ({ value: f, label: t(`entries.filter.${f}`) }))} />

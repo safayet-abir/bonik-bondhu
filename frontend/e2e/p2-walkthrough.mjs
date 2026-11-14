@@ -57,7 +57,8 @@ try {
   step("supplier saved");
 
   // Stock purchase linked to supplier
-  await page.getByRole("link", { name: "Add" }).click();
+  await page.getByRole("link", { name: "Entries" }).click(); // P6: the nav slot "Add" became "Advisor"
+  await page.getByRole("button", { name: "New entry" }).click();
   await page.getByRole("button", { name: "Stock purchase (cash)" }).click();
   await page.getByText("Stock bought for resale, paid now.").waitFor();
   await page.getByLabel("Amount (Tk)").fill("65000");
@@ -69,7 +70,8 @@ try {
 
   // Credit sale + duplicate warning + confirm
   for (let i = 0; i < 2; i++) {
-    await page.getByRole("link", { name: "Add" }).click();
+    await page.getByRole("link", { name: "Entries" }).click();
+    await page.getByRole("button", { name: "New entry" }).click();
     await page.getByRole("button", { name: "Sale on credit (baki)" }).click();
     await page.getByText("Not cash yet.").waitFor();
     await page.getByLabel("Amount (Tk)").fill("2000");

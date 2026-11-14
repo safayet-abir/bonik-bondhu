@@ -196,6 +196,16 @@ def _scrub(value, names: list[tuple[re.Pattern, str]]):
     return value
 
 
+def supplier_labels(db: Session, profile: BusinessProfile, as_of: date):
+    """(concentration, {supplier_id: "Supplier n"}, {display_name: label}) — n by share, largest first.
+    Used for everything that leaves the owner: lender snapshots and AI tool output."""
+    conc = supplier_service.concentration(db, profile, as_of)
+    ordered = sorted(conc.suppliers.values(),
+                     key=lambda s: (-(conc.result.shares.get(s.id) or 0), s.created_at, str(s.id)))
+    labels = {s.id: f"Supplier {i}" for i, s in enumerate(ordered, 1)}
+    return conc, labels, {s.display_name: labels[s.id] for s in ordered}
+
+
 def name_patterns(names: dict[str, str]) -> list[tuple[re.Pattern, str]]:
     """Whole-word, case-insensitive; longest first. Bangla vowel signs are not
     \\w, so "রহিমের" still matches "রহিম". shortcut: names under 3 letters are
@@ -207,11 +217,7 @@ def name_patterns(names: dict[str, str]) -> list[tuple[re.Pattern, str]]:
 def build(db: Session, profile: BusinessProfile, sections: list[str], r: FinancingRequest,
           a: FinancialAssessment) -> dict:
     as_of = a.as_of_date
-    conc = supplier_service.concentration(db, profile, as_of)
-    ordered = sorted(conc.suppliers.values(),
-                     key=lambda s: (-(conc.result.shares.get(s.id) or 0), s.created_at, str(s.id)))
-    labels = {s.id: f"Supplier {i}" for i, s in enumerate(ordered, 1)}
-    names = {s.display_name: labels[s.id] for s in ordered}
+    conc, labels, names = supplier_labels(db, profile, as_of)
     builders = {
         "profile_summary": lambda: _profile(profile),
         "money_summary": lambda: _money(db, profile, as_of),

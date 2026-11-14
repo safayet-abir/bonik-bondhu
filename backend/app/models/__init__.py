@@ -1,5 +1,6 @@
 """SQLAlchemy models mirroring db/schema.sql (the schema file is authoritative;
 models never create tables)."""
+from .ai import AiInteraction, Document, ExtractionDraft
 from .audit import AuditLog
 from .base import Base
 from .consent import Consent, LenderReview, LenderReviewEvent, SharedReport

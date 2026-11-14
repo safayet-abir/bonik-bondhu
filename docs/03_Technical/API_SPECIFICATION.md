@@ -312,6 +312,8 @@ Template: **Purpose · Auth/Role · Request · Example · Success · Validation 
 
 **GET `/profiles/{pid}/advisor/help-topics`** → `{"items":[{"key":"what_is_funding_gap","title_bn","title_en","body_bn","body_en"}]}` plus deterministic answers (e.g. `next_week_installments`) computed by services.
 
+- Implementation notes (P6): help-topics returns `{"items":[…8 topics], "quick":[{"key","title","answer"}]}` (6 quick answers from the profile's records; optional `?lang=bn|en`); the same object is the `help_topics` of 503/429 advisor errors. Advisor `history` = up to 12 messages `{role:user|assistant, text}`. `POST /transactions` also accepts `document_id` (owned photo → `evidence_state=document_attached`, `entry_method=manual`; another profile's → 404). Documents: 201 body as above; 413 also when `Content-Length` is far above the limit; 415 for a bad signature, an undecodable image or > 40 megapixels. Extraction 422 `EXTRACTION_FAILED` carries `draft_id`; 503 also when no LLM is configured. parse-purpose: invalid model output → 503 `AI_UNAVAILABLE` (`ai.err.parse_failed`); quantity missing → 1, unit → "pcs". Message keys: `ai.err.unavailable|daily_limit|extraction_failed|parse_failed|consent_required|draft_resolved`, `doc.err.type|too_large`. Provider order/models: DECISIONS SUG-47.
+
 ### 4.14 Consent (owner)
 
 **GET `/profiles/{pid}/consents`** → `{"items":[{"id","status","lender_organization":{"name","is_demo"},"requested_by":"Nasrin Officer (DEMO)","requested_sections":[…],"request_message","approved_sections","valid_until","is_expired":false,"latest_report":{"version":1,"snapshot_sha256"},"read_count":2,"open_info_requests":1}]}`.

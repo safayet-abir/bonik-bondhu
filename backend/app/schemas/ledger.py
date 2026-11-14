@@ -30,6 +30,8 @@ class TransactionCreate(InModel):
     season_cost_item_id: uuid.UUID | None = None
     client_request_id: uuid.UUID | None = None
     confirm_duplicate: bool = False
+    # An uploaded photo of this profile kept as evidence when entering by hand (FR-EXT-04 manual path)
+    document_id: uuid.UUID | None = None
 
     @field_validator("value_date")
     @classmethod

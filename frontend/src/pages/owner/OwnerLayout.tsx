@@ -1,4 +1,4 @@
-import { ChevronDown, HandCoins, Home, List, Menu, PlusCircle, Sprout } from "lucide-react";
+import { ChevronDown, HandCoins, Home, List, Menu, MessageCircle, Sprout } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, Outlet } from "react-router";
 
@@ -10,7 +10,8 @@ import { ProfileIcon } from "./Profiles";
 
 /** Header (UI spec §4.3): active profile always visible (FR-PROF-04),
  *  DEMO badge, language switch. Bottom nav (§4.1/4.2) lists only screens that
- *  exist in this phase; Advisor joins in P6. Farm profiles
+ *  exist: Home/Seasons · Entries · Financing · Advisor · More ("Add" lives on
+ *  Home and Entries). Farm profiles
  *  start on Seasons and never get a Forecast entry (FR-SEA-08). */
 function OwnerChrome() {
   const { t } = useTranslation();
@@ -22,8 +23,8 @@ function OwnerChrome() {
       ? { to: `${base}/home`, icon: Sprout, label: t("nav.seasons") }
       : { to: `${base}/home`, icon: Home, label: t("nav.home") },
     { to: `${base}/entries`, icon: List, label: t("nav.entries") },
-    { to: `${base}/entries/new`, icon: PlusCircle, label: t("nav.add") },
     { to: `${base}/financing`, icon: HandCoins, label: t("nav.financing") },
+    { to: `${base}/advisor`, icon: MessageCircle, label: t("nav.advisor") },
     { to: `${base}/more`, icon: Menu, label: t("nav.more") },
   ];
   return (

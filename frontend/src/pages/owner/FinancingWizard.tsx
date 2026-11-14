@@ -1,4 +1,4 @@
-import { CheckCircle2, ClipboardCheck, Copy, Landmark, PlusCircle, Trash2 } from "lucide-react";
+import { CheckCircle2, ClipboardCheck, Copy, Landmark, PlusCircle, Sparkles, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router";
@@ -213,6 +213,48 @@ function StepPurpose({ req, onCreated, setReq, next }: Partial<StepProps> & { on
 }
 
 // ------------------------------------------------------------------ step 2
+type Item = FinancingRequest["items"][number];
+
+/** An AI-suggested item counts only after the owner adds a price and its
+ *  source and confirms it (FR-FIN-03; AI never fills prices). */
+function AiItemConfirm({ item, url, onDone }: { item: Item; url: string; onDone: () => Promise<void> }) {
+  const { t } = useTranslation();
+  const [qty, setQty] = useState(item.quantity);
+  const [price, setPrice] = useState("");
+  const [source, setSource] = useState<PriceSource>("supplier_quote");
+  const [fields, setFields] = useState<FieldErrors>({});
+  const [busy, setBusy] = useState(false);
+
+  async function confirm() {
+    setBusy(true);
+    setFields({});
+    try {
+      await api(`${url}/items/${item.id}`, {
+        method: "PATCH", body: { quantity: qty, unit_price: price || "0", price_source_type: source, confirmed: true },
+      });
+      await onDone();
+    } catch (err) {
+      setFields(err instanceof ApiError && Object.keys(err.fields).length ? err.fields : { unit_price: "err.generic" });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mt-2 flex flex-col gap-2">
+      <div className="grid grid-cols-2 gap-2">
+        <AmountInput label={`${t("fin.quantity")} (${item.unit})`} value={qty} onChange={setQty} errorKey={fields.quantity} />
+        <AmountInput label={t("fin.unit_price")} value={price} onChange={setPrice} errorKey={fields.unit_price} />
+      </div>
+      <Chips label={t("fin.price_source")} value={source} onChange={setSource}
+             options={PRICE_SOURCES.map((s) => ({ value: s, label: t(`price_source.${s}`) }))} />
+      <Button variant="secondary" busy={busy} icon={<CheckCircle2 aria-hidden className="size-5" />} onClick={() => void confirm()}>
+        {t("fin.ai_confirm_btn")}
+      </Button>
+    </div>
+  );
+}
+
 function StepItems({ req, setReq, next }: StepProps) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as Lang;
@@ -232,6 +274,22 @@ function StepItems({ req, setReq, next }: StepProps) {
   const [plan, setPlan] = useState<SeasonDetail | null>(null);
 
   const reload = useCallback(async () => setReq(await api<FinancingRequest>(url)), [url, setReq]);
+  const [parsing, setParsing] = useState(false);
+  const [parseNote, setParseNote] = useState<string | null>(null);
+
+  async function parse() {
+    setParsing(true);
+    setParseNote(null);
+    try {
+      await api(`${url}/parse-purpose`, { method: "POST", body: {} });
+      await reload();
+      setParseNote("fin.ai_items_confirm");
+    } catch (err) {
+      setParseNote(err instanceof ApiError ? err.messageKey : "err.generic"); // manual entry still works
+    } finally {
+      setParsing(false);
+    }
+  }
 
   useEffect(() => {
     if (req.season_id) api<SeasonDetail>(`/profiles/${p.id}/seasons/${req.season_id}`).then(setPlan).catch(() => setPlan(null));
@@ -281,7 +339,12 @@ function StepItems({ req, setReq, next }: StepProps) {
                 <span className="text-small text-bb-muted">
                   {formatNumber(i.quantity, lang)} {i.unit} × {i.unit_price ? formatTaka(i.unit_price, lang) : "—"} · {t(`price_source.${i.price_source_type}`)}
                 </span>
-                {i.ai_proposed && !i.confirmed ? <span className="text-caption text-bb-warning">{t("fin.ai_confirm")}</span> : null}
+                {i.ai_proposed && !i.confirmed ? (
+                  <>
+                    <span className="text-caption text-bb-warning">{t("fin.ai_confirm")}</span>
+                    <AiItemConfirm item={i} url={url} onDone={reload} />
+                  </>
+                ) : null}
               </div>
               <span className="tabular font-semibold">{formatTaka(i.line_total, lang)}</span>
               <button type="button" aria-label={t("common.delete")} className="flex size-12 items-center justify-center text-bb-danger"
@@ -313,6 +376,15 @@ function StepItems({ req, setReq, next }: StepProps) {
           ))}
         </Card>
       ) : null}
+
+      <Card className="flex flex-col gap-2">
+        <p className="font-semibold">{t("fin.ai_parse_title")}</p>
+        <p className="text-small text-bb-muted">{t("fin.ai_parse_note")}</p>
+        <Button variant="secondary" busy={parsing} icon={<Sparkles aria-hidden className="size-5" />} onClick={() => void parse()}>
+          {t("fin.ai_parse")}
+        </Button>
+        {parseNote ? <StatusBanner tone={parseNote === "fin.ai_items_confirm" ? "info" : "warning"} title={t(parseNote)} /> : null}
+      </Card>
 
       <Card key={formKey} className="flex flex-col gap-3">
         <p className="font-semibold">{t("fin.add_item")}</p>

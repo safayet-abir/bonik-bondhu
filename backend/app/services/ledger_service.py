@@ -13,7 +13,9 @@ from ..core.clock import utcnow
 from ..core.errors import AppError, field_error, not_found
 from ..engine.accounting import LOAN_LINK_TYPES, SUPPLIER_LINK_TYPES
 from ..engine.money import money_str
-from ..models import BusinessProfile, DebtFacility, FarmingSeason, SeasonCostItem, Supplier, Transaction, User
+from ..models import (
+    BusinessProfile, DebtFacility, Document, FarmingSeason, SeasonCostItem, Supplier, Transaction, User,
+)
 from ..schemas.ledger import SupplierRef, TransactionCreate, TransactionOut
 from .profile_service import bump_data_version
 
@@ -88,6 +90,8 @@ def create(db: Session, user: User, profile: BusinessProfile, data: TransactionC
     if data.settlement_date is not None and data.settlement_date < data.value_date:
         raise field_error("settlement_date", "entry.err.settlement_date")
     season_id = _check_links(db, profile, data)
+    if document_id is None and data.document_id is not None:
+        document_id = _owned(db, Document, profile, data.document_id).id  # another profile's photo -> 404
 
     duplicate = _find_duplicate(db, profile, data)
     if duplicate is not None and not data.confirm_duplicate:

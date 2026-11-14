@@ -382,6 +382,17 @@ export type SectionKey = "profile_summary" | "money_summary" | "forecast" | "fin
   "supplier_risk" | "news_signals" | "season_summary" | "transaction_list";
 export type ConsentStatus = "requested" | "approved" | "declined" | "revoked";
 export type ReviewStatus = "under_review" | "info_requested" | "decision_recorded";
+// ---------------------------------------------------------------- P6 AI
+export type DocumentOut = { id: string; mime_type: string; size_bytes: number; sha256: string; duplicate_of: string | null };
+type DraftField = { value: string | null; confidence: number };
+export type ExtractionDraft = {
+  id: string; status: string; document_id: string; matched_supplier_id: string | null; provider: string;
+  proposed: { txn_type: DraftField; amount: DraftField; value_date: DraftField; supplier_name: DraftField; note: DraftField };
+};
+export type AdvisorReply = { reply: string; language: "bn" | "en"; tools_used: string[]; grounded: boolean; mode: "llm" | "template" };
+export type HelpTopic = { key: string; title_bn: string; title_en: string; body_bn: string; body_en: string };
+export type HelpPayload = { items: HelpTopic[]; quick: { key: string; title: string; answer: string }[] };
+
 export type Decision = "proceed" | "decline" | "refer";
 
 export type LenderCase = {

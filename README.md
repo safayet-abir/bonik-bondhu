@@ -17,7 +17,7 @@ The full development blueprint is in [`docs/`](docs/README.md). Start there.
 | P3 First working financial assessment | Done — forecast baseline (shop), financing requests + items + live gap preview, 5-step wizard with autosave, deterministic assessment (3 statuses, missing items, flags, "how calculated", inputs hash, stale detection), farm harvest check + loan-cover price, `seed-demo` / `reset-demo` CLI; D1–D4 golden through the API; 190 backend tests + browser walkthrough (`frontend/e2e/p3-walkthrough.mjs`). New suggestions SUG-30..36 await team approval (DECISIONS §2.1) |
 | P4 Deterministic risk signals (L1/L2) | Done — supplier concentration + dependency bars, auto what-ifs (shop delay 7/14 d, price +15%; farm price −15%, yield −20%, inputs +15%) that never change the status, curated news import (`import-news`) + matching + proposed scenarios with confirm/dismiss, Risks and News tabs; 7 real news events (10 sources, pending second-person review) in `data/news/`; 208 backend tests + browser walkthrough (`frontend/e2e/p4-walkthrough.mjs`). SUG-30..40 approved (DECISIONS §2.1) |
 | P5 Consent & lender review | Done — lender access request by share code (identical 202, rate limit), owner approves chosen sections for 7/14/30 days, immutable snapshot + SHA-256 (supplier names → Supplier 1/2/3), lender case file with read audit, private notes, information requests, demo decision with reason, reshare (new version), revoke/expiry block access, other organisations get 404; owner Sharing screen + lender portal (case list, request access, case file); 221 backend tests + browser E2E-3 (`frontend/e2e/p5-walkthrough.mjs`) |
-| P6 AI (receipt draft, purpose parse, grounded advisor) | Next |
+| P6 AI (receipt draft, purpose parse, grounded advisor) | Built — Gemini + Groq through one OpenAI-compatible adapter with automatic fallback (SUG-47); receipt photo → draft → owner confirms (photo kept as evidence, EXIF stripped); purpose text → item list without prices; advisor with 10 read-only tools, grounding check and fixed answers from the records when AI is off; daily caps; Advisor in the nav. 238 backend tests (fake provider) + browser walkthrough with AI off (`frontend/e2e/p6-walkthrough.mjs`). **Still to do: run with real API keys (E2 receipts, E10 questions — P6-T08)** |
 
 ## Stack
 
@@ -83,6 +83,7 @@ cd frontend && node e2e/p2-walkthrough.mjs http://localhost:8000 e2e-shots-p2   
 cd frontend && node e2e/p3-walkthrough.mjs http://localhost:8000 e2e-shots-p3
 cd frontend && node e2e/p4-walkthrough.mjs http://localhost:8000 e2e-shots-p4
 cd frontend && node e2e/p5-walkthrough.mjs http://localhost:8000 e2e-shots-p5   # owner + lender (E2E-3)
+cd frontend && node e2e/p6-walkthrough.mjs http://localhost:8000 e2e-shots-p6   # AI features with LLM_PROVIDER=none
 ```
 
 ## Admin CLI

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useSearchParams } from "react-router";
 
-import { api, ApiError, type FieldErrors } from "../../api/client";
+import { API_BASE, api, ApiError, type FieldErrors } from "../../api/client";
 import type { Debt, DebtList, Page, Season, Supplier, TxnType } from "../../api/types";
 import { AmountInput } from "../../components/AmountInput";
 import { Button } from "../../components/Button";
@@ -37,16 +37,23 @@ export function AddEntry() {
   const qType = params.get("type") as TxnType | null;
   const costItemId = params.get("cost_item_id");
   const back = params.get("back");
+  // From SCR-O05: an uploaded photo (doc), an AI draft to confirm (draft), unsure fields (low), AI failure notice
+  const docId = params.get("doc");
+  const draftId = params.get("draft");
+  const notice = params.get("notice");
+  const unsure = new Set((params.get("low") ?? "").split(","));
 
   const requestId = useMemo(() => crypto.randomUUID(), []);
   const today = todayDhaka();
-  const [type, setType] = useState<TxnType>(qType && ALL_TYPES.includes(qType) ? qType : "sale_cash");
+  const validType = !!qType && ALL_TYPES.includes(qType);
+  const [type, setType] = useState<TxnType>(validType ? qType : "sale_cash");
+  const [typeChosen, setTypeChosen] = useState(validType || !draftId); // AI "unknown" type: the owner must pick
   const [amount, setAmount] = useState(params.get("amount") ?? "");
-  const [date, setDate] = useState(today);
+  const [date, setDate] = useState(params.get("date") ?? today);
   const categories = isFarm ? FARM_COST_CATEGORIES : SHOP_EXPENSE_CATEGORIES;
   const [category, setCategory] = useState(params.get("category") ?? (isFarm ? "" : "rent"));
-  const [note, setNote] = useState("");
-  const [supplierId, setSupplierId] = useState("");
+  const [note, setNote] = useState(params.get("note") ?? "");
+  const [supplierId, setSupplierId] = useState(params.get("supplier_id") ?? "");
   const [debtId, setDebtId] = useState("");
   const [seasonId, setSeasonId] = useState(params.get("season_id") ?? "");
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -72,7 +79,13 @@ export function AddEntry() {
 
   function pick(ty: TxnType) {
     setType(ty);
+    setTypeChosen(true);
     setDuplicate(null);
+  }
+
+  async function discard() {
+    await api(`/profiles/${p.id}/extraction-drafts/${draftId}/discard`, { method: "POST" }).catch(() => undefined);
+    void navigate(back ?? `/p/${p.id}/entries`);
   }
 
   async function save(confirmDuplicate: boolean) {
@@ -80,9 +93,11 @@ export function AddEntry() {
     setFields({});
     setError(null);
     try {
-      await api(`/profiles/${p.id}/transactions`, {
+      // An AI draft is confirmed through its own endpoint (photo_assisted); a plain photo is attached as evidence
+      await api(draftId ? `/profiles/${p.id}/extraction-drafts/${draftId}/confirm` : `/profiles/${p.id}/transactions`, {
         method: "POST",
         body: {
+          document_id: draftId ? null : docId,
           txn_type: type, amount, value_date: date, note: note || null,
           category: showCategory && category ? category : null,
           supplier_id: showSupplier && supplierId ? supplierId : null,
@@ -109,6 +124,7 @@ export function AddEntry() {
 
   function submit(e: FormEvent) {
     e.preventDefault();
+    if (!typeChosen) return;
     if (!amount || Number(amount) <= 0) {
       setFields({ amount: "entry.err.amount" });
       return;
@@ -120,9 +136,17 @@ export function AddEntry() {
   return (
     <PageShell title={t("entry.new")} back={back ?? undefined}>
       <ErrorBanner error={error} />
+      {notice ? <StatusBanner tone="warning" title={t(notice)}>{t("photo.manual_with_photo")}</StatusBanner> : null}
+      {draftId ? <StatusBanner tone="info" title={t("photo.check")}>{t("ai.suggestion_confirm")}</StatusBanner> : null}
+      {params.get("dup") ? <StatusBanner tone="warning" title={t("photo.duplicate")} /> : null}
+      {docId ? (
+        <img src={`${API_BASE}/profiles/${p.id}/documents/${docId}/content`} alt={t("photo.preview")}
+             className="max-h-60 w-full rounded-bb border border-bb-border object-contain" />
+      ) : null}
       <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
         <fieldset className="flex flex-col gap-3">
           <legend className="mb-1 font-semibold">{t("entry.what_happened")}</legend>
+          {!typeChosen ? <p className="font-semibold text-bb-warning">{t("photo.choose_type")}</p> : null}
           {TXN_GROUPS.map((g) => (
             <div key={g.key} className="flex flex-col gap-2">
               <p className="text-small text-bb-muted">{t(`entry.group.${g.key}`)}</p>
@@ -130,9 +154,9 @@ export function AddEntry() {
                 {g.types.map((ty) => {
                   const Icon = TXN_ICON[ty];
                   return (
-                    <button key={ty} type="button" aria-pressed={type === ty} onClick={() => pick(ty)}
+                    <button key={ty} type="button" aria-pressed={typeChosen && type === ty} onClick={() => pick(ty)}
                             className={`flex min-h-14 items-center gap-2 rounded-bb border p-2 text-left text-small font-semibold ${
-                              type === ty ? "border-bb-primary bg-bb-primary-soft text-bb-primary" : "border-bb-border bg-bb-surface"
+                              typeChosen && type === ty ? "border-bb-primary bg-bb-primary-soft text-bb-primary" : "border-bb-border bg-bb-surface"
                             }`}>
                       <Icon aria-hidden className="size-5 shrink-0" />
                       {t(`txn.${ty}`)}
@@ -153,8 +177,9 @@ export function AddEntry() {
         ) : null}
 
         <AmountInput label={t("entry.amount")} value={amount} onChange={setAmount}
-                     hint={t("entry.amount_hint")} errorKey={fields.amount} />
+                     hint={unsure.has("amount") ? t("photo.unsure") : t("entry.amount_hint")} errorKey={fields.amount} />
         <Field label={t("entry.date")} type="date" value={date} max={addDays(today, 1)}
+               hint={unsure.has("value_date") ? t("photo.unsure") : undefined}
                onChange={(e) => setDate(e.target.value)} errorKey={fields.value_date} />
 
         {showCategory ? (
@@ -212,9 +237,14 @@ export function AddEntry() {
           </StatusBanner>
         ) : null}
 
-        <Button type="submit" full busy={busy}>
+        <Button type="submit" full busy={busy} disabled={!typeChosen}>
           {t("common.save")}
         </Button>
+        {draftId ? (
+          <Button type="button" variant="secondary" full disabled={busy} onClick={() => void discard()}>
+            {t("photo.discard")}
+          </Button>
+        ) : null}
       </form>
     </PageShell>
   );

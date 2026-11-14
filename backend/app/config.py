@@ -25,9 +25,13 @@ class Settings(BaseSettings):
     CORS_ORIGINS: str = "http://localhost:5173"
     OWNER_SESSION_DAYS: int = 7  # SUG-03
     LENDER_SESSION_HOURS: int = 8  # SUG-03
-    LLM_PROVIDER: Literal["gemini", "none"] = "none"  # DEC-22
+    # DEC-22 + SUG-47: primary provider; the other configured one is the fallback for text features
+    LLM_PROVIDER: Literal["gemini", "groq", "none"] = "none"
     GEMINI_API_KEY: str = ""
-    LLM_MODEL: str = ""
+    LLM_MODEL: str = "gemini-flash-lite-latest"  # Gemini text model (purpose, advisor)
+    LLM_VISION_MODEL: str = "gemini-flash-latest"  # Gemini model for receipt photos
+    GROQ_API_KEY: str = ""
+    GROQ_MODEL: str = "openai/gpt-oss-120b"  # Groq text model (no receipt photos)
     LLM_TIMEOUT_SECONDS: int = 20
     AI_DAILY_LIMIT_ADVISOR: int = 30  # SUG-05
     AI_DAILY_LIMIT_EXTRACTION: int = 10
@@ -54,7 +58,7 @@ class Settings(BaseSettings):
 
     @property
     def llm_status(self) -> str:
-        if self.LLM_PROVIDER == "gemini" and self.GEMINI_API_KEY:
+        if self.LLM_PROVIDER != "none" and (self.GEMINI_API_KEY or self.GROQ_API_KEY):
             return "configured"
         return "disabled"
 

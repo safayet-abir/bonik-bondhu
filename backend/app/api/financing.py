@@ -6,12 +6,12 @@ import uuid
 
 from fastapi import APIRouter, Response, status
 
-from ..core.deps import OwnedProfile
+from ..core.deps import OwnedProfile, OwnerUser
 from ..db import DbSession
 from ..schemas.assessment import AssessmentOut, ScenarioOut
 from ..schemas.financing import FinancingCreate, FinancingList, FinancingOut, FinancingPatch, ItemCreate, ItemOut, ItemPatch
 from ..schemas.forecast import AsOfIn
-from ..services import assessment_service, financing_service, forecast_service
+from ..services import ai_service, assessment_service, financing_service, forecast_service
 
 router = APIRouter(prefix="/profiles/{pid}", tags=["financing"])
 BASE = "/financing-requests"
@@ -52,6 +52,13 @@ def update_item(rid: uuid.UUID, iid: uuid.UUID, patch: ItemPatch, profile: Owned
 def delete_item(rid: uuid.UUID, iid: uuid.UUID, profile: OwnedProfile, db: DbSession) -> Response:
     financing_service.delete_item(db, profile, rid, iid)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post(BASE + "/{rid}/parse-purpose")
+def parse_purpose(rid: uuid.UUID, profile: OwnedProfile, user: OwnerUser, db: DbSession) -> dict:
+    """#40 (P6-T05): AI item list from the stored purpose text — no prices, unconfirmed."""
+    items = ai_service.parse_purpose(db, user, profile, rid)
+    return {"items": [financing_service.item_out(i) for i in items], "note_key": "fin.ai_items_confirm"}
 
 
 @router.post(BASE + "/{rid}/assessments", status_code=status.HTTP_201_CREATED, response_model=AssessmentOut)
