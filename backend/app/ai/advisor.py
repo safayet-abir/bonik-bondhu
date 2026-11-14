@@ -40,7 +40,7 @@ def run(provider: Provider, system: str, history: list[dict], message: str, spec
         if not reply.tool_calls:
             ans.text = reply.text.strip()
             return ans
-        msgs.append({"role": "assistant", "content": reply.text or None, "tool_calls": [
+        msgs.append(reply.assistant_message or {"role": "assistant", "content": reply.text or None, "tool_calls": [
             {"id": c["id"], "type": "function",
              "function": {"name": c["name"], "arguments": json.dumps(c["arguments"])}}
             for c in reply.tool_calls]})

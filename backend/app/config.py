@@ -6,6 +6,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
@@ -29,7 +30,9 @@ class Settings(BaseSettings):
     LLM_PROVIDER: Literal["gemini", "groq", "none"] = "none"
     GEMINI_API_KEY: str = ""
     LLM_MODEL: str = "gemini-flash-lite-latest"  # Gemini text model (purpose, advisor)
-    LLM_VISION_MODEL: str = "gemini-flash-latest"  # Gemini model for receipt photos
+    # Receipt photos. Live test 15 Nov 2026: flash-lite read a receipt in 1.5 s; gemini-flash-latest
+    # answered 503 "high demand" / timed out on the free tier.
+    LLM_VISION_MODEL: str = "gemini-flash-lite-latest"
     GROQ_API_KEY: str = ""
     GROQ_MODEL: str = "openai/gpt-oss-120b"  # Groq text model (no receipt photos)
     LLM_TIMEOUT_SECONDS: int = 20
@@ -47,6 +50,12 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     # Built React app served by FastAPI (TRD §3 "Build"); empty = default path
     FRONTEND_DIST: str = ""
+
+    @field_validator("LLM_MODEL", "LLM_VISION_MODEL", "GROQ_MODEL", mode="before")
+    @classmethod
+    def _blank_model_means_default(cls, v, info):
+        # older .env files have "LLM_MODEL=" (empty); an empty model name would make every call fail
+        return v.strip() if isinstance(v, str) and v.strip() else cls.model_fields[info.field_name].default
 
     @property
     def is_production(self) -> bool:

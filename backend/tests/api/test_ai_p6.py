@@ -205,6 +205,21 @@ def test_ai08_purpose_items_without_prices_cached_and_scrubbed(client, monkeypat
 
 
 # ----------------------------------------------------------------- advisor
+def test_tool_round_echoes_provider_message_and_blank_model_uses_default() -> None:
+    from app.ai import advisor
+    from app.config import Settings
+    raw = {"role": "assistant", "content": None, "tool_calls": [
+        {"id": "c1", "type": "function", "function": {"name": "get_help", "arguments": "{}"},
+         "extra_content": {"google": {"thought_signature": "sig"}}}]}
+    first = Reply(text="", tool_calls=[{"id": "c1", "name": "get_help", "arguments": {}}], provider="gemini",
+                  model="m", assistant_message=raw)
+    fake = Fake(first, "Done.")
+    assert advisor.run(fake, "sys", [], "help?", [], lambda n, a: "{}").text == "Done."
+    assert fake.calls[1]["messages"][2] == raw  # Gemini 400s if the thought_signature is dropped
+    assert Settings(LLM_MODEL="", GROQ_MODEL=" ").LLM_MODEL == "gemini-flash-lite-latest"
+    assert Settings(GROQ_MODEL=" ").GROQ_MODEL == "openai/gpt-oss-120b"
+
+
 def test_ut11_grounding() -> None:
     src = ['{"existing_total": "18000.00", "date": "2026-12-08"}']
     assert grounding.grounded("আগামী সপ্তাহে কিস্তি Tk ১৮,০০০ (৮ ডিসেম্বর)", src)

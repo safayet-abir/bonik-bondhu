@@ -35,6 +35,9 @@ class Reply:
     input_tokens: int | None = None
     output_tokens: int | None = None
     latency_ms: int = 0
+    # The provider's own assistant message, sent back unchanged in the next round: Gemini rejects
+    # (400) tool calls that lose their `extra_content.google.thought_signature`.
+    assistant_message: dict | None = None
 
 
 @dataclass
@@ -74,7 +77,9 @@ class Provider:
         usage = data.get("usage") or {}
         return Reply(text=msg.get("content") or "", tool_calls=calls, provider=self.name, model=self.model,
                      input_tokens=usage.get("prompt_tokens"), output_tokens=usage.get("completion_tokens"),
-                     latency_ms=int((time.monotonic() - start) * 1000))
+                     latency_ms=int((time.monotonic() - start) * 1000),
+                     assistant_message={"role": "assistant", "content": msg.get("content"),
+                                        "tool_calls": msg["tool_calls"]} if calls else None)
 
 
 def providers(feature: str) -> list[Provider]:
