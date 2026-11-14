@@ -26,6 +26,14 @@ export function groupSouthAsian(amount: string): string {
   return sign + grouped + decimals;
 }
 
+/** Plain quantity (kg, acres, %): "1.5000" -> "1.5", "3300.00" -> "3,300"; Bangla digits in bn. */
+export function formatNumber(value: string, lang: Lang): string {
+  const trimmed = value.includes(".") ? value.replace(/\.?0+$/, "") : value;
+  const [i, f] = trimmed.split(".");
+  const g = groupSouthAsian(i) + (f ? `.${f}` : "");
+  return lang === "bn" ? toBanglaDigits(g) : g;
+}
+
 /** "150000.00" -> "Tk 1,50,000" (en) or "Tk ১,৫০,০০০" (bn). */
 export function formatTaka(amount: string, lang: Lang): string {
   const g = groupSouthAsian(amount);

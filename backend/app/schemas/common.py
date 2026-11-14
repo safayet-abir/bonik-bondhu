@@ -8,7 +8,7 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Annotated
 
-from pydantic import BaseModel, BeforeValidator, ConfigDict, PlainSerializer
+from pydantic import AfterValidator, BaseModel, BeforeValidator, ConfigDict, PlainSerializer
 
 from ..engine.money import MAX_AMOUNT, money_str, parse_amount
 
@@ -39,6 +39,15 @@ def _non_negative(d: Decimal) -> Decimal:
         raise ValueError("err.field.amount_negative")
     return _check_cents(d)
 
+
+def _opt_text(v: str | None) -> str | None:
+    if v is not None and len(v) > 120:
+        raise ValueError("err.field.too_long")
+    return v or None
+
+
+OptText = Annotated[str | None, AfterValidator(_opt_text)]
+"""Optional short free text (≤ 120 chars); empty string -> null."""
 
 _out = PlainSerializer(money_str, return_type=str)
 

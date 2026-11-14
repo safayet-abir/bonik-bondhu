@@ -100,3 +100,16 @@ def get_owned_profile(
 
 
 OwnedProfile = Annotated[BusinessProfile, Depends(get_owned_profile)]
+
+
+def _require_activity(activity_type: str):
+    def dep(profile: OwnedProfile) -> BusinessProfile:
+        # Ownership is checked first (404), then the type (403) — P2-T11.
+        if profile.activity_type != activity_type:
+            raise AppError("PROFILE_TYPE_MISMATCH", 403, "err.profile_type_mismatch")
+        return profile
+    return dep
+
+
+FarmProfile = Annotated[BusinessProfile, Depends(_require_activity("crop_farm"))]
+ShopProfile = Annotated[BusinessProfile, Depends(_require_activity("shop"))]

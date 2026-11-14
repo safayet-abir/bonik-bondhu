@@ -61,7 +61,7 @@ export function Summary() {
   const num = (n: number) => (lang === "bn" ? toBanglaDigits(String(n)) : String(n));
 
   return (
-    <PageShell title={t("summary.title")}>
+    <PageShell title={t("summary.title")} back={`/p/${p.id}/more`}>
       <div role="group" aria-label={t("summary.period")} className="flex flex-wrap gap-2">
         {periods.map((pd) => (
           <button key={pd} type="button" aria-pressed={period === pd} onClick={() => setPeriod(pd)}
