@@ -13,8 +13,9 @@ import { formatTaka } from "../../lib/format";
 import { useActiveProfile } from "../../state/ActiveProfile";
 import { seasonTitle } from "../owner/AddEntry";
 
-/** SCR-F05 Season summary (FR-SEA-07). Loan-cover price needs a financing
- *  request and arrives with P3; everything here is the farmer's own estimate. */
+/** SCR-F05 Season summary (FR-SEA-07). The loan-cover price appears once a
+ *  complete financing request is linked to the season; everything here is
+ *  the farmer's own estimate. */
 export function SeasonSummary() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as Lang;
@@ -61,7 +62,23 @@ export function SeasonSummary() {
           </div>
         ))}
       </Card>
-      <p className="text-small text-bb-muted">{t("season.loan_cover_later")}</p>
+      {s.loan_cover_price_per_kg ? (
+        <Card className="flex flex-col gap-1">
+          <div className="flex justify-between gap-3">
+            <span className="font-semibold">{t("season.loan_cover_title")}</span>
+            <span className="tabular font-semibold">{perKg(s.loan_cover_price_per_kg)}</span>
+          </div>
+          <p className="text-small text-bb-muted">{t("season.loan_cover_low")}</p>
+          <p className="text-small">{t("season.loan_cover")}</p>
+          {s.loan_cover_basis ? (
+            <p className="text-caption text-bb-muted">
+              {t("season.loan_cover_basis", { amount: formatTaka(s.loan_cover_basis.repayment_total, lang) })}
+            </p>
+          ) : null}
+        </Card>
+      ) : (
+        <p className="text-small text-bb-muted">{t("season.loan_cover_later")}</p>
+      )}
       <button type="button" onClick={() => setShowHow((v) => !v)} aria-expanded={showHow}
               className="flex min-h-12 items-center gap-2 font-semibold text-bb-primary">
         <Info aria-hidden className="size-5" />

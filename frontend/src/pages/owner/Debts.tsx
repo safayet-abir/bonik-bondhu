@@ -1,6 +1,7 @@
 import { AlertTriangle, CheckCircle2, Landmark, PlusCircle, ShieldCheck } from "lucide-react";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router";
 
 import { api, ApiError, type FieldErrors } from "../../api/client";
 import type { Debt, DebtFrequency, DebtList, LenderType } from "../../api/types";
@@ -163,6 +164,8 @@ function DebtCard({ d, onClose }: { d: Debt; onClose: (d: Debt) => void }) {
 export function Debts() {
   const { t } = useTranslation();
   const p = useActiveProfile();
+  const [params] = useSearchParams();
+  const back = params.get("back")?.startsWith(`/p/${p.id}/`) ? params.get("back")! : `/p/${p.id}/more`;
   const [data, setData] = useState<DebtList | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [adding, setAdding] = useState(false);
@@ -189,7 +192,7 @@ export function Debts() {
   }
 
   return (
-    <PageShell title={t("debt.title")} back={`/p/${p.id}/more`}>
+    <PageShell title={t("debt.title")} back={back}>
       <ErrorBanner error={error} />
       {!data && !error ? <Loading /> : null}
       {data?.no_debt_declared && active.length === 0 ? (

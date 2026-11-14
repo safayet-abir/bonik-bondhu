@@ -115,6 +115,44 @@ def schedule(d: DebtFacility, as_of=None):
                                   d.next_due_date, horizon_end(as_of), as_of)
 
 
+def obligation_rows(db: Session, profile: BusinessProfile, as_of, until) -> list[tuple[str, list]]:
+    """Every active declared debt as dated outflows in [as_of, until], for the
+    forecast (known debt service) and the assessment (Architecture §5.2/5.4).
+
+    A declared overdue amount is money owed NOW, so it is placed on `as_of`
+    and the regular schedule continues with the rest of the outstanding
+    balance (outstanding − overdue). The total never exceeds what the owner
+    declared, and an overdue loan can never make the result look better."""
+    out: list[tuple[str, list]] = []
+    for n, d in enumerate((x for x in list_debts(db, profile) if x.status == "active"), 1):
+        rows = []
+        overdue = d.overdue_amount if d.is_overdue else Decimal(0)
+        if overdue > 0:
+            rows.append((as_of, overdue))
+        rest = d.outstanding_balance - overdue
+        if rest > 0:
+            rows += existing_debt_schedule(d.installment_amount, rest, d.installment_frequency,
+                                           d.next_due_date, until, as_of)
+        if rows:
+            out.append((f"debt{n}", rows))
+    return out
+
+
+def obligation_flags(db: Session, profile: BusinessProfile, as_of) -> list[str]:
+    active = [d for d in list_debts(db, profile) if d.status == "active" and d.outstanding_balance > 0]
+    flags = []
+    if any(d.is_overdue for d in active):
+        flags.append("existing_debt_overdue")
+    if any(dates_outdated(d.next_due_date, as_of) for d in active):
+        flags.append("existing_debt_dates_outdated")
+    return flags
+
+
+def debts_declared(db: Session, profile: BusinessProfile) -> bool:
+    """FR-ASM-02: either at least one active debt or "I have no current loans"."""
+    return profile.no_debt_declared_at is not None or active_count(db, profile) > 0
+
+
 def debt_out(d: DebtFacility) -> DebtOut:
     as_of = today()
     return DebtOut(

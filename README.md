@@ -14,7 +14,8 @@ The full development blueprint is in [`docs/`](docs/README.md). Start there.
 | P0 Foundation & approvals | Done — all SUG items approved (14 Nov 2026), schema migrated, `/health` OK, golden tests green |
 | P1 Auth, profiles, first vertical slice | Done — register/login/lockout/logout, profiles, cash sale + expense, money summary, lender role routing; 74 backend tests + browser E2E (`frontend/e2e/p1-slice.mjs`) |
 | P2 Financial data engine | Done — all 12 entry types with supplier/loan/season links, duplicate warning, void, E1 golden summary, debts + "no current loans", suppliers, crop seasons (acre/decimal/sq ft/bigha), cost items, harvest, season summary; shop + farm screens; 143 backend tests + browser walkthrough (`frontend/e2e/p2-walkthrough.mjs`) |
-| P3 First working financial assessment | Next |
+| P3 First working financial assessment | Done — forecast baseline (shop), financing requests + items + live gap preview, 5-step wizard with autosave, deterministic assessment (3 statuses, missing items, flags, "how calculated", inputs hash, stale detection), farm harvest check + loan-cover price, `seed-demo` / `reset-demo` CLI; D1–D4 golden through the API; 190 backend tests + browser walkthrough (`frontend/e2e/p3-walkthrough.mjs`). New suggestions SUG-30..36 await team approval (DECISIONS §2.1) |
+| P4 Deterministic risk signals (L1/L2) | Next |
 
 ## Stack
 

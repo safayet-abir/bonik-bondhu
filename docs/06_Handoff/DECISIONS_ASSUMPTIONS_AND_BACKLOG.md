@@ -117,6 +117,19 @@ These are proposals needed to make the blueprint buildable. Phase 0 task `P0-T01
 | SUG-28 | Duplicate-entry warning: same profile + type + amount + value_date (+ supplier if set) as a confirmed entry → user must tick "this is a separate entry" | S1 A4 duplicate rule needs a concrete matcher | F1 | Other matcher |
 | SUG-29 | Lockout/admin CLI commands (`create-lender`, `reset-password`, `seed-demo`, `import-news`) | Manual provisioning | Ops | Other tooling |
 
+### 2.1 Implementation suggestions raised in P3 (14 Nov 2026) — **pending team approval**
+These fill gaps the sources do not settle. Each is cautious (can only make a result look *worse*, never better), does not change any golden number D1–D4, and is easy to switch off.
+
+| ID | Suggestion (implemented) | Why | Golden impact | Alternative |
+|---|---|---|---|---|
+| SUG-30 | Declared **overdue amount** = outflow on as_of; the regular schedule continues with outstanding − overdue | Ignoring money already owed would overstate capacity; total never exceeds declared outstanding | none (no overdue in seed) | Ignore overdue in projection (flag only) |
+| SUG-31 | Past `next_due_date` dates are skipped **without** consuming the outstanding (flag `existing_debt_dates_outdated`) | Sources say "skip past dates" but not whether the balance shrinks; not shrinking keeps the burden visible | none | Consume skipped installments |
+| SUG-32 | Farm check subtracts the profile's declared household withdrawal from as_of to harvest (pre-harvest) and harvest to due date | DEC-37 applies per profile; a farm with no pre-harvest income still feeds the household | none (D3 household = 0) | Household ignored for farms (reference formula) |
+| SUG-33 | Farm with equal installments: every installment must fall on/after harvest; the last due date is the binding check | Reference covers a single payment only | none (D3 single) | Farm limited to single payment |
+| SUG-34 | `terms_incomplete` also when the first due date is before as_of or the minimum reserve is missing | A schedule starting in the past cannot be checked | none | Accept and skip past dates |
+| SUG-35 | `profile_location_missing` = district or upazila empty (status insufficient) | Location needed for news matching (L1) and lender profile | none (seed has both) | Flag only |
+| SUG-36 | With an explanation, flag `request_exceeds_gap` is replaced by `over_request_explained` (request − gap still shown) | Plan P3-T11 "flag switches" | none | Show both flags |
+
 ---
 
 ## 3. Assumptions (stated, testable, revisit after evidence)

@@ -1,7 +1,7 @@
-import { NotebookText } from "lucide-react";
-import { useEffect, useState } from "react";
+import { HandCoins, NotebookText, TrendingUp } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, Navigate, useLocation, useNavigate } from "react-router";
 
 import { api } from "../../api/client";
 import type { Page, Summary, Transaction, TxnType } from "../../api/types";
@@ -25,6 +25,12 @@ export function ProfileHome() {
   return useActiveProfile().activity_type === "crop_farm" ? <Seasons /> : <Home />;
 }
 
+/** Farm profiles never get a forecast screen (FR-SEA-08). */
+export function ShopOnly({ children }: { children: ReactNode }) {
+  const p = useActiveProfile();
+  return p.activity_type === "shop" ? <>{children}</> : <Navigate to={`/p/${p.id}/home`} replace />;
+}
+
 function InOut({ title, s, lang }: { title: string; s: Summary; lang: Lang }) {
   const { t } = useTranslation();
   return (
@@ -45,9 +51,9 @@ function InOut({ title, s, lang }: { title: string; s: Summary; lang: Lang }) {
   );
 }
 
-/** SCR-O03 Shop home. First-time: Path A "Record my money" (Path B
- *  "Check financing" appears in P3 when its endpoints exist). Returning:
- *  today / this month, quick add, recent entries (tap → detail / void). */
+/** SCR-O03 Shop home. First-time: Path A "Record my money" or Path B
+ *  "Check financing". Returning: today / this month, quick add, recent
+ *  entries (tap → detail / void), forecast and financing shortcuts. */
 export function Home() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as Lang;
@@ -85,6 +91,14 @@ export function Home() {
           </span>
           <span className="text-small text-bb-muted">{t("home.path_a_hint")}</span>
         </button>
+        <button type="button" onClick={() => navigate(`/p/${p.id}/financing/new`)}
+                className="flex flex-col items-start gap-1 rounded-bb border border-bb-border bg-bb-surface p-4 text-left">
+          <span className="flex items-center gap-2 text-card font-semibold">
+            <HandCoins aria-hidden className="size-6 text-bb-primary" />
+            {t("home.path_b")}
+          </span>
+          <span className="text-small text-bb-muted">{t("home.path_b_hint")}</span>
+        </button>
       </PageShell>
     );
   }
@@ -119,6 +133,16 @@ export function Home() {
           {t("home.see_summary")}
         </Link>
       </section>
+      <div className="grid grid-cols-2 gap-3">
+        <Button variant="secondary" icon={<TrendingUp aria-hidden className="size-5" />}
+                onClick={() => navigate(`/p/${p.id}/forecast`)}>
+          {t("forecast.title")}
+        </Button>
+        <Button variant="secondary" icon={<HandCoins aria-hidden className="size-5" />}
+                onClick={() => navigate(`/p/${p.id}/financing`)}>
+          {t("home.path_b")}
+        </Button>
+      </div>
     </PageShell>
   );
 }

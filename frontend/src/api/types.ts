@@ -151,7 +151,146 @@ export type SeasonSummary = {
   income_range: IncomeRange | null;
   break_even_price_per_kg: string | null;
   loan_cover_price_per_kg: string | null;
+  loan_cover_basis: { financing_request_id: string; repayment_total: string } | null;
   labels: string[];
+};
+
+export type HorizonRow = { low: string; expected: string; known_debt_service: string };
+
+export type Forecast = {
+  id: string;
+  status: "ok" | "insufficient_history";
+  as_of_date: string;
+  method_version: string;
+  weeks_with_records: number;
+  window_weeks: number;
+  min_weeks_required: number;
+  weekly: {
+    net: { low: string; expected: string; high: string };
+    collections_expected: string;
+    payments_expected: string;
+    purchases_expected: string;
+  } | null;
+  horizons: Record<string, HorizonRow>;
+  weeks: { start: string; end: string; has_records: boolean; net: string | null }[];
+  is_stale: boolean;
+  disclaimer_key: string;
+  created_at: string;
+};
+
+export type PriceSource = "supplier_quote" | "own_purchase_history" | "reference_market_price" | "public_listing" | "owner_estimate";
+export type PurposeCategory = "inventory" | "farm_inputs" | "equipment" | "other";
+
+export type FinancingItem = {
+  id: string;
+  item_name: string;
+  quantity: string;
+  unit: string;
+  unit_price: string | null;
+  line_total: string;
+  price_source_type: PriceSource;
+  price_date: string | null;
+  price_source_note: string | null;
+  ai_proposed: boolean;
+  confirmed: boolean;
+  source_season_cost_item_id: string | null;
+};
+
+export type Installment = { due_date: string; amount: string };
+
+export type FinancingRequest = {
+  id: string;
+  season_id: string | null;
+  status: string;
+  requested_amount: string;
+  purpose_text: string;
+  purpose_category: PurposeCategory;
+  desired_start_date: string | null;
+  associated_expenses: string | null;
+  liquidity_buffer: string | null;
+  buffer_justification: string | null;
+  cash_safely_available: string | null;
+  committed_financing: string | null;
+  current_cash_balance: string | null;
+  minimum_cash_reserve: string | null;
+  schedule_type: "equal_installments" | "single_payment" | null;
+  installment_count: number | null;
+  installment_frequency: "weekly" | "monthly" | null;
+  first_due_date: string | null;
+  interest_fees_total: string | null;
+  interest_fees_unknown: boolean;
+  over_request_explanation: string | null;
+  items: FinancingItem[];
+  preview: {
+    items_total: string;
+    funding_gap: string;
+    request_minus_gap: string;
+    gap_inputs_complete: boolean;
+    installments: Installment[];
+    repayment_total: string | null;
+  };
+  latest_assessment: { id: string; status: AssessmentStatus; is_stale: boolean; created_at: string } | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AssessmentStatus = "insufficient_information" | "not_affordable_base_case" | "ready_for_lender_review";
+
+export type DueCheck = {
+  date: string; paid: string; new_installment: string; existing_paid: string;
+  balance_after: string; shortfall_vs_reserve: string;
+};
+
+export type ShopResult = {
+  kind: "shop_due_dates";
+  start_balance: string; reserve: string; household_monthly: string; daily_net_low: string; household_daily: string;
+  horizon_end: string; checks: DueCheck[]; first_shortfall: DueCheck | null;
+  beyond_horizon: { installment_no: number; due_date: string; amount: string }[];
+  min_balance_after_payment: string; any_shortfall: boolean;
+};
+
+export type CropResult = {
+  kind: "crop_harvest";
+  start_balance: string; reserve: string; expected_harvest_date: string; due_date: string; first_due_date: string;
+  installments: number; output_low: string; price_low: string; remaining_costs_outside_request: string;
+  total_planned_costs: string; debts_due_by_due_date: string; household_until_due: string;
+  income_low: string; pre_harvest_balance: string; pre_harvest_shortfall: string; available_at_due_date: string;
+  repayment_due: string; covered: boolean; surplus_or_shortfall: string;
+  loan_cover_price_per_unit: string; break_even_price_per_unit: string;
+};
+
+export type Assessment = {
+  id: string;
+  financing_request_id: string;
+  activity_type: ActivityType;
+  status: AssessmentStatus;
+  as_of_date: string;
+  engine_version: string;
+  forecast_run_id: string | null;
+  purpose_items_total: string | null;
+  funding_gap: string | null;
+  request_minus_gap: string | null;
+  missing_items: string[];
+  flags: string[];
+  base_result: ShopResult | CropResult | Record<string, never>;
+  explanation: {
+    formulas: { key: string; expr: string; values: string }[];
+    inputs: { name: string; value: string | number | boolean | null; source: string }[];
+    proposal: {
+      requested_amount: string;
+      schedule_type: string | null; installment_count: number | null; frequency: string | null;
+      first_due_date: string | null; last_due_date: string | null; interest_fees_total: string | null;
+      interest_fees_unknown: boolean; repayment_total: string | null; installments: Installment[]; label: string;
+    };
+    parameters: Record<string, string | number>;
+    excluded: string[];
+  };
+  scenarios: unknown[];
+  news_signals: unknown[];
+  inputs_sha256: string;
+  is_stale: boolean;
+  disclaimer_key: string;
+  created_at: string;
 };
 
 export type Summary = {

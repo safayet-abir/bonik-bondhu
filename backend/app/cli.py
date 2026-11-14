@@ -5,8 +5,12 @@
     python -m app.cli reset-password --phone 01712345678
 
 Passwords are typed at a hidden prompt (or read from BB_NEW_PASSWORD for
-scripted use) and never echoed or logged. Later phases add seed-demo,
-reset-demo (P3-T09) and import-news (P4-T04).
+scripted use) and never echoed or logged.
+
+    python -m app.cli seed-demo     # fictional DEMO data; password from DEMO_PASSWORD
+    python -m app.cli reset-demo    # delete DEMO rows (audit rows stay) and seed again
+
+import-news arrives in P4-T04.
 """
 from __future__ import annotations
 
@@ -17,6 +21,8 @@ import sys
 
 from sqlalchemy import func, select, update
 
+from . import demo
+from .config import get_settings
 from .core.audit import audit
 from .core.clock import utcnow
 from .core.security import hash_password, normalize_phone, password_problem
@@ -84,6 +90,37 @@ def reset_password(args: argparse.Namespace) -> int:
     return 0
 
 
+def _demo_password() -> str:
+    pw = os.environ.get("DEMO_PASSWORD") or get_settings().DEMO_PASSWORD
+    if not pw:
+        sys.exit("Set DEMO_PASSWORD (environment or backend/.env) before seeding DEMO data.")
+    if password_problem(pw, "+8801900000001"):
+        sys.exit("DEMO_PASSWORD rejected: use 8–128 chars, not only digits.")
+    return pw
+
+
+def seed_demo_cmd(args: argparse.Namespace) -> int:
+    pw = _demo_password()
+    with get_sessionmaker()() as db, db.begin():
+        conn = db.connection()
+        if demo.demo_present(conn):
+            sys.exit("DEMO data (or a user with a DEMO phone) already exists. Run reset-demo instead.")
+        n = demo.seed(conn, pw)
+    print(f"DEMO data seeded ({n} demo users; password = DEMO_PASSWORD). All data is fictional.")
+    return 0
+
+
+def reset_demo_cmd(args: argparse.Namespace) -> int:
+    pw = _demo_password()
+    with get_sessionmaker()() as db, db.begin():
+        conn = db.connection()
+        demo.reset(conn)
+        n = demo.seed(conn, pw)
+        audit(db, "admin.reset_demo", actor_role="admin", entity_type="demo")
+    print(f"DEMO data deleted and re-seeded ({n} demo users). Audit rows are kept.")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.cli", description="Bonik Bondhu admin commands")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -101,6 +138,12 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("reset-password", help="reset a user's password after offline identity check")
     p.add_argument("--phone", required=True)
     p.set_defaults(func=reset_password)
+
+    p = sub.add_parser("seed-demo", help="insert fictional DEMO data (db/seed_demo.sql)")
+    p.set_defaults(func=seed_demo_cmd)
+
+    p = sub.add_parser("reset-demo", help="delete all DEMO rows and seed them again")
+    p.set_defaults(func=reset_demo_cmd)
 
     args = parser.parse_args(argv)
     return args.func(args)

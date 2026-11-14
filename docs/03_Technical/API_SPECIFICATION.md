@@ -291,6 +291,8 @@ Template: **Purpose · Auth/Role · Request · Example · Success · Validation 
 
 **GET `…/{rid}/assessments/latest`** → latest `AssessmentOut` with `is_stale`.
 
+- Implementation notes (P3): `as_of_date` in POST bodies is honoured only when `APP_ENV ≠ production`. Also `GET /profiles/{pid}/assessments/{aid}` (read one, used by SCR-O12). `explanation.formulas` items are `{key, expr, values}` (i18n label key + formula + the same formula with numbers); `explanation.proposal` carries `requested_amount`, the installment rows and `label:"owner_proposal_not_lender_offer"`. `base_result.checks[]` also has `existing_paid`. `ForecastOut` adds `weeks[]` (8 blocks, `net` null = missing week). `FinancingOut` adds `latest_assessment {id,status,is_stale}` and `preview.gap_inputs_complete` / `repayment_total`. A declared overdue amount is an outflow on as_of (rest of the schedule uses outstanding − overdue). An explicit `interest_fees_unknown:true` wins over an amount in the same PATCH. 409 `CONFLICT` / `fin.err.item_already_copied` when copying the same season cost item twice.
+
 **GET `/profiles/{pid}/assessments/{aid}/scenarios`** → `{"items":[ScenarioOut]}`.
 
 **POST `/profiles/{pid}/scenarios/{scid}/confirm`** — only `origin=news, status=proposed` → computes → `200 ScenarioOut(status="computed")`. Others → 409. **POST `…/dismiss`** → `status="dismissed"`. Neither changes the assessment status (DEC-30). DB: UPDATE `risk_scenarios`.

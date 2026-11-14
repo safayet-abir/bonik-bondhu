@@ -6,13 +6,14 @@ import uuid
 
 from fastapi import APIRouter, Response, status
 
+from ..core.clock import today
 from ..core.deps import FarmProfile
 from ..db import DbSession
 from ..schemas.season import (
-    CostItemCreate, CostItemOut, CostItemPatch, HarvestIn, SeasonCreate, SeasonDetail, SeasonList,
+    CostItemCreate, CostItemOut, CostItemPatch, HarvestIn, LoanCoverBasis, SeasonCreate, SeasonDetail, SeasonList,
     SeasonOut, SeasonPatch, SeasonSummaryOut,
 )
-from ..services import season_service
+from ..services import assessment_service, season_service
 
 router = APIRouter(prefix="/profiles/{pid}/seasons", tags=["seasons"])
 
@@ -62,4 +63,10 @@ def record_harvest(sid: uuid.UUID, data: HarvestIn, profile: FarmProfile, db: Db
 
 @router.get("/{sid}/summary", response_model=SeasonSummaryOut)
 def season_summary(sid: uuid.UUID, profile: FarmProfile, db: DbSession) -> SeasonSummaryOut:
-    return season_service.summary(db, profile, sid)
+    out = season_service.summary(db, profile, sid)
+    cover = assessment_service.season_loan_cover(db, profile, season_service.get(db, profile, sid), today())
+    if cover is not None:
+        price, rid, repayment = cover
+        out.loan_cover_price_per_kg = price
+        out.loan_cover_basis = LoanCoverBasis(financing_request_id=rid, repayment_total=repayment)
+    return out

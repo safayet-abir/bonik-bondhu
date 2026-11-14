@@ -1,4 +1,4 @@
-import { ChevronDown, Home, List, Menu, PlusCircle, Sprout } from "lucide-react";
+import { ChevronDown, HandCoins, Home, List, Menu, PlusCircle, Sprout } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, Outlet } from "react-router";
 
@@ -10,7 +10,7 @@ import { ProfileIcon } from "./Profiles";
 
 /** Header (UI spec §4.3): active profile always visible (FR-PROF-04),
  *  DEMO badge, language switch. Bottom nav (§4.1/4.2) lists only screens that
- *  exist in this phase; Financing and Advisor join in P3/P6. Farm profiles
+ *  exist in this phase; Advisor joins in P6. Farm profiles
  *  start on Seasons and never get a Forecast entry (FR-SEA-08). */
 function OwnerChrome() {
   const { t } = useTranslation();
@@ -23,6 +23,7 @@ function OwnerChrome() {
       : { to: `${base}/home`, icon: Home, label: t("nav.home") },
     { to: `${base}/entries`, icon: List, label: t("nav.entries") },
     { to: `${base}/entries/new`, icon: PlusCircle, label: t("nav.add") },
+    { to: `${base}/financing`, icon: HandCoins, label: t("nav.financing") },
     { to: `${base}/more`, icon: Menu, label: t("nav.more") },
   ];
   return (
@@ -43,7 +44,7 @@ function OwnerChrome() {
         <Outlet />
       </div>
       <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-bb-border bg-bb-surface">
-        <ul className="mx-auto grid h-16 max-w-[480px] grid-cols-4">
+        <ul className="mx-auto grid h-16 max-w-[480px] grid-cols-5">
           {nav.map(({ to, icon: Icon, label }) => (
             <li key={to}>
               <NavLink to={to} end

@@ -10,10 +10,14 @@ import { SeasonSummary } from "./pages/farm/SeasonSummary";
 import { Cases } from "./pages/lender/Cases";
 import { NotFound } from "./pages/NotFound";
 import { AddEntry } from "./pages/owner/AddEntry";
+import { Assessment } from "./pages/owner/Assessment";
 import { Debts } from "./pages/owner/Debts";
 import { Entries } from "./pages/owner/Entries";
 import { EntryDetail } from "./pages/owner/EntryDetail";
-import { ProfileHome } from "./pages/owner/Home";
+import { Financing } from "./pages/owner/Financing";
+import { FinancingWizard } from "./pages/owner/FinancingWizard";
+import { Forecast } from "./pages/owner/Forecast";
+import { ProfileHome, ShopOnly } from "./pages/owner/Home";
 import { More } from "./pages/owner/More";
 import { OwnerLayout } from "./pages/owner/OwnerLayout";
 import { ProfileCreate } from "./pages/owner/ProfileCreate";
@@ -23,7 +27,7 @@ import { Suppliers } from "./pages/owner/Suppliers";
 import { GuestOnly, RequireRole } from "./state/Guards";
 
 // Routes per TRD §3. Only screens with working endpoints exist (MP §17 rule 10);
-// later phases add forecast, financing, assessment, sharing and advisor.
+// later phases add sharing (P5) and advisor (P6).
 export const router = createBrowserRouter([
   { path: "/", element: <GuestOnly><Welcome /></GuestOnly> },
   { path: "/register", element: <GuestOnly><Register /></GuestOnly> },
@@ -46,6 +50,11 @@ export const router = createBrowserRouter([
       { path: "seasons/:sid/edit", element: <SeasonForm /> },
       { path: "seasons/:sid/harvest", element: <Harvest /> },
       { path: "seasons/:sid/summary", element: <SeasonSummary /> },
+      { path: "forecast", element: <ShopOnly><Forecast /></ShopOnly> },
+      { path: "financing", element: <Financing /> },
+      { path: "financing/new", element: <FinancingWizard /> },
+      { path: "financing/:rid/step/:n", element: <FinancingWizard /> },
+      { path: "assessment/:aid", element: <Assessment /> },
       { path: "more", element: <More /> },
     ],
   },

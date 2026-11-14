@@ -1,4 +1,4 @@
-import { ArrowLeftRight, BarChart3, ChevronRight, Landmark, LogOut, Truck } from "lucide-react";
+import { ArrowLeftRight, BarChart3, ChevronRight, Landmark, LogOut, TrendingUp, Truck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router";
 
@@ -18,7 +18,10 @@ export function More() {
   const { me, logout } = useAuth();
   const base = `/p/${p.id}`;
   const links = [
-    ...(p.activity_type === "shop" ? [{ to: `${base}/summary`, icon: BarChart3, label: t("summary.title") }] : []),
+    ...(p.activity_type === "shop" ? [
+      { to: `${base}/summary`, icon: BarChart3, label: t("summary.title") },
+      { to: `${base}/forecast`, icon: TrendingUp, label: t("forecast.title") },
+    ] : []),
     { to: `${base}/debts`, icon: Landmark, label: t("debt.title") },
     { to: `${base}/suppliers`, icon: Truck, label: t("supplier.title") },
   ];

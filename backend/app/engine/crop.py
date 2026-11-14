@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
 
-from .money import money
+from .money import ZERO, money
 
 ONE = Decimal(1)
 
@@ -31,16 +31,24 @@ def break_even_price(total_planned_costs: Decimal, output_expected: Decimal) -> 
 def crop_check(output_low: Decimal, price_low: Decimal, output_exp: Decimal, total_planned_costs: Decimal,
                remaining_costs_outside_request: Decimal, start_balance: Decimal, debts_due_by_due: Decimal,
                reserve: Decimal, repayment_total: Decimal, harvest_date: date, due_date: date,
-               price_factor: Decimal = ONE, yield_factor: Decimal = ONE, cost_factor: Decimal = ONE) -> dict:
-    """Harvest-time repayment check on the LOW case (used from P3)."""
+               price_factor: Decimal = ONE, yield_factor: Decimal = ONE, cost_factor: Decimal = ONE,
+               household_to_harvest: Decimal = ZERO, household_after_harvest: Decimal = ZERO) -> dict:
+    """Harvest-time repayment check on the LOW case.
+
+    `household_to_harvest` / `household_after_harvest` are the owner-declared
+    household withdrawals of THIS profile (DEC-37) between as_of and harvest
+    and between harvest and the due date. They default to 0, which is exactly
+    the reference formula; a farm with no other income before harvest must
+    still feed the household, so the service passes the declared amount."""
     if harvest_date > due_date:
         return {"status": "insufficient_information", "reason": "repayment_due_before_expected_harvest"}
     out_low = output_low * yield_factor
     income_low = out_low * price_low * price_factor
     remaining = remaining_costs_outside_request * cost_factor
-    pre_harvest = start_balance - remaining
-    available = pre_harvest + income_low - debts_due_by_due - reserve
-    required = repayment_total + debts_due_by_due + reserve + remaining - start_balance
+    pre_harvest = start_balance - remaining - household_to_harvest
+    available = pre_harvest + income_low - household_after_harvest - debts_due_by_due - reserve
+    required = (repayment_total + debts_due_by_due + reserve + remaining + household_to_harvest
+                + household_after_harvest - start_balance)
     return {
         "income_low": money(income_low),
         "pre_harvest_balance": money(pre_harvest),
