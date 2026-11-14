@@ -16,6 +16,7 @@ class ScenarioOut(BaseModel):
     parameters: dict
     result: dict | None
     news_event_id: uuid.UUID | None
+    supplier_name: str | None = None
     assumption_key: str
     label_key: str = "scn.whatif"
 

@@ -30,7 +30,7 @@ from ..models import (
     SeasonCostItem,
 )
 from ..schemas.assessment import AssessmentOut, ScenarioOut
-from . import debt_service, financing_service, forecast_service
+from . import debt_service, financing_service, forecast_service, news_service, scenario_service, supplier_service
 from .season_service import _paid_by_item
 
 ENGINE_VERSION = "assess-v1"
@@ -54,6 +54,10 @@ def _s(x: Decimal | None) -> str | None:
 
 def _ordered(codes: set[str], order: tuple[str, ...]) -> list[str]:
     return [c for c in order if c in codes]
+
+
+def ordered_flags(codes: set[str]) -> list[str]:
+    return _ordered(codes, FLAG_ORDER)
 
 
 @dataclass
@@ -141,6 +145,9 @@ def evaluate(db: Session, profile: BusinessProfile, r: FinancingRequest, as_of: 
     if r.interest_fees_unknown:
         flags.add("interest_fees_unknown")
     flags.update(debt_service.obligation_flags(db, profile, as_of))
+    conc = supplier_service.concentration(db, profile, as_of)
+    if conc.result.high_dependency:
+        flags.add("high_supplier_dependency")
 
     start = start_balance(r)
     reserve = r.minimum_cash_reserve or ZERO
@@ -157,6 +164,8 @@ def evaluate(db: Session, profile: BusinessProfile, r: FinancingRequest, as_of: 
         else:
             existing = debt_service.obligation_rows(db, profile, as_of, horizon_end(as_of))
             check = shop_due_date_checks(as_of, baseline, start, reserve, household, existing, new_rows)
+            extra = {"shop_inputs": dict(as_of=as_of, baseline=baseline, start=start, reserve=reserve,
+                                         household=household, existing=existing, new_rows=new_rows)}
             base_result = {
                 "kind": "shop_due_dates", "start_balance": _s(start), "reserve": _s(reserve),
                 "household_monthly": _s(household), "daily_net_low": _s(baseline.net_weekly_low / 7),
@@ -167,6 +176,9 @@ def evaluate(db: Session, profile: BusinessProfile, r: FinancingRequest, as_of: 
         status = "ready_for_lender_review" if affordable else "not_affordable_base_case"
 
     inputs = _inputs(db, profile, r, all_items, baseline, season, as_of)
+    inputs["supplier_shares"] = {"basis": conc.basis,
+                                 "shares": {str(k): str(v) for k, v in sorted(conc.result.shares.items(),
+                                                                               key=lambda kv: str(kv[0]))}}
     explanation = _explain(profile, r, items, gap, baseline, base_result, new_rows, start, reserve, household, as_of)
     return Evaluation(status=status, missing=_ordered(missing, MISSING_ORDER), flags=_ordered(flags, FLAG_ORDER),
                       gap=gap, base_result=base_result, explanation=explanation, inputs=inputs, baseline=baseline,
@@ -341,6 +353,10 @@ def run(db: Session, profile: BusinessProfile, rid: uuid.UUID, as_of: date) -> F
     )
     db.add(a)
     db.flush()
+    extra_flags = scenario_service.create_for_assessment(db, profile, a, ev.extra, as_of)
+    if extra_flags - set(ev.flags):
+        a.flags = ordered_flags(set(ev.flags) | extra_flags)  # DEC-30: flags only, the status never changes
+    db.flush()
     db.refresh(a)
     return a
 
@@ -367,22 +383,64 @@ ASSUMPTION_KEYS = {"supplier_delay": "scn.delay", "input_price_rise": "scn.price
                    "harvest_price_fall": "scn.harvest_price", "yield_shortfall": "scn.yield"}
 
 
+def scenario_out(db: Session, profile: BusinessProfile, s: RiskScenario,
+                 suppliers: dict | None = None) -> ScenarioOut:
+    """Owner view: the supplier's own name is shown to its owner only (the
+    lender snapshot uses Supplier 1/2/3; P5)."""
+    if suppliers is None:
+        suppliers = {x.id: x for x in supplier_service.list_suppliers(db, profile)}
+    sup = suppliers.get(s.supplier_id) if s.supplier_id else None
+    key = ASSUMPTION_KEYS[s.scenario_type]
+    if s.scenario_type == "input_price_rise" and profile.activity_type == "crop_farm":
+        key = "scn.input_cost"
+    return ScenarioOut(id=s.id, scenario_type=s.scenario_type, origin=s.origin, status=s.status,
+                       parameters=s.parameters, result=s.result, news_event_id=s.news_event_id,
+                       supplier_name=sup.display_name if sup else None, assumption_key=key)
+
+
 def scenarios(db: Session, profile: BusinessProfile, a: FinancialAssessment) -> list[ScenarioOut]:
     rows = db.scalars(select(RiskScenario).where(RiskScenario.profile_id == profile.id,
                                                  RiskScenario.assessment_id == a.id)
                       .order_by(RiskScenario.created_at, RiskScenario.id))
-    return [ScenarioOut(id=s.id, scenario_type=s.scenario_type, origin=s.origin, status=s.status,
-                        parameters=s.parameters, result=s.result, news_event_id=s.news_event_id,
-                        assumption_key=ASSUMPTION_KEYS[s.scenario_type]) for s in rows]
+    suppliers = {x.id: x for x in supplier_service.list_suppliers(db, profile)}
+    return [scenario_out(db, profile, s, suppliers) for s in rows]
+
+
+def news_signal_rows(db: Session, profile: BusinessProfile, as_of: date,
+                     scenarios_by_event: dict | None = None) -> list[dict]:
+    """FR-NEWS-02/03: matched events with reason, source, corroboration and
+    DEMO label. Empty news table -> [] (FR-NEWS-06)."""
+    conc = supplier_service.concentration(db, profile, as_of)
+    out = []
+    for m in news_service.match(db, profile, as_of, conc.result.shares):
+        e = m.event
+        sc = (scenarios_by_event or {}).get(e.id)
+        out.append({
+            "id": str(e.id), "news_event_id": str(e.id), "headline": e.headline, "headline_lang": e.headline_lang,
+            "summary": e.summary, "source_name": e.source_name, "source_url": e.source_url,
+            "published_date": e.published_date.isoformat(),
+            "event_date": e.event_date.isoformat() if e.event_date else None, "event_type": e.event_type,
+            "districts": list(e.districts), "upazilas": list(e.upazilas), "is_demo": e.is_demo,
+            "source_count": e.source_count, "corroboration": m.corroboration, "match_reasons": m.reasons,
+            "matched_supplier": m.supplier.display_name if m.supplier else None,
+            "proposed_scenario_id": str(sc.id) if sc else None,
+            "scenario_status": sc.status if sc else None,
+        })
+    return out
 
 
 def assessment_out(db: Session, profile: BusinessProfile, a: FinancialAssessment) -> AssessmentOut:
+    rows = list(db.scalars(select(RiskScenario).where(RiskScenario.profile_id == profile.id,
+                                                      RiskScenario.assessment_id == a.id,
+                                                      RiskScenario.news_event_id.is_not(None))))
+    by_event = {s.news_event_id: s for s in rows}
     return AssessmentOut(
         id=a.id, financing_request_id=a.financing_request_id, activity_type=profile.activity_type, status=a.status,
         as_of_date=a.as_of_date, engine_version=a.engine_version, forecast_run_id=a.forecast_run_id,
         purpose_items_total=a.purpose_items_total, funding_gap=a.funding_gap, request_minus_gap=a.request_minus_gap,
         missing_items=a.missing_items, flags=a.flags, base_result=a.base_result, explanation=a.explanation,
-        scenarios=scenarios(db, profile, a), news_signals=[], inputs_sha256=a.inputs_sha256,
+        scenarios=scenarios(db, profile, a), news_signals=news_signal_rows(db, profile, a.as_of_date, by_event),
+        inputs_sha256=a.inputs_sha256,
         is_stale=a.profile_data_version != profile.data_version, created_at=a.created_at,
     )
 

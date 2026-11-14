@@ -7,6 +7,7 @@ from .debt import DebtFacility
 from .financing import FinancialAssessment, FinancingRequest, FinancingRequestItem, ForecastRun, RiskScenario
 from .ledger import Transaction
 from .lender import LenderOfficer, LenderOrganization
+from .news import NewsEvent
 from .profile import BusinessProfile
 from .season import FarmingSeason, SeasonCostItem
 from .supplier import Supplier
@@ -15,6 +16,6 @@ from .user import User, UserSession
 __all__ = [
     "AuditLog", "Base", "BusinessProfile", "Consent", "DebtFacility", "FarmingSeason",
     "FinancialAssessment", "FinancingRequest", "FinancingRequestItem", "ForecastRun",
-    "LenderOfficer", "LenderOrganization", "RiskScenario", "SeasonCostItem", "Supplier", "Transaction",
+    "LenderOfficer", "LenderOrganization", "NewsEvent", "RiskScenario", "SeasonCostItem", "Supplier", "Transaction",
     "User", "UserSession",
 ]

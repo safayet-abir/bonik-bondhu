@@ -10,7 +10,8 @@ scripted use) and never echoed or logged.
     python -m app.cli seed-demo     # fictional DEMO data; password from DEMO_PASSWORD
     python -m app.cli reset-demo    # delete DEMO rows (audit rows stay) and seed again
 
-import-news arrives in P4-T04.
+    python -m app.cli import-news ../data/news/curated_news.csv
+        # validate rows, upsert by dedup_key; rejected rows are reported (exit 1)
 """
 from __future__ import annotations
 
@@ -18,16 +19,18 @@ import argparse
 import getpass
 import os
 import sys
+from pathlib import Path
 
 from sqlalchemy import func, select, update
 
 from . import demo
 from .config import get_settings
 from .core.audit import audit
-from .core.clock import utcnow
+from .core.clock import today, utcnow
 from .core.security import hash_password, normalize_phone, password_problem
 from .db import get_sessionmaker
 from .models import LenderOfficer, LenderOrganization, User, UserSession
+from .services import news_service
 
 
 def _read_password(phone: str) -> str:
@@ -121,6 +124,18 @@ def reset_demo_cmd(args: argparse.Namespace) -> int:
     return 0
 
 
+def import_news_cmd(args: argparse.Namespace) -> int:
+    path = Path(args.csv)
+    if not path.is_file():
+        sys.exit(f"File not found: {path}")
+    with get_sessionmaker()() as db, db.begin():
+        report = news_service.import_csv(db, path, today())
+    print(f"News import: {report.inserted} inserted, {report.updated} updated, {len(report.rejected)} rejected.")
+    for line, reason in report.rejected:
+        print(f"  line {line}: {reason}")
+    return 1 if report.rejected else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.cli", description="Bonik Bondhu admin commands")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -144,6 +159,10 @@ def main(argv: list[str] | None = None) -> int:
 
     p = sub.add_parser("reset-demo", help="delete all DEMO rows and seed them again")
     p.set_defaults(func=reset_demo_cmd)
+
+    p = sub.add_parser("import-news", help="import curated news events from a CSV file")
+    p.add_argument("csv", help="path to curated_news.csv")
+    p.set_defaults(func=import_news_cmd)
 
     args = parser.parse_args(argv)
     return args.func(args)

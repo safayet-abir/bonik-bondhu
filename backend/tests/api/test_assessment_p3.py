@@ -138,7 +138,8 @@ def test_d3_farm_ready_and_loan_cover(seeded, client) -> None:
         ("0.00", "64600.00", "22200.00")
     assert (b["debts_due_by_due_date"], b["repayment_due"], b["covered"]) == ("6000.00", "42400.00", True)
     assert (b["break_even_price_per_unit"], b["loan_cover_price_per_unit"]) == ("19.70", "19.78")
-    assert "weak_price_evidence" in a["flags"] and "pre_harvest_cash_shortfall" not in a["flags"]
+    assert b["pre_harvest_shortfall"] == "0.00"  # base case fine; P4 inputs +15% scenario adds the flag (golden §4.4)
+    assert "weak_price_evidence" in a["flags"] and "pre_harvest_cash_shortfall" in a["flags"]
     assert_no_forbidden(a)
     sid = client.get(f"/api/v1/profiles/{p['id']}/seasons").json()["items"][0]["id"]
     s = client.get(f"/api/v1/profiles/{p['id']}/seasons/{sid}/summary").json()

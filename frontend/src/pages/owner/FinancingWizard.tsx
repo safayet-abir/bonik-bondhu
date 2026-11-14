@@ -18,7 +18,7 @@ import { StatusBanner } from "../../components/StatusBanner";
 import type { Lang } from "../../i18n";
 import { formatDate, todayDhaka } from "../../lib/dates";
 import { PRICE_SOURCES, PURPOSE_CATEGORIES, editable, orNull } from "../../lib/financing";
-import { formatNumber, formatTaka } from "../../lib/format";
+import { formatAmount, formatNumber, formatTaka } from "../../lib/format";
 import { useActiveProfile, useReloadProfile } from "../../state/ActiveProfile";
 import { seasonTitle } from "./AddEntry";
 
@@ -380,7 +380,7 @@ function StepMoney({ req, setReq, next }: StepProps) {
                    errorKey={fields.current_cash_balance} />
       <GapBox req={req} lang={lang} />
       {over ? (
-        <Field label={t("fin.over_request", { diff: formatNumber(editable(req.preview.request_minus_gap), lang) })}
+        <Field label={t("fin.over_request", { diff: formatAmount(req.preview.request_minus_gap ?? "0", lang) })}
                value={explain} maxLength={500} onChange={(e) => setExplain(e.target.value)}
                hint={t("fin.over_request_hint")} errorKey={fields.over_request_explanation} />
       ) : null}

@@ -34,6 +34,13 @@ export function formatNumber(value: string, lang: Lang): string {
   return lang === "bn" ? toBanglaDigits(g) : g;
 }
 
+/** Money amount without the "Tk" prefix, for sentences that already say Tk:
+ *  "9376.90" -> "9,376.90" (paisa kept as two digits, never "9,376.9"). */
+export function formatAmount(amount: string, lang: Lang): string {
+  const g = groupSouthAsian(amount);
+  return lang === "bn" ? toBanglaDigits(g) : g;
+}
+
 /** "150000.00" -> "Tk 1,50,000" (en) or "Tk ১,৫০,০০০" (bn). */
 export function formatTaka(amount: string, lang: Lang): string {
   const g = groupSouthAsian(amount);

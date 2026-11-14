@@ -259,6 +259,67 @@ export type CropResult = {
   loan_cover_price_per_unit: string; break_even_price_per_unit: string;
 };
 
+export type ScenarioType = "supplier_delay" | "input_price_rise" | "harvest_price_fall" | "yield_shortfall";
+
+export type ShopScenarioResult = {
+  kind: "shop_due_dates"; any_shortfall: boolean; covered: boolean; checks_count: number;
+  min_balance_after_payment: string;
+  first_shortfall: { date: string; balance_after: string; shortfall_vs_reserve: string } | null;
+};
+export type CropScenarioResult = Omit<CropResult, "kind" | "start_balance" | "reserve" | "expected_harvest_date" |
+  "due_date" | "first_due_date" | "installments" | "output_low" | "price_low" | "remaining_costs_outside_request" |
+  "total_planned_costs" | "debts_due_by_due_date" | "household_until_due"> & { kind: "crop_harvest" };
+
+/** What-if only (DEC-30): never changes the assessment status. */
+export type Scenario = {
+  id: string;
+  scenario_type: ScenarioType;
+  origin: "auto" | "news";
+  status: "computed" | "proposed" | "dismissed";
+  parameters: { days?: number; share?: string; start?: string; pct?: string; basis?: string };
+  result: ShopScenarioResult | CropScenarioResult | null;
+  news_event_id: string | null;
+  supplier_name: string | null;
+  assumption_key: string;
+  label_key: string;
+};
+
+export type NewsSignal = {
+  id: string;
+  news_event_id: string;
+  headline: string;
+  headline_lang: "bn" | "en";
+  summary: string | null;
+  source_name: string;
+  source_url: string | null;
+  published_date: string;
+  event_date: string | null;
+  event_type: string;
+  districts: string[];
+  upazilas: string[];
+  is_demo: boolean;
+  source_count: number;
+  corroboration: "single_source" | "corroborated";
+  match_reasons: ("location" | "supplier_location" | "sector" | "commodity")[];
+  matched_supplier: string | null;
+  proposed_scenario_id: string | null;
+  scenario_status: Scenario["status"] | null;
+};
+
+export type Concentration = {
+  window_days: number;
+  window_start: string;
+  window_end: string;
+  basis: "linked_purchases" | "owner_reported" | "none";
+  linked_purchase_count: number;
+  total_purchases: string | null;
+  suppliers: { supplier_id: string; display_name: string; amount: string | null; share_pct: string }[];
+  top_share_pct: string | null;
+  high_dependency: boolean;
+  threshold_pct: string;
+  note_key: string | null;
+};
+
 export type Assessment = {
   id: string;
   financing_request_id: string;
@@ -285,8 +346,8 @@ export type Assessment = {
     parameters: Record<string, string | number>;
     excluded: string[];
   };
-  scenarios: unknown[];
-  news_signals: unknown[];
+  scenarios: Scenario[];
+  news_signals: NewsSignal[];
   inputs_sha256: string;
   is_stale: boolean;
   disclaimer_key: string;

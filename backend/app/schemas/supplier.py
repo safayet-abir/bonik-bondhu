@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import uuid
+from datetime import date
 from decimal import Decimal
 from typing import Annotated
 
 from pydantic import AfterValidator, BaseModel, BeforeValidator
 
 from ..engine.money import parse_amount
-from .common import InModel, OptText
+from .common import InModel, MoneyOut, OptText
 
 
 def _share(v: object) -> Decimal | None:
@@ -62,3 +63,27 @@ class SupplierOut(BaseModel):
 class SupplierList(BaseModel):
     items: list[SupplierOut]
     total: int
+
+
+class ConcentrationRow(BaseModel):
+    supplier_id: uuid.UUID
+    display_name: str
+    amount: MoneyOut | None  # null when owner-reported
+    share_pct: str
+
+
+class ConcentrationOut(BaseModel):
+    """FR-SUP-03..06 (API #24). `basis` tells where the shares come from;
+    sparse data carries `note_key` and is never shown as low risk."""
+
+    window_days: int
+    window_start: date
+    window_end: date
+    basis: str
+    linked_purchase_count: int
+    total_purchases: MoneyOut | None
+    suppliers: list[ConcentrationRow]
+    top_share_pct: str | None
+    high_dependency: bool
+    threshold_pct: str
+    note_key: str | None

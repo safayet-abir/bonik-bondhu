@@ -1,5 +1,5 @@
 import { AlertTriangle, ChevronRight, Pencil, RefreshCw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router";
 
@@ -12,11 +12,12 @@ import { ErrorBanner, Loading, PageShell } from "../../components/PageShell";
 import { StatusBanner } from "../../components/StatusBanner";
 import type { Lang } from "../../i18n";
 import { formatDate } from "../../lib/dates";
-import { STATUS_KEY, STATUS_TONE, editable, fixLink } from "../../lib/financing";
-import { formatNumber, formatTaka } from "../../lib/format";
+import { STATUS_KEY, STATUS_TONE, fixLink } from "../../lib/financing";
+import { formatAmount, formatNumber, formatTaka } from "../../lib/format";
 import { useActiveProfile } from "../../state/ActiveProfile";
+import { NewsTab, RisksTab } from "./AssessmentRisks";
 
-type Tab = "result" | "how";
+type Tab = "result" | "risks" | "news" | "how";
 
 function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
   return (
@@ -36,7 +37,7 @@ function ShopBlock({ r, lang }: { r: ShopResult; lang: Lang }) {
         <p className="font-semibold text-bb-danger">
           {t("asm.shortfall_on", {
             date: formatDate(r.first_shortfall.date, lang),
-            amount: formatNumber(editable(r.first_shortfall.shortfall_vs_reserve), lang),
+            amount: formatAmount(r.first_shortfall.shortfall_vs_reserve, lang),
           })}
         </p>
       ) : (
@@ -91,7 +92,7 @@ function CropBlock({ r, lang }: { r: CropResult; lang: Lang }) {
     <>
       <p className={r.covered ? "" : "font-semibold text-bb-danger"}>
         {r.covered ? t("asm.crop_covered", { date: formatDate(r.due_date, lang) })
-          : t("asm.crop_short", { amount: formatNumber(editable(r.surplus_or_shortfall.replace("-", "")), lang) })}
+          : t("asm.crop_short", { amount: formatAmount(r.surplus_or_shortfall.replace("-", ""), lang) })}
       </p>
       {Number(r.pre_harvest_shortfall) > 0 ? (
         <StatusBanner tone="warning" title={t("flag.pre_harvest_cash_shortfall")}>
@@ -159,8 +160,8 @@ function HowTab({ a, lang }: { a: AssessmentT; lang: Lang }) {
   );
 }
 
-/** SCR-O12 Assessment result (FR-ASM-01..09). Risks and News tabs join in P4
- *  when their endpoints exist. Never approval language: the lender decides. */
+/** SCR-O12 Assessment result (FR-ASM-01..09) with Risks (FR-SCN) and News
+ *  (FR-NEWS) tabs. Never approval language: the lender decides. */
 export function Assessment() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as Lang;
@@ -172,10 +173,13 @@ export function Assessment() {
   const [tab, setTab] = useState<Tab>("result");
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    setA(null);
+  const load = useCallback(() => {
     api<AssessmentT>(`/profiles/${p.id}/assessments/${aid}`).then(setA).catch(setError);
   }, [p.id, aid]);
+  useEffect(() => {
+    setA(null);
+    load();
+  }, [load]);
 
   const base = `/p/${p.id}`;
   if (!a) return <PageShell back={`${base}/financing`}><ErrorBanner error={error} />{error ? null : <Loading />}</PageShell>;
@@ -206,9 +210,14 @@ export function Assessment() {
         </StatusBanner>
       ) : null}
       <Chips label={t("asm.title")} value={tab} onChange={setTab}
-             options={[{ value: "result", label: t("asm.tab_result") }, { value: "how", label: t("asm.tab_how") }]} />
+             options={[{ value: "result", label: t("asm.tab_result") },
+                       { value: "risks", label: t("asm.tab_risks") },
+                       { value: "news", label: a.news_signals.length
+                         ? `${t("asm.tab_news")} (${formatNumber(String(a.news_signals.length), lang)})` : t("asm.tab_news") },
+                       { value: "how", label: t("asm.tab_how") }]} />
 
-      {tab === "how" ? <HowTab a={a} lang={lang} /> : (
+      {tab === "how" ? <HowTab a={a} lang={lang} /> : tab === "risks" ? <RisksTab a={a} lang={lang} />
+        : tab === "news" ? <NewsTab a={a} lang={lang} profileId={p.id} onChanged={load} /> : (
         <>
           <StatusBanner tone={STATUS_TONE[a.status]} title={t(STATUS_KEY[a.status])}>{t("asm.not_approval")}</StatusBanner>
 

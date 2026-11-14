@@ -15,7 +15,8 @@ The full development blueprint is in [`docs/`](docs/README.md). Start there.
 | P1 Auth, profiles, first vertical slice | Done — register/login/lockout/logout, profiles, cash sale + expense, money summary, lender role routing; 74 backend tests + browser E2E (`frontend/e2e/p1-slice.mjs`) |
 | P2 Financial data engine | Done — all 12 entry types with supplier/loan/season links, duplicate warning, void, E1 golden summary, debts + "no current loans", suppliers, crop seasons (acre/decimal/sq ft/bigha), cost items, harvest, season summary; shop + farm screens; 143 backend tests + browser walkthrough (`frontend/e2e/p2-walkthrough.mjs`) |
 | P3 First working financial assessment | Done — forecast baseline (shop), financing requests + items + live gap preview, 5-step wizard with autosave, deterministic assessment (3 statuses, missing items, flags, "how calculated", inputs hash, stale detection), farm harvest check + loan-cover price, `seed-demo` / `reset-demo` CLI; D1–D4 golden through the API; 190 backend tests + browser walkthrough (`frontend/e2e/p3-walkthrough.mjs`). New suggestions SUG-30..36 await team approval (DECISIONS §2.1) |
-| P4 Deterministic risk signals (L1/L2) | Next |
+| P4 Deterministic risk signals (L1/L2) | Done — supplier concentration + dependency bars, auto what-ifs (shop delay 7/14 d, price +15%; farm price −15%, yield −20%, inputs +15%) that never change the status, curated news import (`import-news`) + matching + proposed scenarios with confirm/dismiss, Risks and News tabs; 7 real news events (10 sources, pending second-person review) in `data/news/`; 208 backend tests + browser walkthrough (`frontend/e2e/p4-walkthrough.mjs`). SUG-30..40 approved (DECISIONS §2.1) |
+| P5 Consent & lender review | Next |
 
 ## Stack
 
@@ -77,6 +78,9 @@ backend on :8000 (it serves `frontend/dist`), then:
 ```bash
 cd frontend && node e2e/p1-slice.mjs http://localhost:8000 e2e-shots [lenderPhone] [lenderPassword]
 cd frontend && node e2e/p2-walkthrough.mjs http://localhost:8000 e2e-shots-p2   # shop + farm
+# P3/P4 use the DEMO seed: run `python -m app.cli reset-demo` first; password from DEMO_PASSWORD
+cd frontend && node e2e/p3-walkthrough.mjs http://localhost:8000 e2e-shots-p3
+cd frontend && node e2e/p4-walkthrough.mjs http://localhost:8000 e2e-shots-p4
 ```
 
 ## Admin CLI
@@ -86,6 +90,8 @@ cd backend
 python -m app.cli create-lender --org "DEMO Bank Ltd (fictional)" --org-type bank \
     --name "Nasrin Officer (DEMO)" --phone 01900000101 --email l1.nasrin@demo.invalid --demo
 python -m app.cli reset-password --phone 01712345678     # after an offline identity check
+python -m app.cli seed-demo | reset-demo                 # fictional DEMO data (DEMO_PASSWORD)
+python -m app.cli import-news ../data/news/curated_news.csv   # curated news (see data/news/README.md)
 ```
 
 Passwords are typed at a hidden prompt (or read from `BB_NEW_PASSWORD` for scripts).
@@ -96,6 +102,7 @@ Passwords are typed at a hidden prompt (or read from `BB_NEW_PASSWORD` for scrip
 backend/   FastAPI app (api → services → engine | models | ai), Alembic, tests
   db/      schema.sql + seed_demo.sql (copies of the reviewed files in docs/03_Technical; CI checks they match)
 frontend/  React app (owner app mobile-first, lender portal desktop)
+data/news/ Curated news CSV (real items with links + rules; imported by the CLI)
 docs/      The MVP blueprint (PRD, flows, UI spec, API, schema, plan, tests, decisions)
 scripts/   CI helpers
 ```

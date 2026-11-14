@@ -1,9 +1,9 @@
-import { Lock, Pencil, PlusCircle, Truck } from "lucide-react";
+import { AlertTriangle, Info, Lock, Pencil, PlusCircle, Truck } from "lucide-react";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 import { api, ApiError, type FieldErrors } from "../../api/client";
-import type { Page, Supplier } from "../../api/types";
+import type { Concentration, Page, Supplier } from "../../api/types";
 import { AmountInput } from "../../components/AmountInput";
 import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
@@ -11,7 +11,7 @@ import { EmptyState } from "../../components/EmptyState";
 import { Field } from "../../components/Field";
 import { ErrorBanner, Loading, PageShell } from "../../components/PageShell";
 import type { Lang } from "../../i18n";
-import { toBanglaDigits } from "../../lib/format";
+import { formatNumber, formatTaka, toBanglaDigits } from "../../lib/format";
 import { useActiveProfile } from "../../state/ActiveProfile";
 
 type Form = { display_name: string; goods_supplied: string; district: string; upazila: string; share: string };
@@ -74,18 +74,63 @@ function SupplierForm({ initial, onSaved, onCancel, supplierId }: {
   );
 }
 
-/** SCR-O08 Suppliers (FR-SUP-01/02). The dependency bar arrives with
- *  supplier-concentration in P4; names are never shown to lenders. */
+/** FR-SUP-03..06: one CSS bar per supplier (no chart library, SUG-16). */
+function Dependency({ c, lang }: { c: Concentration; lang: Lang }) {
+  const { t } = useTranslation();
+  if (c.basis === "none" && c.note_key === "supplier.add_prompt") return null;
+  const num = (v: string) => formatNumber(v, lang);
+  return (
+    <Card className="flex flex-col gap-3">
+      <p className="font-semibold">{t("supplier.dependency_title")}</p>
+      {c.suppliers.map((s) => (
+        <div key={s.supplier_id} className="flex flex-col gap-1">
+          <div className="flex justify-between gap-2 text-small">
+            <span className="font-semibold">{s.display_name}</span>
+            <span className="tabular">
+              {num(s.share_pct)}%{s.amount ? ` · ${formatTaka(s.amount, lang)}` : ""}
+            </span>
+          </div>
+          <div className="h-3 w-full rounded-full bg-bb-bg" aria-hidden>
+            <div className={`h-3 rounded-full ${c.high_dependency && s.share_pct === c.top_share_pct ? "bg-bb-warning" : "bg-bb-primary"}`}
+                 style={{ width: `${Math.min(100, Number(s.share_pct))}%` }} />
+          </div>
+        </div>
+      ))}
+      {c.high_dependency && c.top_share_pct ? (
+        <p className="flex gap-2 font-semibold text-bb-warning">
+          <AlertTriangle aria-hidden className="mt-1 size-4 shrink-0" />
+          {t("supplier.high_dep", { pct: num(c.top_share_pct) })}
+        </p>
+      ) : null}
+      {c.note_key === "supplier.sparse" ? (
+        <p className="flex gap-2 text-small font-semibold text-bb-muted">
+          <Info aria-hidden className="mt-0.5 size-4 shrink-0" />{t("supplier.sparse")}
+        </p>
+      ) : null}
+      <p className="text-small text-bb-muted">
+        {c.basis === "linked_purchases"
+          ? t("supplier.basis_linked", { n: num(String(c.linked_purchase_count)),
+                                         weeks: num(String(c.window_days / 7)),
+                                         total: formatTaka(c.total_purchases ?? "0", lang) })
+          : c.basis === "owner_reported" ? t("supplier.basis_owner") : t("supplier.basis_none")}
+      </p>
+    </Card>
+  );
+}
+
+/** SCR-O08 Suppliers + dependency (FR-SUP-01..06). Names are never shown to lenders. */
 export function Suppliers() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as Lang;
   const p = useActiveProfile();
   const [items, setItems] = useState<Supplier[] | null>(null);
+  const [conc, setConc] = useState<Concentration | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [editing, setEditing] = useState<string | "new" | null>(null);
 
   const load = useCallback(() => {
     api<Page<Supplier>>(`/profiles/${p.id}/suppliers`).then((r) => setItems(r.items)).catch(setError);
+    api<Concentration>(`/profiles/${p.id}/supplier-concentration`).then(setConc).catch(setError);
   }, [p.id]);
   useEffect(load, [load]);
 
@@ -112,6 +157,7 @@ export function Suppliers() {
         </Button>
       )}
       {!items && !error ? <Loading /> : null}
+      {conc && editing === null ? <Dependency c={conc} lang={lang} /> : null}
       {items && items.length === 0 && editing !== "new" ? (
         <EmptyState icon={<Truck className="size-10" />} message={t("supplier.add_prompt")} />
       ) : null}

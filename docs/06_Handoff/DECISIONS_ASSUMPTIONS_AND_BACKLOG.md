@@ -117,8 +117,14 @@ These are proposals needed to make the blueprint buildable. Phase 0 task `P0-T01
 | SUG-28 | Duplicate-entry warning: same profile + type + amount + value_date (+ supplier if set) as a confirmed entry → user must tick "this is a separate entry" | S1 A4 duplicate rule needs a concrete matcher | F1 | Other matcher |
 | SUG-29 | Lockout/admin CLI commands (`create-lender`, `reset-password`, `seed-demo`, `import-news`) | Manual provisioning | Ops | Other tooling |
 
-### 2.1 Implementation suggestions raised in P3 (14 Nov 2026) — **pending team approval**
+### 2.1 Implementation suggestions raised in P3 and P4 (14 Nov 2026)
 These fill gaps the sources do not settle. Each is cautious (can only make a result look *worse*, never better), does not change any golden number D1–D4, and is easy to switch off.
+
+> **Outcome (14 Nov 2026): SUG-30 … SUG-40 — APPROVED.** The project owner delegated these
+> implementation decisions to the AI developer (Claude) ("fix the gaps the plan leaves open"); they are
+> recorded here so the team can still revisit any of them. SUG-32 is approved with a UI clarification:
+> the household field says "only the part paid from this business — if you have a shop and a farm, split
+> it, don't write the same money twice", so per-profile subtraction (DEC-37) does not double count.
 
 | ID | Suggestion (implemented) | Why | Golden impact | Alternative |
 |---|---|---|---|---|
@@ -129,6 +135,10 @@ These fill gaps the sources do not settle. Each is cautious (can only make a res
 | SUG-34 | `terms_incomplete` also when the first due date is before as_of or the minimum reserve is missing | A schedule starting in the past cannot be checked | none | Accept and skip past dates |
 | SUG-35 | `profile_location_missing` = district or upazila empty (status insufficient) | Location needed for news matching (L1) and lender profile | none (seed has both) | Flag only |
 | SUG-36 | With an explanation, flag `request_exceeds_gap` is replaced by `over_request_explained` (request − gap still shown) | Plan P3-T11 "flag switches" | none | Show both flags |
+| SUG-37 | **News relevance (P4).** `supplier_location` counts only when the event is relevant to that supply: event names no sector, or names the shop's sector, or one of its commodities is in the supplier's goods. Sector/commodity alone matches only events with no location (national news); for local events they are extra reasons after a location match. Location names are compared case/space-insensitively with a small alias list (Chittagong→Chattogram, Ashulia→Savar …) | Architecture §5.6 read literally makes D1 match the Dhamrai flood through Supplier C (spices) — contradicting golden §4.2 "Dhamrai flood **not** matched"; a crop-field flood does not stop a spice wholesaler, and a grocery-sector event 100 km away is noise without a location link | none — makes the golden hold | §5.6 literally (golden D1 changes) |
+| SUG-38 | **News → scenario mapping details.** Supply events need a known share for the matched supplier (else signal only); start = max(event date, as_of); `price_shock` → shop input +15% on the top supplier share, farm only when the event's commodities are farm inputs (fertiliser, seed, diesel …) — a rice price rise is not a cost rise for a rice farmer; supplier-delay proposals are shop-only (a farm has no forecast) | SUG-12 mapping is per event type and silent on these cases | none | Mechanical mapping |
+| SUG-39 | **Confirm = same inputs.** Confirming a news scenario re-evaluates the assessment's own inputs; if the profile changed (or the inputs hash differs) → 409 `ASSESSMENT_STALE`. A confirmed shortfall adds `scenario_shortfall` / `pre_harvest_cash_shortfall`; a confirmed single-source event adds `news_signal_single_source`. Status never changes (DEC-30) | Reproducibility; the stored hash proves the what-if used the checked inputs | none (flags only appear after the owner tests a news risk) | Recompute on current data |
+| SUG-40 | **Concentration details.** Window = 56 days ending yesterday (same as the forecast); owner-reported shares are used as stated (not normalised — the owner may not list every supplier); scenario share rounded to 4 dp (0.6500); "sparse" note when not high-dependency and the basis is owner-reported or < 4 linked purchases | FR-SUP-03/06 give the rule, not these edges | none | Other edges |
 
 ---
 
@@ -170,7 +180,7 @@ These fill gaps the sources do not settle. Each is cautious (can only make a res
 | GAP-01 | `EVENT.txt` and `judge.txt` originals | Cannot verify event deadline/rubric beyond S6 §16 summary | Team uploads files |
 | GAP-02 | Real lender-permitted repayment patterns, rates, fees | All terms are owner-entered proposals | Loan officer interviews (S1 §7.1) |
 | GAP-03 | Crop yield and price datasets (BBS, DAM, TCB) — named in S1 §9 but no data supplied | Crop uses owner-entered ranges (ASM-02) | Team obtains files; web research approval |
-| GAP-04 | Real curated news items for Bangladesh | MVP news set must be curated by team from real articles, or labelled DEMO | Team curation; research approval |
+| GAP-04 | Real curated news items for Bangladesh | MVP news set must be curated by team from real articles, or labelled DEMO | **Partly closed 14 Nov 2026:** owner approved web research; 7 real events (10 sources) for Dhaka/Gazipur in `data/news/curated_news.csv`, AI-assisted — still needs the P4-T08 second-person review |
 | GAP-05 | Current Gemini/Groq free-tier limits, data-use terms | Budget/privacy cannot be confirmed | **Owner approval for web research** (MP §23 rule 5) |
 | GAP-06 | Team size and role assignment | Plan assumes S1 §12.4 five roles; merge if fewer | Team |
 | GAP-07 | Hosting provider for demo deployment | SUG-19 is generic | Team |

@@ -8,7 +8,9 @@ from starlette.responses import Response
 from starlette.staticfiles import StaticFiles
 from starlette.types import Scope
 
-from .api import auth, debts, financing, forecasts, health, lender, profiles, seasons, suppliers, transactions
+from .api import (
+    auth, debts, financing, forecasts, health, lender, news, profiles, scenarios, seasons, suppliers, transactions,
+)
 from .config import get_settings
 from .core.errors import install_error_handlers
 from .core.logging import configure_logging
@@ -52,7 +54,8 @@ def create_app() -> FastAPI:
     )
 
     for router in (health.router, auth.router, profiles.router, transactions.router, suppliers.router,
-                   debts.router, seasons.router, forecasts.router, financing.router, lender.router):
+                   suppliers.concentration_router, debts.router, seasons.router, forecasts.router,
+                   financing.router, scenarios.router, news.router, lender.router):
         app.include_router(router, prefix=API_V1)
 
     dist = settings.frontend_dist_path
