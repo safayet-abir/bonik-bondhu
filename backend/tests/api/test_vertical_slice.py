@@ -92,13 +92,6 @@ def test_bangla_digit_amount(client) -> None:  # FR-I18N-04
     assert _entry(client, pid, "sale_cash", "৮,৫০০").json()["amount"] == "8500.00"
 
 
-def test_p1_slice_accepts_only_cash_sale_and_expense(client) -> None:
-    owner(client)
-    pid = create_profile(client)["id"]
-    r = _entry(client, pid, "loan_received", "50000")
-    assert r.status_code == 422 and r.json()["error"]["fields"] == {"txn_type": "entry.err.type_unavailable"}
-
-
 def test_entry_bumps_data_version(client, clean_db: str) -> None:  # FR-ASM-09 groundwork
     from sqlalchemy import create_engine, text
 

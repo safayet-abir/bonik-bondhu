@@ -13,7 +13,8 @@ The full development blueprint is in [`docs/`](docs/README.md). Start there.
 |---|---|
 | P0 Foundation & approvals | Done — all SUG items approved (14 Nov 2026), schema migrated, `/health` OK, golden tests green |
 | P1 Auth, profiles, first vertical slice | Done — register/login/lockout/logout, profiles, cash sale + expense, money summary, lender role routing; 74 backend tests + browser E2E (`frontend/e2e/p1-slice.mjs`) |
-| P2 Financial data engine | Next |
+| P2 Financial data engine | Done — all 12 entry types with supplier/loan/season links, duplicate warning, void, E1 golden summary, debts + "no current loans", suppliers, crop seasons (acre/decimal/sq ft/bigha), cost items, harvest, season summary; shop + farm screens; 143 backend tests + browser walkthrough (`frontend/e2e/p2-walkthrough.mjs`) |
+| P3 First working financial assessment | Next |
 
 ## Stack
 
@@ -74,6 +75,7 @@ backend on :8000 (it serves `frontend/dist`), then:
 
 ```bash
 cd frontend && node e2e/p1-slice.mjs http://localhost:8000 e2e-shots [lenderPhone] [lenderPassword]
+cd frontend && node e2e/p2-walkthrough.mjs http://localhost:8000 e2e-shots-p2   # shop + farm
 ```
 
 ## Admin CLI

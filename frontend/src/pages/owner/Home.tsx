@@ -1,20 +1,29 @@
-import { ArrowDownCircle, NotebookText, Receipt } from "lucide-react";
+import { NotebookText } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router";
 
 import { api } from "../../api/client";
-import type { Page, Summary, Transaction } from "../../api/types";
+import type { Page, Summary, Transaction, TxnType } from "../../api/types";
 import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
 import { ErrorBanner, Loading, PageShell } from "../../components/PageShell";
 import { StatusBanner } from "../../components/StatusBanner";
 import type { Lang } from "../../i18n";
-import { formatDate, todayDhaka } from "../../lib/dates";
+import { todayDhaka } from "../../lib/dates";
 import { formatTaka } from "../../lib/format";
+import { TXN_ICON } from "../../lib/txn";
 import { useActiveProfile } from "../../state/ActiveProfile";
+import { Seasons } from "../farm/Seasons";
+import { EntryRow } from "./Entries";
 
 type Data = { today: Summary; month: Summary; recent: Transaction[] };
+const QUICK: TxnType[] = ["sale_cash", "sale_credit", "purchase_cash", "operating_expense"];
+
+/** /p/:pid/home — shop home (SCR-O03) or farm home (SCR-F01). */
+export function ProfileHome() {
+  return useActiveProfile().activity_type === "crop_farm" ? <Seasons /> : <Home />;
+}
 
 function InOut({ title, s, lang }: { title: string; s: Summary; lang: Lang }) {
   const { t } = useTranslation();
@@ -38,7 +47,7 @@ function InOut({ title, s, lang }: { title: string; s: Summary; lang: Lang }) {
 
 /** SCR-O03 Shop home. First-time: Path A "Record my money" (Path B
  *  "Check financing" appears in P3 when its endpoints exist). Returning:
- *  today / this month, quick add, recent entries. */
+ *  today / this month, quick add, recent entries (tap → detail / void). */
 export function Home() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as Lang;
@@ -62,7 +71,7 @@ export function Home() {
   if (error) return <PageShell><ErrorBanner error={error} /></PageShell>;
   if (!data) return <Loading />;
 
-  const add = (type: string) => navigate(`/p/${p.id}/entries/new?type=${type}`);
+  const add = (type: TxnType) => navigate(`/p/${p.id}/entries/new?type=${type}`);
 
   if (data.recent.length === 0) {
     return (
@@ -90,32 +99,21 @@ export function Home() {
       <section className="flex flex-col gap-2">
         <h2 className="font-semibold">{t("home.quick_add")}</h2>
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="secondary" icon={<ArrowDownCircle aria-hidden className="size-5 text-bb-success" />}
-                  onClick={() => add("sale_cash")}>
-            {t("txn.sale_cash")}
-          </Button>
-          <Button variant="secondary" icon={<Receipt aria-hidden className="size-5" />}
-                  onClick={() => add("operating_expense")}>
-            {t("txn.operating_expense")}
-          </Button>
+          {QUICK.map((ty) => {
+            const Icon = TXN_ICON[ty];
+            return (
+              <Button key={ty} variant="secondary" onClick={() => add(ty)}
+                      icon={<Icon aria-hidden className={`size-5 ${ty === "sale_cash" ? "text-bb-success" : ""}`} />}>
+                {t(`txn.${ty}`)}
+              </Button>
+            );
+          })}
         </div>
       </section>
       <section className="flex flex-col gap-2">
         <h2 className="font-semibold">{t("home.recent")}</h2>
         <ul className="divide-y divide-bb-border rounded-bb border border-bb-border bg-bb-surface">
-          {data.recent.map((tx) => (
-            <li key={tx.id} className="flex items-center justify-between gap-2 p-3">
-              <span>
-                <span className="block">
-                  {tx.category ? t(`category.${tx.category}`, { defaultValue: tx.category }) : t(`txn.${tx.txn_type}`)}
-                </span>
-                <span className="text-small text-bb-muted">{formatDate(tx.value_date, lang)}</span>
-              </span>
-              <span className={`tabular font-semibold ${tx.txn_type === "sale_cash" ? "text-bb-success" : ""}`}>
-                {formatTaka(tx.amount, lang)}
-              </span>
-            </li>
-          ))}
+          {data.recent.map((tx) => <EntryRow key={tx.id} tx={tx} to={`/p/${p.id}/entries/${tx.id}`} />)}
         </ul>
         <Link to={`/p/${p.id}/summary`} className="text-center font-semibold text-bb-primary underline">
           {t("home.see_summary")}

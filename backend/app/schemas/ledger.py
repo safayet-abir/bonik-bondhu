@@ -46,6 +46,17 @@ class TransactionCreate(InModel):
         return v or None
 
 
+class VoidIn(InModel):
+    reason: str
+
+    @field_validator("reason")
+    @classmethod
+    def _reason(cls, v: str) -> str:
+        if not 3 <= len(v) <= 200:  # FR-LED-06
+            raise ValueError("entry.err.void_reason")
+        return v
+
+
 class SupplierRef(BaseModel):
     id: uuid.UUID
     display_name: str
@@ -60,12 +71,16 @@ class TransactionOut(BaseModel):
     category: str | None
     note: str | None
     supplier: SupplierRef | None = None
+    debt_facility_id: uuid.UUID | None = None
     season_id: uuid.UUID | None
+    season_cost_item_id: uuid.UUID | None = None
     document_id: uuid.UUID | None
     entry_method: str
     evidence_state: str
     status: str
+    duplicate_confirmed: bool = False
     void_reason: str | None
+    voided_at: datetime | None = None
     created_at: datetime
 
 

@@ -102,7 +102,7 @@
 | 401 | `AUTH_REQUIRED` / `SESSION_EXPIRED` / `INVALID_CREDENTIALS` | no cookie / expired or revoked / login failure |
 | 403 | `FORBIDDEN_ROLE`, `CSRF_HEADER_MISSING`, `CONSENT_REQUIRED`, `CONSENT_REVOKED`, `CONSENT_EXPIRED`, `PROFILE_TYPE_MISMATCH` | role/consent/CSRF; shop-only or farm-only endpoint on wrong profile type |
 | 404 | `NOT_FOUND` | not found **or not owned** |
-| 409 | `PHONE_TAKEN`, `EMAIL_TAKEN`, `POSSIBLE_DUPLICATE`, `ASSESSMENT_STALE`, `CONSENT_STATE_INVALID`, `DRAFT_ALREADY_RESOLVED` | conflicts |
+| 409 | `PHONE_TAKEN`, `EMAIL_TAKEN`, `POSSIBLE_DUPLICATE`, `ASSESSMENT_STALE`, `CONSENT_STATE_INVALID`, `DRAFT_ALREADY_RESOLVED`, `CONFLICT` | conflicts; `CONFLICT` is the generic state conflict with a specific `message_key` (P2: `entry.err.already_voided`, `debt.err.active_exists`, `season.err.cost_item_in_use`) |
 | 413 | `FILE_TOO_LARGE` | > 5 MB |
 | 415 | `UNSUPPORTED_FILE_TYPE` | not JPEG/PNG (magic bytes) |
 | 422 | `VALIDATION_ERROR` (with `fields`), `BIGHA_FACTOR_REQUIRED`, `EXTRACTION_FAILED` | invalid input / unreadable AI output |
@@ -154,7 +154,8 @@ Template: **Purpose · Auth/Role · Request · Example · Success · Validation 
 
 ### 4.4 Transactions (owner)
 
-**GET `/profiles/{pid}/transactions`** — filters `from`, `to`, `txn_type`, `status`, `season_id`, `supplier_id`. → `{"items":[TransactionOut],"total":n}` sorted by `value_date desc, created_at desc`.
+**GET `/profiles/{pid}/transactions`** — filters `from`, `to`, `txn_type` (repeatable, e.g. `?txn_type=loan_received&txn_type=loan_principal_repayment`), `status`, `season_id`, `supplier_id`. → `{"items":[TransactionOut],"total":n}` sorted by `value_date desc, created_at desc`.
+- Implementation notes (P2): a `season_cost_item_id` implies its season (must match `season_id` if both are sent) and is allowed only on `purchase_cash|purchase_credit|payable_payment|operating_expense`; `POSSIBLE_DUPLICATE.existing` also carries `txn_type`; a confirmed duplicate is stored with `duplicate_confirmed=true`.
 
 **POST `/profiles/{pid}/transactions`**
 - Request `TransactionCreate`: `txn_type` (12 values), `amount`, `value_date`, optional `settlement_date`, `category`, `note` (≤ 300), `supplier_id` (purchase types only), `debt_facility_id` (loan types only), `season_id`, `season_cost_item_id` (farm profiles only), `client_request_id` (UUID), `confirm_duplicate` (bool, default false).
@@ -203,6 +204,7 @@ Template: **Purpose · Auth/Role · Request · Example · Success · Validation 
 - Success `201 DebtOut` incl. `next_installments` (first 3 dates within horizon) and `evidence_state`. Creating a debt clears nothing; `no_debt_declared` becomes false automatically. DB: INSERT; bump `data_version`.
 
 **PATCH `/profiles/{pid}/debts/{did}`** — update fields or `status:"closed"`.
+- Implementation notes (P2): GET list returns `{"items","total","no_debt_declared"}`; `outstanding_as_of` defaults to today; `DebtOut.dates_outdated` is true when an active debt's `next_due_date` is in the past (schedule skips past dates without using up the outstanding balance — the cautious reading; assessment flag `existing_debt_dates_outdated`); creating a debt clears `no_debt_declared_at`.
 
 **POST `/profiles/{pid}/debts/declare-none`** → `200 {"no_debt_declared":true}`; 409 if active debts exist. DB: UPDATE `no_debt_declared_at`.
 
@@ -214,7 +216,7 @@ Template: **Purpose · Auth/Role · Request · Example · Success · Validation 
 - Errors: 422 `BIGHA_FACTOR_REQUIRED`; 422 ordering (low ≤ expected ≤ high; sowing < harvest).
 - DB: INSERT `farming_seasons`; bump `data_version`.
 
-**GET / PATCH `/profiles/{pid}/seasons/{sid}`**; **GET `/profiles/{pid}/seasons`** list.
+**GET / PATCH `/profiles/{pid}/seasons/{sid}`**; **GET `/profiles/{pid}/seasons`** list. (P2: GET one also returns `cost_items` with each item's `paid_total`; PATCH `status` accepts `planned|growing|closed` — `harvested` only via `/harvest`.)
 
 **POST `/profiles/{pid}/seasons/{sid}/cost-items`** — `{"category":"fertilizer","item_name":"Fertilizer","quantity":"1","unit":"lot","unit_cost":"18000","price_source_type":"owner_estimate"}` → `201 CostItemOut` (`total_cost`). PATCH/DELETE `…/{iid}` (DELETE → 409 if referenced by a transaction or request item).
 
