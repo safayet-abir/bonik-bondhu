@@ -190,7 +190,7 @@ function Sections({ s }: { s: S }) {
           {s.news_signals.length === 0 ? <p className="text-small">{t("news.none")}</p> : s.news_signals.map((n: S, i: number) => (
             <div key={i} className="flex flex-col gap-1 border-t border-bb-border pt-2 text-small first:border-0 first:pt-0">
               <p className="font-semibold" lang={n.headline_lang}>{n.is_demo ? <><DemoBadge />{" "}</> : null}{n.headline}</p>
-              <p className="text-bb-muted">{t("news.reported_by", { source: n.source_name, date: day(n.published_date) })} · {t(n.corroboration === "corroborated" ? "news.corroborated" : "news.single")}</p>
+              <p className="text-bb-muted">{t("news.reported_by", { source: n.source_name, date: day(n.published_date) })} · {t(n.corroboration === "corroborated" ? "news.corroborated" : "news.single")}{n.auto_collected ? ` · ${t("news.auto")}` : ""}</p>
               {n.source_url ? <a href={n.source_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-bb-primary underline"><ExternalLink aria-hidden className="size-4" />{t("news.open_source")}</a> : null}
             </div>))}
         </Section>

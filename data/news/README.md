@@ -29,3 +29,11 @@ Dhamrai) and Gazipur (Kaliakair): 7 real events from 10 source articles. Headlin
 taken from the publishers' pages as listed by search; summaries are our own. **Plan P4-T08 asks for
 a review by a second person**: open each link, check the headline, dates and districts, then change
 `curated_by` to the reviewer's initials. Real news ages out of matching 30 days after publication.
+
+**Keeping news fresh (SUG-45):** every event above stops matching after 14 Dec 2026 (latest
+published 14 Nov). Fresh real news comes from the daily collector: `python -m app.cli fetch-news`
+(add `--dry-run` to only print), or set `NEWS_FETCH_HOURS=24` so the app runs it itself. It searches
+Google News for the areas of active owners and suppliers, keeps only headlines that name the place
+and match a fixed keyword rule, and labels them "Collected automatically — not checked by a
+person". It never overwrites the hand-curated rows of this file. Before the demo, run a dry run and
+look at what it picked up.

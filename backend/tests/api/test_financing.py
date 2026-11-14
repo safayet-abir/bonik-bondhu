@@ -84,6 +84,32 @@ def test_items_crud_and_unconfirmed_never_count(client) -> None:
     assert client.delete(f"{url}/items/{iid}").status_code == 404
 
 
+def test_ai_proposed_item_counts_only_after_owner_price(client, clean_db: str) -> None:  # FR-FIN-03, P6 seam
+    from sqlalchemy import create_engine, text
+    pid, rid = setup_shop(client)
+    url = f"/api/v1/profiles/{pid}/financing-requests/{rid}"
+    engine = create_engine(clean_db)
+    with engine.begin() as conn:  # the row shape parse-purpose will insert (API spec §4.10)
+        iid = conn.execute(text(
+            "INSERT INTO financing_request_items (profile_id, financing_request_id, item_name, quantity, unit, "
+            "unit_price, price_source_type, ai_proposed, confirmed) "
+            "VALUES (:p, :r, 'চাল', 20, 'বস্তা', 0, 'owner_estimate', true, false) RETURNING id"),
+            {"p": pid, "r": rid}).scalar_one()
+    engine.dispose()
+    req = client.get(url).json()
+    assert req["items"][0]["unit_price"] is None and req["items"][0]["confirmed"] is False
+    assert req["preview"]["items_total"] == "0.00"
+    a = client.post(url + "/assessments").json()
+    assert "purpose_items_missing" in a["missing_items"] and "weak_price_evidence" not in a["flags"]
+    r = client.patch(f"{url}/items/{iid}", json={"confirmed": True})
+    assert r.status_code == 422 and r.json()["error"]["fields"] == {"unit_price": "fin.err.price_required"}
+    r = client.patch(f"{url}/items/{iid}", json={"unit_price": "2500", "price_source_type": "supplier_quote",
+                                                  "confirmed": True}).json()
+    assert (r["confirmed"], r["ai_proposed"], r["line_total"]) == (True, True, "50000.00")
+    assert client.get(url).json()["preview"]["items_total"] == "50000.00"
+    assert "purpose_items_missing" not in client.post(url + "/assessments").json()["missing_items"]
+
+
 def test_farm_copy_season_cost_item(client) -> None:  # FR-FIN-08
     owner(client)
     p = create_profile(client, "Farm", activity_type="crop_farm", district="Dhaka", upazila="Dhamrai")

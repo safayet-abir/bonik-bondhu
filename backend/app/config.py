@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     FORECAST_WINDOW_WEEKS: int = 8  # SUG-07
     FORECAST_MIN_WEEKS: int = 4  # SUG-07
     HIGH_DEPENDENCY_SHARE: Decimal = Decimal("0.50")  # SUG-10
+    # Daily automatic news collection inside the app (SUG-45); 0 = off (CLI `fetch-news` still works)
+    NEWS_FETCH_HOURS: int = 0
     DEMO_PASSWORD: str = ""
     LOG_LEVEL: str = "INFO"
     # Built React app served by FastAPI (TRD §3 "Build"); empty = default path

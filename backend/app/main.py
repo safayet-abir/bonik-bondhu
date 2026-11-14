@@ -59,6 +59,10 @@ def create_app() -> FastAPI:
                    financing.router, scenarios.router, news.router, consents.router, lender.router):
         app.include_router(router, prefix=API_V1)
 
+    if settings.NEWS_FETCH_HOURS > 0:
+        from .news_feed import start_daily
+        start_daily(settings.NEWS_FETCH_HOURS)
+
     dist = settings.frontend_dist_path
     if (dist / "index.html").is_file():
         app.mount("/", SPAStaticFiles(directory=dist, html=True), name="spa")

@@ -300,6 +300,8 @@ export type NewsSignal = {
   is_demo: boolean;
   source_count: number;
   corroboration: "single_source" | "corroborated";
+  /** Collected by the daily news search, not checked by a person (SUG-45). Absent in older snapshots. */
+  auto_collected?: boolean;
   match_reasons: ("location" | "supplier_location" | "sector" | "commodity")[];
   matched_supplier: string | null;
   proposed_scenario_id: string | null;

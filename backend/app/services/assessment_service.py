@@ -422,6 +422,7 @@ def news_signal_rows(db: Session, profile: BusinessProfile, as_of: date,
             "event_date": e.event_date.isoformat() if e.event_date else None, "event_type": e.event_type,
             "districts": list(e.districts), "upazilas": list(e.upazilas), "is_demo": e.is_demo,
             "source_count": e.source_count, "corroboration": m.corroboration, "match_reasons": m.reasons,
+            "auto_collected": e.curated_by == news_service.AUTO_CURATOR,  # SUG-45: not checked by a person
             "matched_supplier": m.supplier.display_name if m.supplier else None,
             "proposed_scenario_id": str(sc.id) if sc else None,
             "scenario_status": sc.status if sc else None,

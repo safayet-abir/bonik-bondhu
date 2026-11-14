@@ -90,6 +90,7 @@
 
   "news.single": "Reported by one source — not confirmed",
   "news.corroborated": "Reported by several sources",
+  "news.auto": "Collected automatically — not checked by a person",
   "news.demo": "Demo event (fictional)",
   "news.test": "Test this risk",
   "news.dismiss": "Not relevant",
@@ -803,7 +804,7 @@
   "lender.event.note": "note",
   "lender.event.info_request": "information request",
   "lender.event.decision": "decision",
-  "lender.err.consent_required": "The owner has not approved this request",
+  "lender.err.consent_required": "The owner has not given access yet",
   "lender.err.consent_revoked": "The owner stopped sharing this case",
   "lender.err.consent_expired": "The sharing period has ended",
   "lender.err.status": "Choose a status",

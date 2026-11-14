@@ -153,6 +153,7 @@ function NewsCard({ n, a, lang, profileId, onChanged }: {
           n.corroboration === "corroborated" ? "bg-bb-primary-soft text-bb-primary" : "bg-bb-bg text-bb-warning"}`}>
           {t(n.corroboration === "corroborated" ? "news.corroborated" : "news.single")}
         </span>
+        {n.auto_collected ? <span className="rounded-full bg-bb-bg px-2 text-caption text-bb-muted">{t("news.auto")}</span> : null}
       </div>
       <p lang={n.headline_lang} className="flex items-start gap-2 font-semibold">
         <Newspaper aria-hidden className="mt-1 size-5 shrink-0 text-bb-primary" />{n.headline}

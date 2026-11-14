@@ -136,6 +136,26 @@ def import_news_cmd(args: argparse.Namespace) -> int:
     return 1 if report.rejected else 0
 
 
+def fetch_news_cmd(args: argparse.Namespace) -> int:
+    import httpx
+
+    from . import news_feed
+    with get_sessionmaker()() as db, db.begin():
+        if args.dry_run:
+            with httpx.Client(timeout=20, follow_redirects=True) as client:
+                rows = news_feed.collect(db, today(), client)
+            for r in rows:
+                print(f"{r['published_date']} {r['event_type']:<28} {r['dedup_key']:<50} {r['source_name']}: "
+                      f"{r['headline']}")
+            print(f"{len(rows)} rows (dry run, nothing saved)")
+            db.rollback()
+            return 0
+        report = news_feed.fetch(db, today())
+    print(f"News fetch: {report.inserted} inserted, {report.updated} updated, "
+          f"{report.skipped} skipped (curated by a person).")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.cli", description="Bonik Bondhu admin commands")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -163,6 +183,10 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("import-news", help="import curated news events from a CSV file")
     p.add_argument("csv", help="path to curated_news.csv")
     p.set_defaults(func=import_news_cmd)
+
+    p = sub.add_parser("fetch-news", help="collect recent news for owners' areas from a news search (SUG-45)")
+    p.add_argument("--dry-run", action="store_true", help="print what would be saved")
+    p.set_defaults(func=fetch_news_cmd)
 
     args = parser.parse_args(argv)
     return args.func(args)

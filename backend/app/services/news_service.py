@@ -126,7 +126,9 @@ def match(db: Session, profile: BusinessProfile, as_of: date,
                     m.supplier = s
                     break
         sector = bool(category) and category in _canon_set(e.sectors)
-        commodity = bool(crops & _canon_set(e.commodities))
+        # A farm buys inputs: a fertiliser/diesel price shock is relevant even though it is not its crop.
+        commodity = bool(crops & _canon_set(e.commodities)) or (
+            profile.activity_type == "crop_farm" and e.event_type == "price_shock" and is_farm_input_shock(e))
         if not local or m.reasons:
             if sector:
                 m.reasons.append("sector")
@@ -142,10 +144,14 @@ def is_farm_input_shock(event: NewsEvent) -> bool:
 
 
 # --------------------------------------------------------------------------- import (CLI only)
+AUTO_CURATOR = "auto-news-search"  # curated_by of rows from the daily collector (SUG-45)
+
+
 @dataclass
 class ImportReport:
     inserted: int = 0
     updated: int = 0
+    skipped: int = 0
     rejected: list[tuple[int, str]] = field(default_factory=list)
 
 
@@ -210,7 +216,7 @@ def import_csv(db: Session, path: Path, today: date) -> ImportReport:
     several sources (source_count = distinct sources; the first row is the
     primary). Upsert by dedup_key; re-importing the same file is idempotent."""
     report = ImportReport()
-    groups: dict[str, list[dict]] = {}
+    rows: list[dict] = []
     with path.open(encoding="utf-8-sig", newline="") as fh:
         reader = csv.DictReader(fh)
         missing = [c for c in CSV_COLUMNS if c not in (reader.fieldnames or [])]
@@ -219,11 +225,19 @@ def import_csv(db: Session, path: Path, today: date) -> ImportReport:
             return report
         for line, row in enumerate(reader, start=2):
             try:
-                clean = validate_row(row, today)
+                rows.append(validate_row(row, today))
             except ValueError as exc:
                 report.rejected.append((line, str(exc)))
-                continue
-            groups.setdefault(clean["dedup_key"], []).append(clean)
+    return import_rows(db, rows, report)
+
+
+def import_rows(db: Session, clean_rows: list[dict], report: ImportReport | None = None) -> ImportReport:
+    """Upsert validated rows grouped by dedup_key. An automatically collected
+    row never overwrites an event a person curated."""
+    report = report or ImportReport()
+    groups: dict[str, list[dict]] = {}
+    for clean in clean_rows:
+        groups.setdefault(clean["dedup_key"], []).append(clean)
     for key, rows in groups.items():
         primary = rows[0]
         sources = {(r["source_url"] or r["source_name"]).casefold() for r in rows}
@@ -231,6 +245,8 @@ def import_csv(db: Session, path: Path, today: date) -> ImportReport:
         if existing is None:
             db.add(NewsEvent(**primary, source_count=len(sources)))
             report.inserted += 1
+        elif primary["curated_by"] == AUTO_CURATOR and existing.curated_by != AUTO_CURATOR:
+            report.skipped += 1
         else:
             for k, v in primary.items():
                 setattr(existing, k, v)

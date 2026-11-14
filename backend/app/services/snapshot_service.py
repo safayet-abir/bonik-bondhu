@@ -152,7 +152,8 @@ def _supplier_risk(conc: supplier_service.SupplierConcentration, labels: dict) -
 
 def _news(db: Session, p: BusinessProfile, as_of: date, names: dict) -> list[dict]:
     keep = ("headline", "headline_lang", "summary", "source_name", "source_url", "published_date", "event_date",
-            "event_type", "districts", "upazilas", "is_demo", "corroboration", "source_count", "match_reasons")
+            "event_type", "districts", "upazilas", "is_demo", "corroboration", "source_count", "match_reasons",
+            "auto_collected")
     out = []
     for n in assessment_service.news_signal_rows(db, p, as_of):
         row = {k: n[k] for k in keep}
@@ -195,6 +196,14 @@ def _scrub(value, names: list[tuple[re.Pattern, str]]):
     return value
 
 
+def name_patterns(names: dict[str, str]) -> list[tuple[re.Pattern, str]]:
+    """Whole-word, case-insensitive; longest first. Bangla vowel signs are not
+    \\w, so "রহিমের" still matches "রহিম". shortcut: names under 3 letters are
+    not scrubbed (too many false hits); a different spelling/script is not caught."""
+    return [(re.compile(r"(?<!\w)" + re.escape(n.strip()) + r"(?!\w)", re.IGNORECASE), lbl)
+            for n, lbl in sorted(names.items(), key=lambda kv: -len(kv[0])) if len(n.strip()) >= 3]
+
+
 def build(db: Session, profile: BusinessProfile, sections: list[str], r: FinancingRequest,
           a: FinancialAssessment) -> dict:
     as_of = a.as_of_date
@@ -215,7 +224,6 @@ def build(db: Session, profile: BusinessProfile, sections: list[str], r: Financi
         "transaction_list": lambda: _transactions(db, profile, as_of, labels),
     }
     body = {key: builders[key]() for key in SECTIONS if key in sections}  # allowlist, fixed order
-    patterns = [(re.compile(re.escape(n), re.IGNORECASE), lbl)
-                for n, lbl in sorted(names.items(), key=lambda kv: -len(kv[0])) if len(n.strip()) >= 3]
+    patterns = name_patterns(names)
     return {"schema": SCHEMA, "generated_at": utcnow().replace(microsecond=0).isoformat().replace("+00:00", "Z"),
             "as_of_date": as_of.isoformat(), "is_demo": profile.is_demo, "sections": _scrub(body, patterns)}
