@@ -1,0 +1,48 @@
+/* Design tokens — UI spec §2 (SUG-17, approved 14 Nov 2026). */
+@import "tailwindcss";
+
+@theme {
+  --color-bb-primary: #0b6b53;
+  --color-bb-primary-dark: #084c3b;
+  --color-bb-primary-soft: #e3f1ec;
+  --color-bb-bg: #f6f7f5;
+  --color-bb-surface: #ffffff;
+  --color-bb-text: #1c2321;
+  --color-bb-muted: #5b6661;
+  --color-bb-border: #dde2df;
+  --color-bb-success: #1e7b34;
+  --color-bb-warning: #b26a00;
+  --color-bb-danger: #b42318;
+  --color-bb-info: #1f5fa8;
+  --color-bb-demo: #6b4fa1;
+
+  --font-sans: "Noto Sans Bengali", "Noto Sans", system-ui, sans-serif;
+
+  /* Type scale: 13 caption · 14 small · 16 body · 18 card title · 22 screen title · 28 key amount */
+  --text-caption: 13px;
+  --text-small: 14px;
+  --text-body: 16px;
+  --text-card: 18px;
+  --text-title: 22px;
+  --text-amount: 28px;
+
+  --radius-bb: 8px;
+}
+
+html {
+  background: var(--color-bb-bg);
+  color: var(--color-bb-text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6; /* Bangla conjuncts need height */
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--color-bb-bg);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}

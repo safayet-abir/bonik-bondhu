@@ -1,0 +1,37 @@
+"""Alembic environment. Migrations are hand-written SQL (DB doc §7): schema.sql
+is the reviewed source of truth, so there is no autogenerate metadata."""
+from __future__ import annotations
+
+from logging.config import fileConfig
+
+from alembic import context
+from sqlalchemy import create_engine, pool
+
+from app.config import get_settings
+
+config = context.config
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
+
+# Allows tests to target another DB: config.attributes["database_url"]
+url = config.attributes.get("database_url") or get_settings().DATABASE_URL
+
+
+def run_migrations_offline() -> None:
+    context.configure(url=url, target_metadata=None, literal_binds=True)
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+def run_migrations_online() -> None:
+    engine = create_engine(url, poolclass=pool.NullPool)
+    with engine.connect() as connection:
+        context.configure(connection=connection, target_metadata=None, transaction_per_migration=True)
+        with context.begin_transaction():
+            context.run_migrations()
+
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()

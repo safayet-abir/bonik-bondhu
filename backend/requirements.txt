@@ -1,0 +1,21 @@
+# Pinned top-level dependencies (SUG-01, SUG-02, SUG-18, SUG-20). Python 3.11+ (dev: 3.14).
+fastapi==0.162.7
+uvicorn[standard]==0.54.0
+pydantic==2.14.3
+pydantic-settings==2.16.3
+SQLAlchemy==2.1.8
+alembic==1.20.1
+psycopg[binary]==3.3.9
+argon2-cffi==25.1.0
+pillow==13.0.0
+python-multipart==0.0.33
+
+# Tests
+pytest==9.2.0
+httpx==0.28.1
+httpx2==2.16.0  # preferred by starlette.testclient (removes deprecation warning)
+
+# Windows note: if "An Application Control policy has blocked this file" appears
+# when importing sqlalchemy, replace its compiled wheel with the pure-Python one:
+#   pip download SQLAlchemy==2.1.8 --no-deps --platform any --only-binary=:all: -d wheels
+#   pip install --force-reinstall --no-deps wheels/sqlalchemy-2.1.8-py3-none-any.whl
