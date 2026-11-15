@@ -11,14 +11,15 @@
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { chromium } from "playwright";
+import { launchOpts, rec } from "./rec.mjs";
 
 const [base = "http://localhost:8000", shots = "e2e-shots-p7", demoPw = process.env.DEMO_PASSWORD] = process.argv.slice(2);
 if (!demoPw) throw new Error("pass the DEMO password as 3rd argument or DEMO_PASSWORD");
 mkdirSync(shots, { recursive: true });
 const step = (msg) => console.log(`✓ ${msg}`);
 const dhaka = (days = 0) => new Date(Date.now() + 6 * 3600e3 + days * 864e5).toISOString().slice(0, 10);
-const browser = await chromium.launch({ channel: "msedge" });
-const ctx = await browser.newContext({ viewport: { width: 360, height: 760 } });
+const browser = await chromium.launch(launchOpts);
+const ctx = await browser.newContext({ viewport: { width: 360, height: 760 }, ...rec({ width: 360, height: 760 }) });
 const page = await ctx.newPage();
 const shot = (name) => page.screenshot({ path: join(shots, `${name}.png`), fullPage: true });
 const text = (s) => page.getByText(s).first().waitFor();
@@ -90,7 +91,10 @@ try {
 
   await page.getByRole("link", { name: "More" }).click();
   await page.getByRole("link", { name: "Forecast (estimate)" }).click();
-  await page.waitForLoadState("networkidle");
+  // the page computes the forecast (POST) after a 404 on latest; a sleepy free host can take a while
+  for (let i = 0; i < 60 && (await page.request.get(`${base}/api/v1/profiles/${pid}/forecasts/latest`)).status() === 404; i++) {
+    await page.waitForTimeout(1000);
+  }
   if ((await api("GET", `/profiles/${pid}/forecasts/latest`)).status !== "ok") throw new Error("forecast not ok");
   await shot("e2e1-01-forecast");
   step("forecast ok");

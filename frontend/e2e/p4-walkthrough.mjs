@@ -10,14 +10,15 @@
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { chromium } from "playwright";
+import { launchOpts, rec } from "./rec.mjs";
 
 const [base = "http://localhost:8000", shots = "e2e-shots-p4", demoPw = process.env.DEMO_PASSWORD] = process.argv.slice(2);
 if (!demoPw) throw new Error("pass the DEMO password as 3rd argument or DEMO_PASSWORD");
 mkdirSync(shots, { recursive: true });
 const step = (msg) => console.log(`✓ ${msg}`);
 
-const browser = await chromium.launch({ channel: "msedge" });
-const page = await browser.newPage({ viewport: { width: 360, height: 760 } });
+const browser = await chromium.launch(launchOpts);
+const page = await browser.newPage({ viewport: { width: 360, height: 760 }, ...rec({ width: 360, height: 760 }) });
 const shot = (name) => page.screenshot({ path: join(shots, `${name}.png`), fullPage: true });
 const text = (s, exact = false) => page.getByText(s, { exact }).first().waitFor();
 const tab = (name) => page.getByRole("button", { name }).click();

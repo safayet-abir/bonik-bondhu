@@ -9,6 +9,7 @@
 import { mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { chromium } from "playwright";
+import { launchOpts, rec } from "./rec.mjs";
 
 const [base = "http://localhost:8000", shots = "e2e-shots-p6-ai", receipt, demoPw = process.env.DEMO_PASSWORD] = process.argv.slice(2);
 if (!receipt || !demoPw) throw new Error("usage: p6-ai-on.mjs <base> <shots> <receipt.jpg> [demoPassword]");
@@ -16,8 +17,8 @@ mkdirSync(shots, { recursive: true });
 const step = (msg) => console.log(`✓ ${msg}`);
 const AI_WAIT = { timeout: 90_000 }; // free-tier LLM calls can take a while
 
-const browser = await chromium.launch({ channel: "msedge" });
-const page = await browser.newPage({ viewport: { width: 360, height: 760 } });
+const browser = await chromium.launch(launchOpts);
+const page = await browser.newPage({ viewport: { width: 360, height: 760 }, ...rec({ width: 360, height: 760 }) });
 const shot = (name) => page.screenshot({ path: join(shots, `${name}.png`), fullPage: true });
 const text = (s, opts = {}) => page.getByText(s, { exact: false }).first().waitFor(opts);
 const get = async (path) => (await page.request.get(`${base}/api/v1${path}`)).json();
@@ -82,9 +83,13 @@ try {
   await row.getByLabel("Price per unit (Tk)").fill("2500");
   await shot("02-ai-items");
   await row.getByRole("button", { name: "Confirm this item" }).click();
-  await page.waitForLoadState("networkidle");
-  detail = await get(`/profiles/${pid}/financing-requests/${req.id}`);
-  const confirmed = detail.items.find((i) => i.id === ai[0].id);
+  // poll: a slow host may still be saving; the first row on screen need not be ai[0] of the API list
+  let confirmed;
+  for (let i = 0; i < 30 && !confirmed; i++) {
+    if (i) await page.waitForTimeout(1000);
+    detail = await get(`/profiles/${pid}/financing-requests/${req.id}`);
+    confirmed = detail.items.find((it) => it.ai_proposed && it.confirmed);
+  }
   if (!confirmed?.confirmed || Number(detail.preview.items_total) !== before + Number(confirmed.line_total)) {
     throw new Error("confirmed AI item did not count");
   }

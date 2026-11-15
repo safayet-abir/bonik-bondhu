@@ -13,15 +13,16 @@
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { chromium } from "playwright";
+import { launchOpts, rec } from "./rec.mjs";
 
 const [base = "http://localhost:8000", shots = "e2e-shots-p5", demoPw = process.env.DEMO_PASSWORD] = process.argv.slice(2);
 if (!demoPw) throw new Error("pass the DEMO password as 3rd argument or DEMO_PASSWORD");
 mkdirSync(shots, { recursive: true });
 const step = (msg) => console.log(`✓ ${msg}`);
 
-const browser = await chromium.launch({ channel: "msedge" });
-const ownerCtx = await browser.newContext({ viewport: { width: 360, height: 760 } });
-const lenderCtx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+const browser = await chromium.launch(launchOpts);
+const ownerCtx = await browser.newContext({ viewport: { width: 360, height: 760 }, ...rec({ width: 360, height: 760 }) });
+const lenderCtx = await browser.newContext({ viewport: { width: 1280, height: 900 }, ...rec({ width: 1280, height: 900 }) });
 const A = await ownerCtx.newPage();
 const B = await lenderCtx.newPage();
 const shot = (page, name) => page.screenshot({ path: join(shots, `${name}.png`), fullPage: true });

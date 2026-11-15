@@ -91,14 +91,34 @@ def _names(place: str) -> re.Pattern:
     return _w("|".join(re.escape(n) for n in sorted(names, key=len, reverse=True)))
 
 
-def _search(client: httpx.Client, query: str) -> list[tuple[str, str, str, date]]:
-    """(headline, link, outlet, published Dhaka date) from one RSS search."""
+# National price searches also return foreign stories ("Onion prices in Tajikistan rise", live run 16 Nov):
+# keep one only if the headline names Bangladesh/Dhaka or the publisher is Bangladeshi.
+# shortcut: hand-kept outlet list; an unlisted BD outlet's national story is skipped (fewer signals, never a
+# foreign one) — extend the list if real BD stories go missing.
+BD_OUTLETS = {"thedailystar", "tbsnews", "newagebd", "observerbd", "dhakatribune", "bdnews24", "prothomalo",
+              "banglatribune", "thefinancialexpress", "daily-sun", "thedailynewnation", "unb", "bssnews", "risingbd",
+              "jugantor", "samakal", "kalerkantho", "ittefaq", "bd-pratidin", "dailyjanakantha", "ajkerpatrika",
+              "jagonews24", "somoynews", "banglanews24", "dhakapost", "dailyasianage", "dailynewnation",
+              "bonikbarta"}
+BD_WORDS = _w(r"Bangladesh|Bangladeshi|Dhaka")
+
+
+def _bd_outlet(host: str) -> bool:
+    h = host.lower().removeprefix("www.").removeprefix("en.")
+    label = h.split(".")[0]
+    return h.endswith(".bd") or label.endswith("bd") or label in BD_OUTLETS  # "…bd": newagebd, observerbd
+
+
+def _search(client: httpx.Client, query: str) -> list[tuple[str, str, str, date, str]]:
+    """(headline, link, outlet, published Dhaka date, publisher host) from one RSS search."""
     r = client.get(FEED, params={"q": f"{query} when:{WINDOW_DAYS}d", "hl": "en-BD", "gl": "BD", "ceid": "BD:en"})
     r.raise_for_status()
     out = []
     for item in ET.fromstring(r.content).iter("item"):
         title, link = item.findtext("title") or "", item.findtext("link") or ""
         outlet = (item.findtext("source") or "").strip()
+        src = item.find("source")
+        host = httpx.URL(src.get("url", "")).host if src is not None else ""
         try:
             published = parsedate_to_datetime(item.findtext("pubDate") or "").astimezone(DHAKA).date()
         except (TypeError, ValueError):
@@ -106,7 +126,7 @@ def _search(client: httpx.Client, query: str) -> list[tuple[str, str, str, date]
         if outlet and title.endswith(f" - {outlet}"):
             title = title[: -len(outlet) - 3]
         if title and link.startswith("https://") and outlet:
-            out.append((title.strip(), link, outlet, published))
+            out.append((title.strip(), link, outlet, published, host))
     return out
 
 
@@ -148,9 +168,11 @@ def collect(db: Session, today: date, client: httpx.Client) -> list[dict]:
             log.warning("news search failed", extra={"error": type(exc).__name__})
             continue
         place = _names(upazila or district) if district else None
-        for title, link, outlet, published in items:
+        for title, link, outlet, published, host in items:
             if published < today - timedelta(days=WINDOW_DAYS) or published > today:
                 continue
+            if district is None and not (_bd_outlet(host) or BD_WORDS.search(title)):
+                continue  # national search: Bangladesh stories only
             if place is not None and not place.search(title):  # the place must be in the headline itself
                 continue
             kind = classify(title)

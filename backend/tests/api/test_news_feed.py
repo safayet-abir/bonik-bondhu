@@ -46,9 +46,11 @@ def _handler(request: httpx.Request) -> httpx.Response:
         return httpx.Response(500)  # one failing search must not stop the rest
     if q.startswith('"rice"'):
         return httpx.Response(200, text=_rss(("Rice prices rise again", "New Age BD", 1)))
+    if q.startswith('"onion"'):  # live run 16 Nov: a foreign story in a national search must not be kept
+        return httpx.Response(200, text=_rss(("Onion prices in Tajikistan rise 60% in a month", "UkrAgroConsult", 1)))
     if q.startswith('"fertilizer"'):
-        return httpx.Response(200, text=_rss(("Fertilizer prices hiked by Tk 5 a kg", "TBS", 2),
-                                             ("Fertilizer prices hiked old news", "TBS", 20)))  # outside 7 days
+        return httpx.Response(200, text=_rss(("Fertilizer prices hiked by Tk 5 a kg", "TBS News", 2),
+                                             ("Fertilizer prices hiked old news", "TBS News", 20)))  # outside 7 days
     return httpx.Response(200, text=_rss())
 
 
