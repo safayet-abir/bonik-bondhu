@@ -129,6 +129,7 @@ def confirm_draft(db: Session, user: User, profile: BusinessProfile, xid: uuid.U
 def discard_draft(db: Session, profile: BusinessProfile, xid: uuid.UUID) -> None:
     d = _draft(db, profile, xid)
     d.status, d.resolved_at = "discarded", utcnow()
+    document_service.drop_file(db, profile, d.document_id)
     db.flush()
 
 

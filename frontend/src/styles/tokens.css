@@ -11,7 +11,7 @@
   --color-bb-muted: #5b6661;
   --color-bb-border: #dde2df;
   --color-bb-success: #1e7b34;
-  --color-bb-warning: #b26a00;
+  --color-bb-warning: #975a00; /* P7 a11y: #b26a00 was 3.9:1 on bg (WCAG AA needs 4.5); now 5.2:1 */
   --color-bb-danger: #b42318;
   --color-bb-info: #1f5fa8;
   --color-bb-demo: #6b4fa1;

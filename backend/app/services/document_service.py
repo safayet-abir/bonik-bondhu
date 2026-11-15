@@ -90,3 +90,10 @@ def get(db: Session, profile: BusinessProfile, did: uuid.UUID) -> Document:
 
 def path(doc: Document) -> Path:
     return _folder() / doc.storage_key
+
+
+def drop_file(db: Session, profile: BusinessProfile, did: uuid.UUID) -> None:
+    """SUG-52: the photo is only needed while the owner checks the entry. Once the entry is saved
+    (or the draft discarded) the image is deleted; the row keeps sha256 + upload time, so the
+    duplicate-photo warning still works and no receipt image (third-party names, phones) is kept."""
+    path(get(db, profile, did)).unlink(missing_ok=True)

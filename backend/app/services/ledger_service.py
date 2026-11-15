@@ -17,6 +17,7 @@ from ..models import (
     BusinessProfile, DebtFacility, Document, FarmingSeason, SeasonCostItem, Supplier, Transaction, User,
 )
 from ..schemas.ledger import SupplierRef, TransactionCreate, TransactionOut
+from . import document_service
 from .profile_service import bump_data_version
 
 # A planned season cost can only be paid by a money-out business entry.
@@ -124,6 +125,9 @@ def create(db: Session, user: User, profile: BusinessProfile, data: TransactionC
     db.add(txn)
     db.flush()
     bump_data_version(profile)
+    if document_id is not None:
+        # shortcut: the file is deleted before the commit; if the commit then failed the owner re-uploads
+        document_service.drop_file(db, profile, document_id)
     return txn, True
 
 

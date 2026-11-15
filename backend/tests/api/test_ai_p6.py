@@ -121,6 +121,9 @@ def test_ai01_ai05_ai06_draft_then_confirm(client, monkeypatch) -> None:
     t = t.json()
     assert (t["entry_method"], t["evidence_state"], t["amount"], t["document_id"]) == \
         ("photo_assisted", "document_attached", "12500.00", doc["id"])  # AI-05: the owner's edit wins
+    # SUG-52: only the data is kept — the image is gone, the duplicate check still knows the photo
+    assert client.get(f"/api/v1/profiles/{pid}/documents/{doc['id']}/content").status_code == 404
+    assert upload(client, pid, jpeg()).json()["duplicate_of"] == doc["id"]
     again = client.post(f"/api/v1/profiles/{pid}/extraction-drafts/{d['id']}/confirm", json=body)
     assert again.status_code == 409 and again.json()["error"]["code"] == "DRAFT_ALREADY_RESOLVED"  # AI-06
 
@@ -178,6 +181,7 @@ def test_ai09_no_llm_manual_entry_keeps_the_photo(make_client, monkeypatch) -> N
                                                               "value_date": "2026-11-10", "document_id": doc["id"]})
     assert t.status_code == 201 and (t.json()["evidence_state"], t.json()["entry_method"]) == \
         ("document_attached", "manual")
+    assert a.get(f"/api/v1/profiles/{pid}/documents/{doc['id']}/content").status_code == 404  # SUG-52
     other = shop(b, 2)
     r = b.post(f"/api/v1/profiles/{other}/transactions", json={"txn_type": "purchase_cash", "amount": "500",
                                                                "value_date": "2026-11-10", "document_id": doc["id"]})
