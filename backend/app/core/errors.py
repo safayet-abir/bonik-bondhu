@@ -12,6 +12,7 @@ from typing import Any
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import DBAPIError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 log = logging.getLogger("bonik.errors")
@@ -108,7 +109,13 @@ async def _http_error(request: Request, exc: StarletteHTTPException) -> JSONResp
 
 
 async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
-    log.exception("unhandled error", extra={"request_id": getattr(request.state, "request_id", None)})
+    rid = getattr(request.state, "request_id", None)
+    if isinstance(exc, DBAPIError):
+        # PostgreSQL messages echo values ("Failing row contains (… phone, email …)"): log the code only
+        log.error("database error", extra={"request_id": rid, "error": type(exc.orig).__name__,
+                                           "sqlstate": getattr(exc.orig, "sqlstate", None)})
+    else:
+        log.exception("unhandled error", extra={"request_id": rid})
     return JSONResponse(status_code=500, content=error_body(request, "INTERNAL_ERROR", "err.generic"))
 
 

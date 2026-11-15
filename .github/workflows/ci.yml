@@ -57,3 +57,18 @@ jobs:
       - run: npm run build
       - name: No secrets in dist/
         run: python3 ../scripts/check_dist_secrets.py dist
+
+  docker:
+    # P7-T05: the production image must build (the dev machine has no Docker)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t bonik-bondhu:ci .
+      - name: Image starts and serves the SPA + health (no DB -> status degraded, still HTTP)
+        run: |
+          docker run -d --name app -p 8000:8000 -e APP_ENV=production -e SECRET_SALT=ci-only-dummy-salt-not-a-secret \
+            -e DATABASE_URL=postgresql+psycopg://x:x@127.0.0.1:1/x \
+            --entrypoint uvicorn bonik-bondhu:ci app.main:create_app --factory --host 0.0.0.0 --port 8000
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://localhost:8000/ && break; sleep 1; done
+          curl -sf http://localhost:8000/ | grep -q 'id="root"'
+          curl -s http://localhost:8000/api/v1/health | grep -q '"db":"down"'

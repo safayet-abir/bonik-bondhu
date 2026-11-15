@@ -69,7 +69,10 @@ def upload(db: Session, user: User, profile: BusinessProfile, raw: bytes,
                           .order_by(Document.created_at).limit(1))
     key = secrets.token_hex(16) + (".jpg" if mime == "image/jpeg" else ".png")
     # shortcut: if the request later fails, the file stays on disk unreferenced; add a cleanup job if uploads grow
-    (_folder() / key).write_bytes(data)
+    try:
+        (_folder() / key).write_bytes(data)
+    except OSError:  # FS-03: storage full / not writable -> 503; manual entry still works
+        raise AppError("SERVICE_UNAVAILABLE", 503, "doc.err.storage") from None
     doc = Document(profile_id=profile.id, uploaded_by=user.id, storage_key=key, mime_type=mime,
                    size_bytes=len(data), sha256=digest, purpose=purpose)
     db.add(doc)

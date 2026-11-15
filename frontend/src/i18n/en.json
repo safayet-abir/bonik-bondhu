@@ -66,6 +66,7 @@
   "ai.err.draft_resolved": "This AI draft was already saved or discarded",
   "doc.err.type": "Only JPEG or PNG photos can be used",
   "doc.err.too_large": "The photo is too large (max 5 MB)",
+  "doc.err.storage": "Photos cannot be saved right now — you can still type the entry",
   "fin.ai_parse_title": "Make a list from my text",
   "fin.ai_parse": "Make the list with AI",
   "fin.ai_parse_note": "Your purpose text is sent to an AI service. AI never adds prices — you add each price and confirm.",

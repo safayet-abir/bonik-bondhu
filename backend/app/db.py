@@ -19,6 +19,7 @@ def get_engine() -> Engine:
     return create_engine(
         settings.DATABASE_URL,
         pool_pre_ping=True,
+        hide_parameters=True,  # DB error text (logged on 500s) must not carry phones, emails or amounts
         connect_args={"connect_timeout": 5},
     )
 

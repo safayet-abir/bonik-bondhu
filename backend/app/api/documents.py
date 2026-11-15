@@ -8,7 +8,7 @@ from fastapi import APIRouter, File, Form, Request, Response, UploadFile, status
 from fastapi.responses import FileResponse
 
 from ..core.deps import OwnedProfile, OwnerUser
-from ..core.errors import AppError
+from ..core.errors import AppError, not_found
 from ..db import DbSession
 from ..schemas.ai import DocumentOut, ExtractionDraftOut, ExtractionIn
 from ..schemas.ledger import TransactionCreate, TransactionOut
@@ -34,7 +34,10 @@ def upload_document(request: Request, profile: OwnedProfile, user: OwnerUser, db
 @router.get("/documents/{did}/content")
 def document_content(did: uuid.UUID, profile: OwnedProfile, db: DbSession) -> FileResponse:
     doc = document_service.get(db, profile, did)
-    return FileResponse(document_service.path(doc), media_type=doc.mime_type,
+    path = document_service.path(doc)
+    if not path.is_file():  # hosts with ephemeral disks lose uploads on redeploy: 404, not a 500
+        raise not_found()
+    return FileResponse(path, media_type=doc.mime_type,
                         headers={"Cache-Control": "private, no-store", "Content-Disposition": "inline"})
 
 

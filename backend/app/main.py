@@ -35,6 +35,9 @@ class SPAStaticFiles(StaticFiles):
 
 def create_app() -> FastAPI:
     settings = get_settings()
+    if settings.is_production and len(settings.SECRET_SALT) < 16:
+        # an empty salt makes the IP hashes in audit_logs trivially reversible (Security §5)
+        raise RuntimeError("Set SECRET_SALT (32+ random hex characters) before starting in production")
     configure_logging(settings.LOG_LEVEL)
 
     app = FastAPI(

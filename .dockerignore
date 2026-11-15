@@ -4,5 +4,6 @@
 **/.pytest_cache
 **/node_modules
 frontend/dist
-uploads
+**/uploads
+**/e2e-shots*
 .git

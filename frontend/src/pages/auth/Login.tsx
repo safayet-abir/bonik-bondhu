@@ -10,7 +10,7 @@ import { ErrorBanner, PageShell } from "../../components/PageShell";
 import { StatusBanner } from "../../components/StatusBanner";
 import { useAuth } from "../../state/Auth";
 
-type LoginState = { phone?: string; notice?: string; reason?: string } | null;
+type LoginState = { phone?: string; notice?: string; reason?: string; from?: string } | null;
 
 /** SCR-A03: phone + password; then route by role from /auth/me (App flow §1). */
 export function Login() {
@@ -32,7 +32,10 @@ export function Login() {
     try {
       await api("/auth/login", { method: "POST", body: { phone, password } });
       const me = await refresh();
-      if (me?.role === "lender_officer") void navigate("/lender/cases", { replace: true });
+      // After an expired session, return to the screen the user was on (only paths inside their own area)
+      const from = state?.from ?? "";
+      if (me?.role === "lender_officer") void navigate(from.startsWith("/lender/") ? from : "/lender/cases", { replace: true });
+      else if (from.startsWith("/p/")) void navigate(from, { replace: true });
       else void navigate("/profiles", { replace: true, state: { fromLogin: true } });
     } catch (err) {
       setPassword("");

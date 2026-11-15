@@ -11,7 +11,7 @@ from app.config import get_settings
 
 config = context.config
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    fileConfig(config.config_file_name, disable_existing_loggers=False)  # in-process runs keep app loggers
 
 # Allows tests to target another DB: config.attributes["database_url"]
 url = config.attributes.get("database_url") or get_settings().DATABASE_URL

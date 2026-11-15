@@ -15,17 +15,17 @@ Fill the "Status on demo day" column only with what the team has verified in P7.
 
 | Item | Planned status | Status on demo day |
 |---|---|---|
-| Register / login / logout / lockout | Working | ☐ |
-| Multi-profile (shop + farm under one user) | Working | ☐ |
-| Ledger with S1 accounting rules (12 types) | Working, golden-tested | ☐ |
-| Summary, forecast baseline | Working (estimate, not validated on BD data) | ☐ |
-| Funding gap, due-date check, crop check, statuses | Working, golden-tested | ☐ |
-| Supplier concentration + delay/price scenarios | Working; severities are **assumptions** | ☐ |
-| News signals | Working rule matching on a **curated** list; DEMO events **fictional** | ☐ |
-| Consent, snapshot hash, lender review, revoke/expiry | Working | ☐ |
-| Receipt photo → draft → confirm | Working if AI on; accuracy = measured E2 numbers only | ☐ |
-| Purpose text → item list | Working if AI on | ☐ |
-| Advisor (bn/en, grounded) | Working if AI on; template fallback otherwise | ☐ |
+| Register / login / logout / lockout | Working | ✔ local 15 Nov (AT/SEC tests, E2E-1, E2E-4) · deployed ☐ |
+| Multi-profile (shop + farm under one user) | Working | ✔ local (P2–P4 walkthroughs) · deployed ☐ |
+| Ledger with S1 accounting rules (12 types) | Working, golden-tested | ✔ local (E1 golden, E2E-1 summary) · deployed ☐ |
+| Summary, forecast baseline | Working (estimate, not validated on BD data) | ✔ local (D1 golden, E2E-1) · deployed ☐ |
+| Funding gap, due-date check, crop check, statuses | Working, golden-tested | ✔ local (D1–D4 golden via API) · deployed ☐ |
+| Supplier concentration + delay/price scenarios | Working; severities are **assumptions** | ✔ local (D1/D3 golden, E2E-1 Risks tab) · deployed ☐ |
+| News signals | Working rule matching on a **curated** list + a daily automatic news search (labelled "collected automatically — not checked by a person", SUG-45); DEMO events **fictional** | ✔ local · deployed ☐ |
+| Consent, snapshot hash, lender review, revoke/expiry | Working | ✔ local (E2E-3 = p5 walkthrough, SEC-08..13) · deployed ☐ |
+| Receipt photo → draft → confirm | Working if AI on; accuracy = measured E2 numbers only | ✔ local with Gemini (p6-ai-on). E2: 19/20 fully correct on **20 synthetic receipts** after tuning on the same set (17/20 before) — no real receipts measured |
+| Purpose text → item list | Working if AI on | ✔ local with Gemini (p6-ai-on) |
+| Advisor (bn/en, grounded) | Working if AI on; template fallback otherwise | ✔ local. E10: 16/20 passed (10 bn + 10 en), fact present 19/20, 0 forbidden phrases, 0 cross-profile leaks; varies run to run |
 | Demo users, lender organisations, news events | **Simulated (DEMO)** | — |
 | Voice, statements import, Monte Carlo, optimizer, Business Health card, GNN, ZK proof, poultry/fish/cattle, Buy/Sell | **Not built** (backlog) — mention only as roadmap | — |
 

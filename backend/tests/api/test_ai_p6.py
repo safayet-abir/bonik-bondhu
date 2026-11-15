@@ -94,6 +94,9 @@ def test_sec17_upload_validation_reencode_and_isolation(make_client, clean_db) -
     assert max(stored.size) == 1600 and not stored.getexif()  # downscaled, EXIF gone
     shop(b, 2)
     assert b.get(f"/api/v1/profiles/{pid}/documents/{doc['id']}/content").status_code == 404
+    for f in __import__("pathlib").Path(get_settings().UPLOAD_DIR).iterdir():  # disk wiped by a redeploy
+        f.unlink()
+    assert a.get(f"/api/v1/profiles/{pid}/documents/{doc['id']}/content").status_code == 404
 
 
 # ----------------------------------------------------------------- receipt drafts

@@ -15,7 +15,8 @@ import { AuthProvider } from "./state/Auth";
 
 // Any 401 SESSION_EXPIRED/AUTH_REQUIRED -> login with a message (FR-AUTH-06).
 setSessionExpiredHandler(() => {
-  void router.navigate("/login", { state: { reason: "auth.session_expired" } });
+  const { pathname, search } = router.state.location; // FS-05: come back here after logging in
+  void router.navigate("/login", { state: { reason: "auth.session_expired", from: pathname + search } });
 });
 
 createRoot(document.getElementById("root")!).render(
