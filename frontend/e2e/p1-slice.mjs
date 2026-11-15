@@ -56,7 +56,7 @@ try {
   await page.getByText("টাকার হিসাব রাখি").click();
 
   // SCR-O04 cash sale 8,500 (typed with Bangla digits)
-  await page.getByLabel("টাকা (Tk)").fill("৮৫০০");
+  await page.getByLabel("পরিমাণ (টাকা)").fill("৮৫০০");
   await shot("05-add-sale");
   await page.getByRole("button", { name: "সংরক্ষণ করুন" }).click();
   await page.getByText("সংরক্ষণ হয়েছে").waitFor();
@@ -64,7 +64,7 @@ try {
 
   // rent 1,500 via quick add
   await page.getByRole("button", { name: "খরচ" }).click();
-  await page.getByLabel("টাকা (Tk)").fill("1500");
+  await page.getByLabel("পরিমাণ (টাকা)").fill("1500");
   await page.getByLabel("কোন খরচ?").selectOption("rent");
   await page.getByRole("button", { name: "সংরক্ষণ করুন" }).click();
   await page.getByText("সংরক্ষণ হয়েছে").waitFor();
