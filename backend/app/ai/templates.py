@@ -31,6 +31,15 @@ STATUS = {
 }
 
 
+# Reply when the model's answer used a forbidden phrase (often by repeating "approved?/eligible?" from the question)
+LENDER_DECIDES = {
+    "bn": "বণিক বন্ধু ঋণ দেয় না এবং কোনো স্কোর দেয় না। ঋণের সিদ্ধান্ত নেয় শুধু ঋণদাতা। "
+          "আপনার নিজের প্রস্তাবের যাচাইয়ের ফল অর্থায়ন অংশে দেখুন।",
+    "en": "Bonik Bondhu does not lend and gives no score. Only the lender decides on a loan. "
+          "You can see the check of your own proposal under Financing.",
+}
+
+
 def tk(v: str | Decimal | None, lang: str) -> str:
     """South-Asian grouping (1,50,000), no ".00", Bangla digits in bn."""
     d = Decimal(v or 0)
@@ -98,16 +107,13 @@ def answer(key: str, tb: Toolbox, lang: str) -> str:
             "This is an estimate, not a promise.")
     if key == "assessment_status":
         d = tb.data("get_latest_assessment")
-        if d.get("status") == "no_financing_request":
+        if d.get("status_code") == "no_financing_request":
             return "আপনার এখনো কোনো অর্থায়নের অনুরোধ নেই (অর্থায়ন)।" if bn else \
                 "You have no financing request yet (Financing)."
-        if d.get("status") == "not_checked_yet":
-            return "আপনার অনুরোধ এখনো যাচাই করা হয়নি (অর্থায়ন → যাচাই)।" if bn else \
-                "Your request has not been checked yet (Financing → Check)."
         if d.get("error"):
             return "এখন তথ্য পাওয়া যাচ্ছে না।" if bn else "This information is not available now."
-        text = STATUS[d["status"]][0 if bn else 1]
-        missing = len(d["missing_items"])
+        text = STATUS[d["status_code"]][0 if bn else 1]
+        missing = len(d["missing"])
         extra = (f" বাকি তথ্য: {_n(missing, lang)}টি।" if bn else f" Missing items: {missing}.") if missing else ""
         note = " এটি আপনার নিজের প্রস্তাবের যাচাই, ঋণের সিদ্ধান্ত নয় — সিদ্ধান্ত নেবে ঋণদাতা।" if bn else \
             " This checks your own proposal; it is not a lending decision — the lender decides."

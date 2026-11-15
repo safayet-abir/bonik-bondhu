@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import base64
 import json
+import re
 import time
 from dataclasses import dataclass, field
 
@@ -105,7 +106,13 @@ def json_object(text: str) -> dict:
     start, end = text.find("{"), text.rfind("}")
     if start < 0 or end <= start:
         raise ValueError("no JSON object")
-    value = json.loads(text[start:end + 1])
+    raw = text[start:end + 1]
+    try:
+        value = json.loads(raw)
+    except json.JSONDecodeError:
+        # E2 run: Gemini sometimes writes a broken "\u…" escape inside Bangla text; keep such a
+        # backslash as a literal character instead of losing the whole (otherwise valid) answer.
+        value = json.loads(re.sub(r'\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})', r"\\\\", raw))
     if not isinstance(value, dict):
         raise ValueError("not an object")
     return value

@@ -226,7 +226,11 @@ def advise(db: Session, user: User, profile: BusinessProfile, data: AdvisorIn) -
         return {"reply": ans.text, "language": lang, "tools_used": ans.tools_used, "grounded": True, "mode": "llm"}
     # SUG-23: discard the reply; answer from the tool the model used (numbers grounded by construction)
     key = next((templates.TOOL_FOR[t] for t in ans.tools_used if t in templates.TOOL_FOR), None)
-    reply = templates.answer(key, tb, lang) if key else (
-        "এই প্রশ্নের যাচাই করা উত্তর দিতে পারিনি। নিচের বোতামগুলো দেখুন।" if lang == "bn"
-        else "I could not give a checked answer to this. Please use the buttons below.")
+    if has_forbidden(ans.text):
+        reply = templates.LENDER_DECIDES[lang]
+    elif key:
+        reply = templates.answer(key, tb, lang)
+    else:
+        reply = ("এই প্রশ্নের যাচাই করা উত্তর দিতে পারিনি। নিচের বোতামগুলো দেখুন।" if lang == "bn"
+                 else "I could not give a checked answer to this. Please use the buttons below.")
     return {"reply": reply, "language": lang, "tools_used": ans.tools_used, "grounded": False, "mode": "template"}

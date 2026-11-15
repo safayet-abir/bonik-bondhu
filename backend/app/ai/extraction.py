@@ -11,7 +11,9 @@ from pydantic import BaseModel, ConfigDict, ValidationError
 
 from .grounding import BN_DIGITS
 
-PROMPT = (Path(__file__).parent / "prompts" / "receipt_v1.txt").read_text(encoding="utf-8")
+PROMPT_NAME = "receipt_v2"  # v2 (15 Nov 2026, after E2): seller-vs-sale rule, d/m/y dates
+PROMPT = (Path(__file__).parent / "prompts" / f"{PROMPT_NAME}.txt").read_text(encoding="utf-8")
+OLD_DATE_DAYS = 365  # an older date is possible but usually a misread year: shown as "unsure"
 TXN_TYPES = ("sale_cash", "sale_credit", "purchase_cash", "purchase_credit", "payable_payment",
              "operating_expense", "unknown")
 MAX_AMOUNT = Decimal("99999999999.99")
@@ -58,17 +60,19 @@ def proposed(raw: dict, today: date) -> dict:
             amount = f"{a.quantize(Decimal('0.01'))}"
     except (InvalidOperation, ValueError):
         pass
-    value_date = None
+    value_date, date_conf = None, _conf(r.value_date)
     try:
         d = date.fromisoformat(str(r.value_date.value).translate(BN_DIGITS).strip())
         if d <= today + timedelta(days=1):
             value_date = d.isoformat()
+            if d < today - timedelta(days=OLD_DATE_DAYS):
+                date_conf = min(date_conf, 0.5)
     except ValueError:
         pass
     return {
         "txn_type": {"value": kind if known else "unknown", "confidence": _conf(r.txn_type) if known else 0.0},
         "amount": {"value": amount, "confidence": _conf(r.amount) if amount else 0.0},
-        "value_date": {"value": value_date, "confidence": _conf(r.value_date) if value_date else 0.0},
+        "value_date": {"value": value_date, "confidence": date_conf if value_date else 0.0},
         "supplier_name": _text(r.supplier_name, 120),
         "note": _text(r.note, 300),
     }

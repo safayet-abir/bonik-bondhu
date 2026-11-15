@@ -10,7 +10,8 @@ from pathlib import Path
 
 from .provider import AIUnavailable, Provider
 
-PROMPT = (Path(__file__).parent / "prompts" / "advisor_v1.txt").read_text(encoding="utf-8")
+PROMPT_NAME = "advisor_v2"  # v2 (15 Nov 2026): Bangla digits + lakh grouping in Bangla replies (UI spec)
+PROMPT = (Path(__file__).parent / "prompts" / f"{PROMPT_NAME}.txt").read_text(encoding="utf-8")
 MAX_TOOL_ROUNDS = 3
 
 

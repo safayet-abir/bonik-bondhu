@@ -220,6 +220,20 @@ def test_tool_round_echoes_provider_message_and_blank_model_uses_default() -> No
     assert Settings(GROQ_MODEL=" ").GROQ_MODEL == "openai/gpt-oss-120b"
 
 
+def test_e2_findings_broken_escape_and_old_year() -> None:
+    from datetime import date
+
+    from app.ai import extraction
+    from app.ai.provider import json_object
+    assert json_object('```json\n{"note": {"value": "চাল \\u09 ডাল"}, "a": "\\u0986"}\n```') == \
+        {"note": {"value": "চাল \\u09 ডাল"}, "a": "আ"}  # broken escape kept, valid one decoded
+    raw = {"txn_type": {"value": "operating_expense", "confidence": 0.9}, "amount": {"value": "350", "confidence": 0.9},
+           "value_date": {"value": "2023-11-11", "confidence": 0.95}}
+    assert extraction.proposed(raw, date(2026, 11, 15))["value_date"] == {"value": "2023-11-11", "confidence": 0.5}
+    raw["value_date"]["value"] = "2026-11-11"
+    assert extraction.proposed(raw, date(2026, 11, 15))["value_date"]["confidence"] == 0.95
+
+
 def test_ut11_grounding() -> None:
     src = ['{"existing_total": "18000.00", "date": "2026-12-08"}']
     assert grounding.grounded("আগামী সপ্তাহে কিস্তি Tk ১৮,০০০ (৮ ডিসেম্বর)", src)
@@ -290,6 +304,20 @@ def test_sec19_tools_bound_to_session_profile(seeded, client, monkeypatch) -> No
     assert json.loads(out)["sales_recorded"] == rahim["sales_recorded"]  # D1's own numbers, not D2's
     assert client.post(f"/api/v1/profiles/{karim['id']}/advisor/messages",
                        json={"message": "hi"}).status_code == 404  # not Rahim's profile
+
+
+def test_assessment_tool_plain_words_and_live_check(seeded, client) -> None:  # noqa: F811
+    """E10 findings: no raw codes for the model; an unchecked/stale request is worked out live (read-only)."""
+    from app.ai.tools import Toolbox
+    from app.db import get_sessionmaker
+    from app.models import BusinessProfile, FinancialAssessment
+    p = demo_profile(client, "01900000004", "Selina Tailoring")
+    with get_sessionmaker()() as db:
+        out = Toolbox(db, db.get(BusinessProfile, p["id"]), "en").data("get_latest_assessment")
+        assert db.query(FinancialAssessment).count() == 0  # nothing saved by the advisor
+    assert out["status_code"] == "insufficient_information" and out["source"].startswith("worked out now")
+    assert "Tell us about your current loans (or say you have none)" in out["missing"]
+    assert "debts_not_declared" not in json.dumps({k: v for k, v in out.items() if k != "status_code"})
 
 
 def test_every_tool_output_is_label_only(seeded, client, monkeypatch) -> None:  # noqa: F811

@@ -33,6 +33,40 @@ HELP: list[dict] = json.loads((Path(__file__).resolve().parents[1] / "help" / "h
                               .read_text(encoding="utf-8"))
 
 
+# Plain words for the model (E10: raw codes like "not_checked_yet" ended up in replies). Same text as the UI (en.json).
+STATUS_TEXT = {
+    "ready_for_lender_review": "ready for a lender to review (a check of the proposal, not a lending decision)",
+    "not_affordable_base_case": "in the careful case the proposed payments do not fit the expected cash",
+    "insufficient_information": "some information is missing, so the check cannot finish",
+}
+MISSING_TEXT = {
+    "debts_not_declared": "Tell us about your current loans (or say you have none)",
+    "household_withdrawal_not_declared": "Write how much you take for your family each month",
+    "purpose_items_missing": "Add what you will buy, with prices",
+    "gap_inputs_missing": "Fill in your money details",
+    "terms_incomplete": "Complete your repayment proposal",
+    "forecast_insufficient_history": "Record at least 4 weeks of sales and costs",
+    "term_beyond_forecast_horizon": "All installments must fall within the next 90 days for this check",
+    "season_incomplete": "Link a crop season with output and price estimates",
+    "repayment_due_before_expected_harvest": "Repayment is due before the expected harvest — choose a later date",
+    "profile_location_missing": "Add your district and upazila",
+}
+FLAG_TEXT = {
+    "request_exceeds_gap": "You asked for more than the estimated need",
+    "over_request_explained": "You asked for more than the estimated need and explained why",
+    "weak_price_evidence": "All prices are your own estimates — a supplier quote makes the case stronger",
+    "high_supplier_dependency": "Most purchases come from one supplier",
+    "scenario_shortfall": "A what-if situation shows a possible shortfall",
+    "pre_harvest_cash_shortfall": "Cash may run short before the harvest",
+    "starting_cash_unknown": "Cash in hand not given — counted as 0",
+    "reserve_zero": "Minimum cash to keep is 0 — no safety margin",
+    "interest_fees_unknown": "Interest and fees unknown — counted as 0",
+    "existing_debt_overdue": "An existing loan is overdue — the overdue amount is counted as due today",
+    "existing_debt_dates_outdated": "A loan's next due date is in the past — please update it",
+    "news_signal_single_source": "A news signal comes from one source only",
+}
+
+
 def _m(x) -> str | None:
     return None if x is None else f"{money(Decimal(x)):.2f}"
 
@@ -150,15 +184,21 @@ class Toolbox:
     def _get_latest_assessment(self) -> dict:
         r, a = self._latest()
         if r is None:
-            return {"status": "no_financing_request", "screen": "Financing"}
-        out = {"requested_amount": _m(r.requested_amount), "purpose_category": r.purpose_category}
-        if a is None:
-            return {**out, "status": "not_checked_yet", "screen": "Financing"}
-        return {**out, "status": a.status, "checked_on": a.as_of_date.isoformat(),
-                "is_stale": a.profile_data_version != self.p.data_version, "missing_items": a.missing_items,
-                "flags": a.flags, "purpose_items_total": _m(a.purpose_items_total), "funding_gap": _m(a.funding_gap),
-                "request_minus_gap": _m(a.request_minus_gap),
-                "result": {k: v for k, v in (a.base_result or {}).items() if k != "checks"},
+            return {"status_code": "no_financing_request", "result": "no financing request yet", "screen": "Financing"}
+        if a is not None and a.profile_data_version == self.p.data_version:
+            code, missing, flags, base = a.status, a.missing_items, a.flags, a.base_result or {}
+            totals = (a.purpose_items_total, a.funding_gap, a.request_minus_gap)
+            source = f"saved check of {a.as_of_date.isoformat()}"
+        else:  # never checked, or the records changed since: work it out now (read-only, nothing is saved)
+            ev = assessment_service.evaluate(self.db, self.p, r, self.today)
+            code, missing, flags, base = ev.status, ev.missing, ev.flags, ev.base_result
+            totals = (ev.gap.items_total, ev.gap.funding_gap, ev.gap.request_minus_gap) if ev.gap else (None,) * 3
+            source = "worked out now, not saved (press Check in Financing to save it and see the what-ifs)"
+        return {"requested_amount": _m(r.requested_amount), "purpose_category": r.purpose_category,
+                "status_code": code, "result": STATUS_TEXT[code], "source": source,
+                "missing": [MISSING_TEXT.get(m, m) for m in missing], "flags": [FLAG_TEXT.get(f, f) for f in flags],
+                "purpose_items_total": _m(totals[0]), "funding_gap": _m(totals[1]), "request_minus_gap": _m(totals[2]),
+                "details": {k: v for k, v in base.items() if k != "checks"},
                 "label": "a check of the owner's own proposal, not a lending decision; the lender decides"}
 
     def _get_scenarios(self) -> dict:
