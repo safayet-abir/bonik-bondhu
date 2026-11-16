@@ -13,7 +13,7 @@ export function tiltFor(left: number, right: number): number {
 }
 
 function blocks(amount: number, unit: number): number {
-  return Math.max(1, Math.min(5, Math.round(amount / unit)));
+  return Math.max(1, Math.min(3, Math.round(amount / unit))); // three cast weights at most: the stack stays below the beam
 }
 
 function useSpring(target: number, from: number): number {
@@ -49,18 +49,19 @@ const BN = "০১২৩৪৫৬৭৮৯";
 
 /** Cast iron weights: a block with shoulders, a ring handle on the top one, the mass stamped in brass. */
 function Weights({ x, rimY, n, lang }: { x: number; rimY: number; n: number; lang: string }) {
-  const H = 15;
+  // separate same-size blocks with a gap, large enough that the stamp reads at 70 % of a 360 px phone (≥ 9 px)
+  const H = 22;
   return (
     <g>
       {Array.from({ length: n }, (_, i) => {
-        const w = 42 - i * 5;
-        const y = rimY - H * (i + 1) + 1;
+        const w = 48;
+        const y = rimY - H * (i + 1) + 2;
         const stamp = lang === "bn" ? STAMPS[i].replace(/\d/g, (d) => BN[Number(d)]) : STAMPS[i];
         return (
           <g key={i}>
             <path className="fill-bb-iron"
-                  d={`M${x - w / 2} ${y + H - 1} V${y + 4} Q${x - w / 2} ${y + 1} ${x - w / 2 + 4} ${y + 1} H${x + w / 2 - 4} Q${x + w / 2} ${y + 1} ${x + w / 2} ${y + 4} V${y + H - 1} Z`} />
-            <text x={x} y={y + 11.5} textAnchor="middle" className="fill-bb-brass font-display" fontSize={10} fontWeight={600}>
+                  d={`M${x - w / 2} ${y + H - 2} V${y + 4} Q${x - w / 2} ${y + 1} ${x - w / 2 + 4} ${y + 1} H${x + w / 2 - 4} Q${x + w / 2} ${y + 1} ${x + w / 2} ${y + 4} V${y + H - 2} Z`} />
+            <text x={x} y={y + 16.5} textAnchor="middle" className="fill-bb-brass font-display" fontSize={16} fontWeight={600}>
               {stamp}
             </text>
           </g>
@@ -87,7 +88,7 @@ function Pan({ hx, hy, n, grad, lang }: { hx: number; hy: number; n: number; gra
   );
 }
 
-export function Balance({ left, right, unit = 6000, settleFrom, className = "", label, lang = "en" }: {
+export function Balance({ left, right, unit = 8000, settleFrom, className = "", label, lang = "en" }: {
   left: number; right: number; unit?: number; settleFrom?: number; className?: string; label: string; lang?: string;
 }) {
   const target = tiltFor(left, right);
