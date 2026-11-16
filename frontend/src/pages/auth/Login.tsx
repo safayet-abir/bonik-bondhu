@@ -47,10 +47,7 @@ export function Login() {
   }
 
   return (
-    <PageShell title={t("auth.login")}>
-      <div className="flex justify-end">
-        <LanguageSwitch />
-      </div>
+    <PageShell title={t("auth.login")} aside={<LanguageSwitch tone="wall" />}>
       {state?.notice ? <StatusBanner tone="success" title={t(state.notice)} /> : null}
       {state?.reason ? <StatusBanner tone="info" title={t(state.reason)} /> : null}
       <ErrorBanner error={error} />

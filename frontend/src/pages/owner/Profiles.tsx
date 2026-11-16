@@ -39,10 +39,7 @@ export function Profiles() {
   if (!profiles) return <Loading />;
 
   return (
-    <PageShell title={t("profiles.which")}>
-      <div className="flex justify-end">
-        <LanguageSwitch />
-      </div>
+    <PageShell title={t("profiles.which")} aside={<LanguageSwitch tone="wall" />}>
       <ul className="flex flex-col gap-3">
         {profiles.map((p) => (
           <li key={p.id}>

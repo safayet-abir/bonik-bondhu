@@ -38,10 +38,7 @@ export function Register() {
   }
 
   return (
-    <PageShell title={t("auth.register_title")}>
-      <div className="flex justify-end">
-        <LanguageSwitch />
-      </div>
+    <PageShell title={t("auth.register_title")} aside={<LanguageSwitch tone="wall" />}>
       <ErrorBanner error={error} />
       <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
         <Field label={t("auth.full_name")} value={form.full_name} onChange={set("full_name")}
