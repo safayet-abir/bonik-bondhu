@@ -61,7 +61,7 @@ see "Live verification" at the end.
 | F0 examples per profile | ✔ 16 Nov | `*.farm` hint keys; checked in `frontend/e2e/ultra-fit.mjs` |
 | F1 Repayment Fit Finder | ✔ 16 Nov | `engine/schedule_search.py`, `GET …/schedule-options`, wizard step 5 card; `tests/api/test_fit_finder.py` (6 tests: every option passes the unchanged assessment; D2 nothing fits; D4 blocked; other owner 404); browser `ultra-fit.mjs`; 254 backend tests |
 | F2 World Bank context | ✔ 16 Nov | `services/economy_service.py`, `app/data/worldbank_bgd.json`, CLI `fetch-economy`, `GET …/economy-context`, `GET …/economy-whatif`, lender case `economy_context`, advisor tool + quick answer; `tests/api/test_economy.py` (6); browser steps in `ultra-fit.mjs`; 260 backend tests |
-| F3 Look and motion | ☐ | |
+| F3 Look and motion | ✔ 17 Nov | World "Daripalla — the shop's brass balance" chosen on the impeccable decision page (code-led; PRODUCT.md, surface brief `.impeccable/surfaces/`). Landing: interactive SVG balance (damped spring, reduced-motion aware, cast weights whose stamped totals rank like the tilt), laptop two-column; app chrome, result balance, lender desk. Finish review: 8 material fixes + 1 regression → all resolved, disposition ship (scored fixes only). axe 0 violations, 320 px reflow clean; E2E green local and live. DESIGN.md by the documenter |
 | F4 Supply Graph · F5 Applicant details · F6 Benchmark Proof · F7 News NLP · F8 Statement import | ☐ | cut order in the plan §8 |
 | F9 Story, docs, recording, merge | ☐ | |
 

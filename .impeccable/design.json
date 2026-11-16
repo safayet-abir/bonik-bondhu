@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-17T00:00:00+06:00",
+  "title": "Design System: Bonik Bondhu (বণিক বন্ধু)",
+  "extensions": {
+    "colorMeta": {
+      "wall": { "role": "primary", "displayName": "Distemper Teal Wall", "canonical": "#1e6f66", "tonalRamp": ["#0b2724", "#103c38", "#14504a", "#1e6f66", "#3f8a81", "#77afa8", "#b4d4cf", "#e1eeeb"] },
+      "wall-deep": { "role": "primary", "displayName": "Shadowed Wall", "canonical": "#14504a", "tonalRamp": ["#081f1c", "#0d322e", "#14504a", "#21665e", "#4a8580", "#7fa9a4", "#b8d1cd", "#e3eeec"] },
+      "wall-mist": { "role": "primary", "displayName": "Wall Mist", "canonical": "#d6ece8", "tonalRamp": ["#2a3d3a", "#45605b", "#66847f", "#8aa8a3", "#adc8c3", "#c6ded9", "#d6ece8", "#eef7f5"] },
+      "brass": { "role": "secondary", "displayName": "Polished Brass", "canonical": "#e2b54f", "tonalRamp": ["#3a2a06", "#5f450c", "#8a6214", "#a87a22", "#e2b54f", "#ecc977", "#f6dc8e", "#fbf0cf"] },
+      "brass-deep": { "role": "secondary", "displayName": "Deep Brass", "canonical": "#8a6214", "tonalRamp": ["#2e2005", "#4a3409", "#6a4b0f", "#8a6214", "#a87a22", "#c99a44", "#e6c98a", "#f7ecd3"] },
+      "danger": { "role": "tertiary", "displayName": "Enamel Red", "canonical": "#c2362b", "tonalRamp": ["#3d0e0a", "#661912", "#94251c", "#c2362b", "#d6645b", "#e5958f", "#f1c6c2", "#faeceb"] },
+      "iron": { "role": "neutral", "displayName": "Cast-Iron Ink", "canonical": "#14201d", "tonalRamp": ["#14201d", "#26332f", "#3a4844", "#4f5e59", "#73817c", "#9ba6a2", "#c6cecb", "#eef1f0"] },
+      "enamel": { "role": "neutral", "displayName": "Enamel", "canonical": "#f6f8f5", "tonalRamp": ["#262a25", "#454a44", "#6a7068", "#90968e", "#b6bbb4", "#d6dad4", "#ebeee9", "#f6f8f5"] },
+      "primary": { "role": "primary", "displayName": "Distemper Teal Wall (role alias)", "canonical": "#1e6f66" },
+      "primary-dark": { "role": "primary", "displayName": "Shadowed Wall (role alias)", "canonical": "#14504a" },
+      "primary-soft": { "role": "primary", "displayName": "Pale Teal Plate", "canonical": "#e1eeeb", "tonalRamp": ["#1e6f66", "#3f8a81", "#77afa8", "#a5cbc5", "#c4ddd9", "#d4e6e2", "#e1eeeb", "#f1f7f5"] },
+      "bg": { "role": "neutral", "displayName": "Wall Wash", "canonical": "#eef3f1", "tonalRamp": ["#232927", "#3e4744", "#5f6a66", "#84908b", "#aab5b1", "#ccd6d2", "#e2e9e6", "#eef3f1"] },
+      "surface": { "role": "neutral", "displayName": "Plate White", "canonical": "#ffffff" },
+      "text": { "role": "neutral", "displayName": "Cast-Iron Ink (role alias)", "canonical": "#14201d" },
+      "muted": { "role": "neutral", "displayName": "Worn Iron", "canonical": "#4f5e59", "tonalRamp": ["#1a211f", "#2e3936", "#3f4b47", "#4f5e59", "#6f7d78", "#95a19d", "#bfc8c5", "#e6ebe9"] },
+      "border": { "role": "neutral", "displayName": "Hairline", "canonical": "#d3deda", "tonalRamp": ["#2b3330", "#4a5551", "#6c7874", "#909c98", "#b3bfbb", "#d3deda", "#e4ebe8", "#f3f6f5"] },
+      "success": { "role": "status", "displayName": "Ledger Green", "canonical": "#1e7b34", "tonalRamp": ["#0a2a12", "#11441d", "#185f28", "#1e7b34", "#4b9a5d", "#86bf92", "#c0e0c6", "#ebf6ed"] },
+      "warning": { "role": "status", "displayName": "Deep Ochre", "canonical": "#975a00", "tonalRamp": ["#2f1c00", "#4f2f00", "#734400", "#975a00", "#b8802e", "#d4aa6a", "#ebd3ab", "#f9f0e2"] },
+      "info": { "role": "status", "displayName": "Ink Blue", "canonical": "#1f5fa8", "tonalRamp": ["#0a1f38", "#12345e", "#194a85", "#1f5fa8", "#4c82c1", "#86abd8", "#c0d5ed", "#ebf2fa"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The landing tagline only; 1.9rem phone, 3rem tablet, 3.75rem desktop." },
+      "headline": { "displayName": "Headline", "purpose": "Screen titles (all h1/h2), the wordmark, the live loan amount. Anek at 92% width, balanced wrap." },
+      "title": { "displayName": "Title", "purpose": "Card titles, header profile name, landing readouts and step titles, brass button label." },
+      "amount": { "displayName": "Amount", "purpose": "The key money figure on a screen; tabular numerals." },
+      "body": { "displayName": "Body", "purpose": "All reading text and inputs; 1.6 line height for Bangla conjuncts." },
+      "body-small": { "displayName": "Body Small", "purpose": "Hints, banner detail, secondary lines." },
+      "label": { "displayName": "Label", "purpose": "Nav labels, captions, DEMO stamp, year tags." }
+    },
+    "shadows": [
+      { "name": "plate-rest", "value": "0 2px 8px -4px rgb(20 32 29 / 0.18)", "purpose": "Cards and status banners resting on the wall wash." },
+      { "name": "header-lip", "value": "0 6px 14px -10px rgb(0 0 0 / 0.6)", "purpose": "Sticky owner header over scrolling content." },
+      { "name": "verdict-plate", "value": "0 6px 16px -8px rgb(0 0 0 / 0.45)", "purpose": "The live fits/short plate on the teal wall." },
+      { "name": "brass-lift", "value": "0 8px 18px -10px rgb(0 0 0 / 0.6)", "purpose": "The brass action button on the teal wall." },
+      { "name": "weight-drop", "value": "0 4px 10px -4px rgb(0 0 0 / 0.55)", "purpose": "The brass slider thumb." }
+    ],
+    "motion": [
+      { "name": "balance-spring", "value": "spring: stiffness 60, damping 7 (rAF, dt capped 1/30 s), rest at |Δ|,|v| < 0.01", "purpose": "The balance's tilt: one small overshoot, then rest. The app's one authored motion; snaps to rest under reduced motion." },
+      { "name": "ease-out-expo", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Easing for the page settle-in." },
+      { "name": "settle-in", "value": "260ms ease-out-expo, from opacity 0 / translateY(6px)", "purpose": "The one page-level motion: owner screens settle in from just below." },
+      { "name": "state-transition", "value": "150ms", "purpose": "Colour changes on language plates, nav and ghost button; 1px press on the brass button." },
+      { "name": "reduced-motion", "value": "animation and transition durations 1ms", "purpose": "Global prefers-reduced-motion override." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "owner-column", "value": "480px" },
+      { "name": "container", "value": "1152px" },
+      { "name": "reflow-floor", "value": "320px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Brass Action Button",
+      "kind": "button",
+      "refersTo": "button-brass",
+      "description": "The one action on the teal wall (landing Create account).",
+      "html": "<div class=\"ds-wall\"><button class=\"ds-btn-brass\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><line x1=\"19\" x2=\"19\" y1=\"8\" y2=\"14\"/><line x1=\"22\" x2=\"16\" y1=\"11\" y2=\"11\"/></svg>Create a new account</button></div>",
+      "css": ".ds-wall { background: var(--color-bb-wall, #1e6f66); padding: 24px; } .ds-btn-brass { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px; width: 100%; max-width: 420px; padding: 0 16px; border: none; border-radius: 8px; background: var(--color-bb-brass, #e2b54f); color: var(--color-bb-iron, #14201d); font: 600 18px/1.6 'Noto Sans Bengali', 'Noto Sans', sans-serif; box-shadow: 0 8px 18px -10px rgb(0 0 0 / 0.6); transition: transform 150ms; cursor: pointer; } .ds-btn-brass:active { transform: translateY(1px); } .ds-btn-brass:focus-visible { outline: 3px solid var(--color-bb-brass, #e2b54f); outline-offset: 2px; }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "In-app primary action on white plates.",
+      "html": "<button class=\"ds-btn-primary\">Save entry</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 16px; border: none; border-radius: 8px; background: var(--color-bb-primary, #1e6f66); color: #fff; font: 600 16px/1.6 'Noto Sans Bengali', 'Noto Sans', sans-serif; cursor: pointer; } .ds-btn-primary:active { background: var(--color-bb-primary-dark, #14504a); } .ds-btn-primary:disabled { opacity: 0.6; } .ds-btn-primary:focus-visible { outline: 3px solid var(--color-bb-brass-deep, #8a6214); outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outlined teal on white; Log out, Check again.",
+      "html": "<button class=\"ds-btn-secondary\">Check again</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 16px; border: 1px solid var(--color-bb-primary, #1e6f66); border-radius: 8px; background: #fff; color: var(--color-bb-primary, #1e6f66); font: 600 16px/1.6 'Noto Sans Bengali', 'Noto Sans', sans-serif; cursor: pointer; } .ds-btn-secondary:active { background: var(--color-bb-primary-soft, #e1eeeb); } .ds-btn-secondary:focus-visible { outline: 3px solid var(--color-bb-brass-deep, #8a6214); outline-offset: 2px; }"
+    },
+    {
+      "name": "Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Labelled 48px text field with hint; never placeholder-only.",
+      "html": "<div class=\"ds-field\"><label for=\"ds-amt\">Amount</label><input id=\"ds-amt\" inputmode=\"decimal\" value=\"8,500\"><p class=\"ds-hint\">Example: 1,50,000</p></div>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 4px; font: 400 16px/1.6 'Noto Sans Bengali', 'Noto Sans', sans-serif; color: var(--color-bb-text, #14201d); } .ds-field label { font-weight: 600; } .ds-field input { height: 48px; padding: 0 12px; border: 1px solid var(--color-bb-border, #d3deda); border-radius: 8px; background: #fff; font: inherit; color: inherit; outline: none; } .ds-field input:focus { border-color: var(--color-bb-primary, #1e6f66); } .ds-field input:focus-visible { box-shadow: 0 0 0 2px var(--color-bb-primary, #1e6f66); } .ds-hint { margin: 0; font-size: 14px; color: var(--color-bb-muted, #4f5e59); }"
+    },
+    {
+      "name": "Chips",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Single-choice pill toggles for tabs, periods and filters.",
+      "html": "<div class=\"ds-chips\" role=\"group\" aria-label=\"Result\"><button class=\"ds-chip\" aria-pressed=\"true\">Result</button><button class=\"ds-chip\" aria-pressed=\"false\">Risks</button><button class=\"ds-chip\" aria-pressed=\"false\">News (11)</button></div>",
+      "css": ".ds-chips { display: flex; flex-wrap: wrap; gap: 8px; } .ds-chip { min-height: 48px; padding: 0 16px; border: 1px solid var(--color-bb-border, #d3deda); border-radius: 9999px; background: #fff; color: var(--color-bb-text, #14201d); font: 400 16px/1.6 'Noto Sans Bengali', 'Noto Sans', sans-serif; cursor: pointer; } .ds-chip[aria-pressed=\"true\"] { border-color: var(--color-bb-primary, #1e6f66); background: var(--color-bb-primary-soft, #e1eeeb); color: var(--color-bb-primary, #1e6f66); font-weight: 600; } .ds-chip:focus-visible { outline: 3px solid var(--color-bb-brass-deep, #8a6214); outline-offset: 2px; }"
+    },
+    {
+      "name": "Card with Status Banner",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Enamel plate resting on the wall wash; status banner = coloured border + icon + words.",
+      "html": "<div class=\"ds-ground\"><div class=\"ds-banner\" role=\"status\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m9 12 2 2 4-4\"/></svg><div><p class=\"ds-bt\">Ready for lender review</p><p class=\"ds-bd\">This is not loan approval. The lender decides.</p></div></div><div class=\"ds-card\"><p class=\"ds-bt\">Starting cash used</p><p class=\"ds-amt\">Tk 15,000</p></div></div>",
+      "css": ".ds-ground { background: var(--color-bb-bg, #eef3f1); padding: 16px; display: flex; flex-direction: column; gap: 16px; font: 400 16px/1.6 'Noto Sans Bengali', 'Noto Sans', sans-serif; color: var(--color-bb-text, #14201d); } .ds-card, .ds-banner { border: 1px solid var(--color-bb-border, #d3deda); border-radius: 8px; background: #fff; padding: 16px; box-shadow: 0 2px 8px -4px rgb(20 32 29 / 0.18); } .ds-banner { display: flex; gap: 12px; padding: 12px; border-color: var(--color-bb-success, #1e7b34); color: var(--color-bb-success, #1e7b34); } .ds-banner svg { flex-shrink: 0; margin-top: 4px; } .ds-bt { margin: 0; font-weight: 600; color: var(--color-bb-text, #14201d); } .ds-bd { margin: 0; font-size: 14px; color: var(--color-bb-muted, #4f5e59); } .ds-amt { margin: 0; font-family: 'Anek Bangla Variable', 'Noto Sans Bengali', sans-serif; font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Owner Bottom Nav",
+      "kind": "nav",
+      "refersTo": "bottom-nav",
+      "description": "Fixed five-column white bar; active tab teal with a brass top bar.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-tab ds-on\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg>Home</a><a class=\"ds-tab\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01\"/></svg>Entries</a><a class=\"ds-tab\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8\"/><path d=\"M12 8v8M9 11h6\"/></svg>Financing</a><a class=\"ds-tab\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg>Advisor</a><a class=\"ds-tab\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M4 6h16M4 12h16M4 18h16\"/></svg>More</a></nav>",
+      "css": ".ds-nav { display: grid; grid-template-columns: repeat(5, 1fr); height: 64px; max-width: 480px; background: #fff; border-top: 1px solid var(--color-bb-border, #d3deda); font: 400 13px/1.6 'Noto Sans Bengali', 'Noto Sans', sans-serif; } .ds-tab { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--color-bb-muted, #4f5e59); text-decoration: none; transition: color 150ms; } .ds-tab:hover { color: var(--color-bb-primary, #1e6f66); } .ds-tab.ds-on { color: var(--color-bb-primary, #1e6f66); font-weight: 600; } .ds-tab.ds-on::before { content: ''; position: absolute; top: 0; left: 16px; right: 16px; height: 3px; border-radius: 0 0 4px 4px; background: var(--color-bb-brass, #e2b54f); } .ds-tab:focus-visible { outline: 3px solid var(--color-bb-brass-deep, #8a6214); outline-offset: -3px; }"
+    },
+    {
+      "name": "Language Plates on the Wall + DEMO Stamp",
+      "kind": "custom",
+      "refersTo": "demo-stamp",
+      "description": "Owner header strip: profile name, iron-ink DEMO stamp on enamel, wall-tone language plates.",
+      "html": "<header class=\"ds-head\"><span class=\"ds-name\">Rahim Store</span><span class=\"ds-demo\">DEMO</span><div class=\"ds-lang\" role=\"group\" aria-label=\"Language\"><button aria-pressed=\"false\" lang=\"bn\">বাং</button><button aria-pressed=\"true\" lang=\"en\">EN</button></div></header>",
+      "css": ".ds-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 16px; max-width: 480px; background: var(--color-bb-wall, #1e6f66); color: #fff; box-shadow: 0 6px 14px -10px rgb(0 0 0 / 0.6); } .ds-name { flex: 1; min-width: 0; font: 600 18px/1.6 'Anek Bangla Variable', 'Noto Sans Bengali', sans-serif; } .ds-demo { display: inline-block; padding: 0 6px; border: 2px solid var(--color-bb-iron, #14201d); border-radius: 2px; background: var(--color-bb-enamel, #f6f8f5); color: var(--color-bb-iron, #14201d); font: 600 13px/1.6 'Anek Bangla Variable', 'Noto Sans Bengali', sans-serif; text-transform: uppercase; letter-spacing: 0.025em; } .ds-lang { display: inline-flex; gap: 8px; } .ds-lang button { min-height: 48px; min-width: 48px; padding: 0 12px; border: 2px solid rgb(255 255 255 / 0.5); border-radius: 8px; background: transparent; color: #fff; font: 600 16px/1.6 'Noto Sans Bengali', 'Noto Sans', sans-serif; transition: background 150ms, color 150ms; cursor: pointer; } .ds-lang button[aria-pressed=\"true\"] { border-color: var(--color-bb-enamel, #f6f8f5); background: var(--color-bb-enamel, #f6f8f5); color: var(--color-bb-iron, #14201d); } .ds-lang button:focus-visible { outline: 3px solid var(--color-bb-brass, #e2b54f); outline-offset: 2px; }"
+    },
+    {
+      "name": "Verdict Plate + Brass Slider",
+      "kind": "custom",
+      "refersTo": "verdict-plate-fits",
+      "description": "The landing weighing controls: iron rail, brass weight thumb, live fits/short plate.",
+      "html": "<div class=\"ds-wall2\"><input class=\"ds-range\" type=\"range\" min=\"50000\" max=\"400000\" step=\"10000\" value=\"200000\" aria-label=\"Loan amount\"><p class=\"ds-verdict\" aria-live=\"polite\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#1e6f66\" stroke-width=\"3\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg>Fits — Tk 4,833 left each week</p><p class=\"ds-verdict ds-short\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M3 21 V8 Q3 6 5 6 H10 L12 11 L14 6 H19 Q21 6 21 8 V21 Z\" fill=\"currentColor\"/><circle cx=\"12\" cy=\"3.5\" r=\"2\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"/></svg>Short by Tk 3,500 each week</p></div>",
+      "css": ".ds-wall2 { background: var(--color-bb-wall, #1e6f66); padding: 16px; display: flex; flex-direction: column; gap: 12px; font: 600 16px/1.6 'Noto Sans Bengali', 'Noto Sans', sans-serif; } .ds-range { appearance: none; width: 100%; height: 48px; background: transparent; cursor: pointer; } .ds-range::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: var(--color-bb-iron, #14201d); } .ds-range::-moz-range-track { height: 6px; border-radius: 3px; background: var(--color-bb-iron, #14201d); } .ds-range::-webkit-slider-thumb { appearance: none; width: 34px; height: 30px; margin-top: -12px; border-radius: 6px 6px 3px 3px; background: var(--color-bb-brass, #e2b54f); border: 2px solid var(--color-bb-iron, #14201d); box-shadow: 0 4px 10px -4px rgb(0 0 0 / 0.55); } .ds-range::-moz-range-thumb { width: 30px; height: 26px; border-radius: 6px 6px 3px 3px; background: var(--color-bb-brass, #e2b54f); border: 2px solid var(--color-bb-iron, #14201d); box-shadow: 0 4px 10px -4px rgb(0 0 0 / 0.55); } .ds-range:focus-visible { outline: 3px solid var(--color-bb-brass, #e2b54f); outline-offset: 2px; } .ds-verdict { margin: 0; display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 8px; background: var(--color-bb-enamel, #f6f8f5); color: var(--color-bb-iron, #14201d); box-shadow: 0 6px 16px -8px rgb(0 0 0 / 0.45); } .ds-verdict svg { flex-shrink: 0; } .ds-short { background: var(--color-bb-danger, #c2362b); color: #fff; }"
+    },
+    {
+      "name": "Brass Balance (mark)",
+      "kind": "custom",
+      "refersTo": "owner-header",
+      "description": "Signature: the shop's brass balance; shown here as the static logo mark. The full component tilts on a damped spring (see motion.balance-spring).",
+      "html": "<div class=\"ds-mark\"><svg viewBox=\"0 0 32 32\" width=\"48\" height=\"48\" aria-hidden=\"true\"><g fill=\"#e2b54f\"><rect x=\"15\" y=\"6\" width=\"2\" height=\"20\"/><rect x=\"4\" y=\"7\" width=\"24\" height=\"2.4\" rx=\"1.2\"/><path d=\"M2 17 Q7 22 12 17 Z M20 17 Q25 22 30 17 Z\"/><path d=\"M11 28 H21 L22.5 30 H9.5 Z\"/></g><g stroke=\"#e2b54f\" stroke-width=\"0.9\" fill=\"none\"><path d=\"M7 8.5 L2.5 17 M7 8.5 L11.5 17 M25 8.5 L20.5 17 M25 8.5 L29.5 17\"/></g></svg><span class=\"ds-word\">বণিক বন্ধু<small>Bonik Bondhu</small></span></div>",
+      "css": ".ds-mark { display: inline-flex; align-items: center; gap: 8px; padding: 16px; background: var(--color-bb-wall, #1e6f66); color: #fff; } .ds-word { display: flex; flex-direction: column; line-height: 1.25; font: 600 22px/1.25 'Anek Bangla Variable', 'Noto Sans Bengali', sans-serif; font-stretch: 92%; } .ds-word small { font: 400 13px/1.25 'Noto Sans', sans-serif; color: #d6ece8; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Daripalla — the shop's brass balance",
+    "overview": "The system is a bazaar counter. A distemper-teal wall is the committed field; on it hangs a polished brass balance, cast-iron weights stamped in brass, and enamel-white plates for everything you read or press. Every loan is weighed on the owner's own scale before a lender sees it, so the scale is not decoration: on the landing it tips live as the loan amount moves, and on the assessment result it rests cash-side-down (fits), payment-side-down (short), or level (not enough information).\n\nThe world speaks in two registers. The public landing (Persuade) is the full teal wall with the balance at hero scale, brass for the one action, and stamped Anek Bangla headings. Inside the owner app and lender portal (Operate), the world retreats to precise details: a teal header strip, brass marks for the active nav tab and focus ring, the balance once on the result screen, cast-weight step numbers, and the iron-ink DEMO stamp. Everything else is plain enamel cards on a pale wall wash, built for a 360 px Android in Bangla.\n\nDensity is low and targets are large: 48 px minimum touch height everywhere, one main action per screen, icon plus words, never icon alone. State is carried by marks and words first and colour second.",
+    "keyCharacteristics": [
+      "Teal wall field, brass instrument, iron ink, enamel plates; red reserved for shortfalls and errors.",
+      "One authored motion: the balance's damped-spring swing. One page-level motion: a 260 ms settle-in.",
+      "Stamped Anek Bangla headings (92 % width) over Noto Sans Bengali reading text at 16 / 1.6.",
+      "8 px corners on every plate and button; pill only for filter chips.",
+      "Soft, short drops under plates; no hard offset shadows.",
+      "Bilingual by construction: Bangla digits in bn, tabular numerals for every amount."
+    ],
+    "rules": [
+      { "name": "The One Metal Rule", "body": "Brass is the instrument and the one action on the wall. Inside the app, primary actions on white plates are teal, and brass appears only as marks (active tab, focus, logo, stamps), never as a second button colour.", "section": "colors" },
+      { "name": "The Red Means Short Rule", "body": "Enamel red marks a shortfall, an error, or a destructive act. It is never decoration, never a brand accent, and never the only signal: it always comes with a notch mark, an X icon, or words.", "section": "colors" },
+      { "name": "The Mark Before Colour Rule", "body": "State is a mark first: a tick for fits, a notched weight for short, the balance's tilt, an icon in every status banner. Colour reinforces; it never carries meaning alone.", "section": "colors" },
+      { "name": "The Stamped Heading Rule", "body": "Headings, wordmark, amounts and weight stamps use Anek; anything read as a sentence uses Noto Sans Bengali. Never set a paragraph in Anek.", "section": "typography" },
+      { "name": "The Tabular Money Rule", "body": "Every amount uses tabular numerals, South-Asian grouping (1,50,000) and Bangla digits when the language is bn.", "section": "typography" },
+      { "name": "The Resting Plate Rule", "body": "Shadows are soft, negative-spread and short; they say \"this plate rests on the wall\", never \"this card floats\". Inputs, chips and the bottom nav are flat with a hairline.", "section": "elevation" }
+    ],
+    "dos": [
+      "**Do** keep the teal wall as the committed field for the landing, the owner header and the balance panel, and plate white on the wall wash for working screens.",
+      "**Do** use brass for the balance, the logo, the one landing action, the active-tab bar, stamps and focus; use teal for in-app primary buttons on white.",
+      "**Do** pair every state with a mark and words: tick, notched weight, status icon, the balance's tilt.",
+      "**Do** set headings, amounts and stamps in Anek Bangla at 92 % width; set reading text in Noto Sans Bengali 16 / 1.6.",
+      "**Do** keep every tappable target at 48 px or more and every text pair at WCAG AA (body on wall in white or wall mist, never brass).",
+      "**Do** show the DEMO stamp right beside any DEMO number, and keep every honesty label visible.",
+      "**Do** honour reduced motion: the balance snaps to rest and the settle-in collapses to 1 ms."
+    ],
+    "donts": [
+      "**Don't** use enamel red for anything but a shortfall, an error or a destructive act.",
+      "**Don't** add a second accent, a gradient field, or a chart library; the only gradient is the brass on the balance itself.",
+      "**Don't** use hard offset shadows or long floating shadows; plates rest on the wall.",
+      "**Don't** set small text in polished brass on the teal wall (about 3.1:1); use white, wall mist, or deep brass on white.",
+      "**Don't** animate anything beyond the balance's swing, the 260 ms settle-in and 150 ms colour/press transitions.",
+      "**Don't** let a design element suggest approval, a score or a lender offer; the balance shows fit against the owner's own cash, nothing more."
+    ]
+  }
+}
