@@ -8,6 +8,8 @@ import type { Page, Summary, Transaction, TxnType } from "../../api/types";
 import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
 import { EconomyCard } from "../../components/Economy";
+import { Balance } from "../../components/Balance";
+import { LedgerScene } from "../../components/Scenes";
 import { ErrorBanner, Loading, PageShell } from "../../components/PageShell";
 import { StatusBanner } from "../../components/StatusBanner";
 import type { Lang } from "../../i18n";
@@ -84,22 +86,24 @@ export function Home() {
     return (
       <PageShell title={t("home.welcome")}>
         <p className="text-bb-muted">{t("home.what_to_do")}</p>
-        <button type="button" onClick={() => add("sale_cash")}
-                className="flex flex-col items-start gap-1 rounded-bb border border-bb-border bg-bb-surface p-4 text-left">
-          <span className="flex items-center gap-2 text-card font-semibold">
-            <NotebookText aria-hidden className="size-6 text-bb-primary" />
-            {t("home.path_a")}
-          </span>
-          <span className="text-small text-bb-muted">{t("home.path_a_hint")}</span>
-        </button>
-        <button type="button" onClick={() => navigate(`/p/${p.id}/financing/new`)}
-                className="flex flex-col items-start gap-1 rounded-bb border border-bb-border bg-bb-surface p-4 text-left">
-          <span className="flex items-center gap-2 text-card font-semibold">
-            <HandCoins aria-hidden className="size-6 text-bb-primary" />
-            {t("home.path_b")}
-          </span>
-          <span className="text-small text-bb-muted">{t("home.path_b_hint")}</span>
-        </button>
+        {/* two doors, each with its own scene from the counter: the ledger, and the balance */}
+        {[
+          { key: "a", onClick: () => add("sale_cash"), icon: NotebookText, scene: <LedgerScene /> },
+          { key: "b", onClick: () => navigate(`/p/${p.id}/financing/new`), icon: HandCoins,
+            scene: <div className="mx-auto w-[62%]"><Balance left={12} right={10} settleFrom={10} label={t("home.path_b")} /></div> },
+        ].map(({ key, onClick, icon: Icon, scene }, i) => (
+          <button key={key} type="button" onClick={onClick} style={{ animationDelay: `${i * 90}ms` }}
+                  className="bb-settle-in group flex flex-col overflow-hidden rounded-bb border border-bb-border bg-bb-surface text-left shadow-[0_2px_8px_-4px_rgb(20_32_29/0.18)] transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-px">
+            <span className="block bg-bb-wall px-4 pt-3">{scene}</span>
+            <span className="flex flex-col gap-1 p-4">
+              <span className="flex items-center gap-2 font-display text-card font-semibold">
+                <Icon aria-hidden className="size-6 text-bb-primary" />
+                {t(`home.path_${key}`)}
+              </span>
+              <span className="text-small text-bb-muted">{t(`home.path_${key}_hint`)}</span>
+            </span>
+          </button>
+        ))}
       </PageShell>
     );
   }

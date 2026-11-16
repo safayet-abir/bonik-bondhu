@@ -148,6 +148,17 @@ h2 {
   animation: bb-settle-in 260ms var(--ease-out-expo) both;
 }
 
+/* a ledger line being written (Scenes.tsx); the drawn state is the resting state */
+@keyframes bb-write {
+  from {
+    stroke-dashoffset: 100;
+  }
+}
+.bb-write {
+  stroke-dasharray: 100;
+  animation: bb-write 520ms var(--ease-out-expo) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
