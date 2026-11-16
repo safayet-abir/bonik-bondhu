@@ -123,7 +123,7 @@ function HowTab({ a, lang }: { a: AssessmentT; lang: Lang }) {
       <Card className="flex flex-col gap-3">
         <p className="font-semibold">{t("how.formulas")}</p>
         {e.formulas.map((f) => (
-          <div key={f.key} className="flex flex-col gap-1 border-l-2 border-bb-primary pl-3">
+          <div key={f.key} className="flex flex-col gap-1 border-t border-bb-border pt-2 first:border-0 first:pt-0">
             <span className="font-semibold">{t(f.key)}</span>
             <code className="text-small break-words text-bb-muted">{f.expr}</code>
             <code className="tabular text-small break-words">{f.values}</code>
@@ -224,7 +224,7 @@ export function Assessment() {
           <div className="rounded-bb bg-bb-wall px-10 pt-3">
             <Balance className="mx-auto max-w-[280px]" label={t(STATUS_KEY[a.status])} settleFrom={0}
                      left={a.status === "ready_for_lender_review" ? 14 : 10}
-                     right={a.status === "not_affordable_base_case" ? 14 : 10} unit={4} />
+                     right={a.status === "not_affordable_base_case" ? 14 : 10} unit={4} lang={lang} />
           </div>
           <StatusBanner tone={STATUS_TONE[a.status]} title={t(STATUS_KEY[a.status])}>{t("asm.not_approval")}</StatusBanner>
 

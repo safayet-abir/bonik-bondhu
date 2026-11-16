@@ -14,7 +14,7 @@
   "land.amount": "Try a loan amount",
   "land.fits": "Fits — {{left}} still in hand each week",
   "land.short": "Short by {{short}} each week",
-  "land.demo_note": "DEMO numbers: a shop with Tk 21,500 free each week, repaying in 12 weekly installments, no fees. Your real check uses your own records, every due date and the cash you want to keep.",
+  "land.demo_note": "numbers: 12 weekly installments, no fees. Your real check uses your own records and every due date.",
   "land.how": "How it works",
   "land.step1": "Keep your accounts",
   "land.step1_text": "Sales, purchases and loans — typed in or read from a receipt photo.",

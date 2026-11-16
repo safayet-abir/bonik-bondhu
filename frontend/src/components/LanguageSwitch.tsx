@@ -10,7 +10,8 @@ import { useAuth } from "../state/Auth";
 const TONE = {
   plate: { on: "border-bb-primary bg-bb-primary-soft text-bb-primary", off: "border-bb-border bg-bb-surface text-bb-muted" },
   // on the teal wall (welcome screen, owner header)
-  wall: { on: "border-bb-brass bg-bb-brass text-bb-iron", off: "border-white/50 bg-transparent text-white" },
+  // brass stays for the scale and the one action; the chosen language is an enamel plate
+  wall: { on: "border-bb-enamel bg-bb-enamel text-bb-iron", off: "border-white/50 bg-transparent text-white" },
 };
 
 export function LanguageSwitch({ large = false, tone = "plate" }: { large?: boolean; tone?: keyof typeof TONE }) {

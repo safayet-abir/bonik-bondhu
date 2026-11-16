@@ -4,7 +4,8 @@ import { useTranslation } from "react-i18next";
 export function DemoBadge() {
   const { t } = useTranslation();
   return (
-    <span className="rounded-full bg-bb-demo px-2 py-0.5 text-caption font-semibold text-white">
+    // a rubber stamp in iron ink on an enamel ground: reads on the teal wall and on white plates alike
+    <span className="inline-block rounded-sm border-2 border-bb-iron bg-bb-enamel px-1.5 font-display text-caption font-semibold uppercase tracking-wide text-bb-iron">
       {t("demo.badge")}
     </span>
   );

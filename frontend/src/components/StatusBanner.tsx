@@ -14,7 +14,7 @@ const TONES: Record<Tone, { cls: string; Icon: typeof Info }> = {
 export function StatusBanner({ tone, title, children }: { tone: Tone; title: string; children?: ReactNode }) {
   const { cls, Icon } = TONES[tone];
   return (
-    <div role="status" className={`flex gap-3 rounded-bb border-l-4 bg-bb-surface p-3 ${cls}`}>
+    <div role="status" className={`flex gap-3 rounded-bb border bg-bb-surface p-3 shadow-[0_2px_8px_-4px_rgb(20_32_29/0.18)] ${cls}`}>
       <Icon aria-hidden className="mt-1 size-5 shrink-0" />
       <div className="text-bb-text">
         <p className="font-semibold">{title}</p>

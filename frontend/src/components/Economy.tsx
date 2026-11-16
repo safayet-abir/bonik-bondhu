@@ -19,15 +19,17 @@ export function EconomyFigures({ ctx }: { ctx: EconomyContext }) {
   const lang = i18n.language as Lang;
   return (
     <div className="flex flex-col gap-2">
-      <ul className="grid grid-cols-2 gap-2">
+      <dl className="divide-y divide-bb-border">
         {ctx.indicators.map((i) => (
-          <li key={i.code} className="flex flex-col rounded-bb bg-bb-bg p-2">
-            <span className="text-caption text-bb-muted">{t(`eco.key.${i.key}`)}</span>
-            <span className="tabular text-h3 font-semibold">{formatNumber(i.value, lang)}%</span>
-            <span className="text-caption text-bb-muted">{year(i.year, lang)}</span>
-          </li>
+          <div key={i.code} className="flex items-baseline justify-between gap-3 py-2">
+            <dt>{t(`eco.key.${i.key}`)}</dt>
+            <dd className="shrink-0 text-right">
+              <span className="tabular font-semibold">{formatNumber(i.value, lang)}%</span>
+              <span className="ml-2 text-caption text-bb-muted">{year(i.year, lang)}</span>
+            </dd>
+          </div>
         ))}
-      </ul>
+      </dl>
       <p className="text-small text-bb-muted">
         {t("eco.note")}{" "}
         <a href={ctx.source.url} target="_blank" rel="noopener noreferrer" className="text-bb-primary underline">

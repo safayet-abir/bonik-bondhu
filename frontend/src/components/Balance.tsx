@@ -43,25 +43,35 @@ function useSpring(target: number, from: number): number {
   return angle;
 }
 
-function Weights({ x, rimY, n }: { x: number; rimY: number; n: number }) {
+// the nominal masses cast into bazaar weights (বাটখারা), bottom to top — the world's detail, not data
+const STAMPS = ["5", "2", "1", "1", "1"];
+const BN = "০১২৩৪৫৬৭৮৯";
+
+/** Cast iron weights: a block with shoulders, a ring handle on the top one, the mass stamped in brass. */
+function Weights({ x, rimY, n, lang }: { x: number; rimY: number; n: number; lang: string }) {
+  const H = 15;
   return (
-    <g className="fill-bb-iron">
+    <g>
       {Array.from({ length: n }, (_, i) => {
-        const w = 40 - i * 6;
-        const y = rimY - 14 * (i + 1);
+        const w = 42 - i * 5;
+        const y = rimY - H * (i + 1) + 1;
+        const stamp = lang === "bn" ? STAMPS[i].replace(/\d/g, (d) => BN[Number(d)]) : STAMPS[i];
         return (
           <g key={i}>
-            <path d={`M${x - w / 2} ${y + 13} L${x - w / 2 + 3} ${y + 2} H${x + w / 2 - 3} L${x + w / 2} ${y + 13} Z`} />
-            <rect x={x - w / 2 + 6} y={y + 6} width={w - 12} height={1.5} className="fill-bb-brass" opacity={0.55} />
+            <path className="fill-bb-iron"
+                  d={`M${x - w / 2} ${y + H - 1} V${y + 4} Q${x - w / 2} ${y + 1} ${x - w / 2 + 4} ${y + 1} H${x + w / 2 - 4} Q${x + w / 2} ${y + 1} ${x + w / 2} ${y + 4} V${y + H - 1} Z`} />
+            <text x={x} y={y + 11.5} textAnchor="middle" className="fill-bb-brass font-display" fontSize={10} fontWeight={600}>
+              {stamp}
+            </text>
           </g>
         );
       })}
-      <circle cx={x} cy={rimY - 14 * n - 3} r={4} />
+      <circle cx={x} cy={rimY - H * n - 3} r={4.5} fill="none" className="stroke-bb-iron" strokeWidth={2.5} />
     </g>
   );
 }
 
-function Pan({ hx, hy, n, grad }: { hx: number; hy: number; n: number; grad: string }) {
+function Pan({ hx, hy, n, grad, lang }: { hx: number; hy: number; n: number; grad: string; lang: string }) {
   const rimY = hy + 86;
   return (
     <g>
@@ -69,7 +79,7 @@ function Pan({ hx, hy, n, grad }: { hx: number; hy: number; n: number; grad: str
         <line x1={hx} y1={hy} x2={hx - 46} y2={rimY} />
         <line x1={hx} y1={hy} x2={hx + 46} y2={rimY} />
       </g>
-      <Weights x={hx} rimY={rimY} n={n} />
+      <Weights x={hx} rimY={rimY} n={n} lang={lang} />
       <path d={`M${hx - 54} ${rimY} Q${hx} ${rimY + 34} ${hx + 54} ${rimY} Z`} fill={`url(#${grad})`}
             className="stroke-bb-brass-deep" strokeWidth={1.5} />
       <circle cx={hx} cy={hy} r={4} className="fill-bb-brass-deep" />
@@ -77,8 +87,8 @@ function Pan({ hx, hy, n, grad }: { hx: number; hy: number; n: number; grad: str
   );
 }
 
-export function Balance({ left, right, unit = 6000, settleFrom, className = "", label }: {
-  left: number; right: number; unit?: number; settleFrom?: number; className?: string; label: string;
+export function Balance({ left, right, unit = 6000, settleFrom, className = "", label, lang = "en" }: {
+  left: number; right: number; unit?: number; settleFrom?: number; className?: string; label: string; lang?: string;
 }) {
   const target = tiltFor(left, right);
   const angle = useSpring(target, settleFrom ?? target);
@@ -110,8 +120,8 @@ export function Balance({ left, right, unit = 6000, settleFrom, className = "", 
       </g>
       <circle cx={PIVOT.x} cy={PIVOT.y} r={9} fill={`url(#${grad})`} className="stroke-bb-brass-deep" strokeWidth={1.5} />
       <circle cx={PIVOT.x} cy={PIVOT.y} r={3} className="fill-bb-iron" />
-      <Pan hx={PIVOT.x - dx} hy={PIVOT.y - dy} n={blocks(left, unit)} grad={grad} />
-      <Pan hx={PIVOT.x + dx} hy={PIVOT.y + dy} n={blocks(right, unit)} grad={grad} />
+      <Pan hx={PIVOT.x - dx} hy={PIVOT.y - dy} n={blocks(left, unit)} grad={grad} lang={lang} />
+      <Pan hx={PIVOT.x + dx} hy={PIVOT.y + dy} n={blocks(right, unit)} grad={grad} lang={lang} />
     </svg>
   );
 }
