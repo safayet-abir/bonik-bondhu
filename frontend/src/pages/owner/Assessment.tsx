@@ -224,7 +224,7 @@ export function Assessment() {
           <div className="rounded-bb bg-bb-wall px-10 pt-3">
             <Balance className="mx-auto max-w-[280px]" label={t(STATUS_KEY[a.status])} settleFrom={0}
                      left={a.status === "ready_for_lender_review" ? 14 : 10}
-                     right={a.status === "not_affordable_base_case" ? 14 : 10} unit={4} lang={lang} />
+                     right={a.status === "not_affordable_base_case" ? 14 : 10} lang={lang} />
           </div>
           <StatusBanner tone={STATUS_TONE[a.status]} title={t(STATUS_KEY[a.status])}>{t("asm.not_approval")}</StatusBanner>
 

@@ -12,8 +12,13 @@ export function tiltFor(left: number, right: number): number {
   return Math.max(-MAX_TILT, Math.min(MAX_TILT, ((right - left) / heavier) * 30));
 }
 
-function blocks(amount: number, unit: number): number {
-  return Math.max(1, Math.min(3, Math.round(amount / unit))); // three cast weights at most: the stack stays below the beam
+/** Weights per pan so the stamped totals rank exactly like the tilt: the heavier pan carries all three
+ *  (৫+২+১), the lighter one fewer (৫+২ or ৫), equal amounts carry equal sets. */
+export function blockCounts(left: number, right: number): [number, number] {
+  if (left === right) return [3, 3];
+  const heavy = Math.max(left, right, 1);
+  const lighter = (v: number) => Math.min(2, Math.max(1, Math.round((3 * v) / heavy)));
+  return left > right ? [3, lighter(right)] : [lighter(left), 3];
 }
 
 function useSpring(target: number, from: number): number {
@@ -88,10 +93,11 @@ function Pan({ hx, hy, n, grad, lang }: { hx: number; hy: number; n: number; gra
   );
 }
 
-export function Balance({ left, right, unit = 8000, settleFrom, className = "", label, lang = "en" }: {
-  left: number; right: number; unit?: number; settleFrom?: number; className?: string; label: string; lang?: string;
+export function Balance({ left, right, settleFrom, className = "", label, lang = "en" }: {
+  left: number; right: number; settleFrom?: number; className?: string; label: string; lang?: string;
 }) {
   const target = tiltFor(left, right);
+  const [nLeft, nRight] = blockCounts(left, right);
   const angle = useSpring(target, settleFrom ?? target);
   const grad = useId().replace(/:/g, "");
   const rad = (angle * Math.PI) / 180;
@@ -121,8 +127,8 @@ export function Balance({ left, right, unit = 8000, settleFrom, className = "", 
       </g>
       <circle cx={PIVOT.x} cy={PIVOT.y} r={9} fill={`url(#${grad})`} className="stroke-bb-brass-deep" strokeWidth={1.5} />
       <circle cx={PIVOT.x} cy={PIVOT.y} r={3} className="fill-bb-iron" />
-      <Pan hx={PIVOT.x - dx} hy={PIVOT.y - dy} n={blocks(left, unit)} grad={grad} lang={lang} />
-      <Pan hx={PIVOT.x + dx} hy={PIVOT.y + dy} n={blocks(right, unit)} grad={grad} lang={lang} />
+      <Pan hx={PIVOT.x - dx} hy={PIVOT.y - dy} n={nLeft} grad={grad} lang={lang} />
+      <Pan hx={PIVOT.x + dx} hy={PIVOT.y + dy} n={nRight} grad={grad} lang={lang} />
     </svg>
   );
 }
