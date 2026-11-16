@@ -11,7 +11,7 @@ from ..db import DbSession
 from ..schemas.assessment import AssessmentOut, ScenarioOut
 from ..schemas.financing import FinancingCreate, FinancingList, FinancingOut, FinancingPatch, ItemCreate, ItemOut, ItemPatch
 from ..schemas.forecast import AsOfIn
-from ..services import ai_service, assessment_service, financing_service, forecast_service
+from ..services import ai_service, assessment_service, economy_service, financing_service, forecast_service
 
 router = APIRouter(prefix="/profiles/{pid}", tags=["financing"])
 BASE = "/financing-requests"
@@ -59,6 +59,20 @@ def parse_purpose(rid: uuid.UUID, profile: OwnedProfile, user: OwnerUser, db: Db
     """#40 (P6-T05): AI item list from the stored purpose text — no prices, unconfirmed."""
     items = ai_service.parse_purpose(db, user, profile, rid)
     return {"items": [financing_service.item_out(i) for i in items], "note_key": "fin.ai_items_confirm"}
+
+
+@router.get("/economy-context")
+def economy_context(profile: OwnedProfile) -> dict:
+    """World Bank yearly figures for Bangladesh (SUG-58); public data, same for every profile."""
+    return economy_service.context()
+
+
+@router.get(BASE + "/{rid}/economy-whatif")
+def economy_whatif(rid: uuid.UUID, profile: OwnedProfile, db: DbSession) -> dict:
+    """What if prices keep rising at last year's inflation (SUG-58). What-if only; never changes the status."""
+    r = financing_service.get(db, profile, rid)
+    return {"context": economy_service.context(),
+            "whatif": economy_service.inflation_whatif(db, profile, r, forecast_service.resolve_as_of(None))}
 
 
 @router.get(BASE + "/{rid}/schedule-options")

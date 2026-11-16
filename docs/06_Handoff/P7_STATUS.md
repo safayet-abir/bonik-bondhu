@@ -60,7 +60,7 @@ see "Live verification" at the end.
 |---|---|---|
 | F0 examples per profile | ✔ 16 Nov | `*.farm` hint keys; checked in `frontend/e2e/ultra-fit.mjs` |
 | F1 Repayment Fit Finder | ✔ 16 Nov | `engine/schedule_search.py`, `GET …/schedule-options`, wizard step 5 card; `tests/api/test_fit_finder.py` (6 tests: every option passes the unchanged assessment; D2 nothing fits; D4 blocked; other owner 404); browser `ultra-fit.mjs`; 254 backend tests |
-| F2 World Bank context | ☐ | |
+| F2 World Bank context | ✔ 16 Nov | `services/economy_service.py`, `app/data/worldbank_bgd.json`, CLI `fetch-economy`, `GET …/economy-context`, `GET …/economy-whatif`, lender case `economy_context`, advisor tool + quick answer; `tests/api/test_economy.py` (6); browser steps in `ultra-fit.mjs`; 260 backend tests |
 | F3 Look and motion | ☐ | |
 | F4 Supply Graph · F5 Applicant details · F6 Benchmark Proof · F7 News NLP · F8 Statement import | ☐ | cut order in the plan §8 |
 | F9 Story, docs, recording, merge | ☐ | |

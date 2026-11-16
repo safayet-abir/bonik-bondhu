@@ -465,6 +465,22 @@ export type CaseFile = {
             decided_at: string | null; events: ReviewEvent[] } | null;
   cib_notice_key: string;
   banner_key: string | null;
+  /** Public World Bank figures shown next to the snapshot (not part of it). Absent before SUG-58. */
+  economy_context?: EconomyContext;
+};
+
+// ---------------------------------------------------------------- Plan Ultra F2 (SUG-58)
+export type EconomyIndicator = { code: string; key: "inflation" | "lending_rate" | "gdp_growth" | "private_credit";
+                                 label: string; year: number; value: string };
+export type EconomyContext = { source: { name: string; url: string }; country: string; indicators: EconomyIndicator[] };
+export type EconomyWhatIf = {
+  context: EconomyContext;
+  whatif: {
+    inflation_pct: string; inflation_year: number; days: number; price_rise_pct: string; base_status: string;
+    result: { kind: "shop_due_dates" | "crop_harvest"; covered: boolean;
+              first_shortfall?: { date: string; balance_after: string; shortfall_vs_reserve: string } | null;
+              surplus_or_shortfall?: string };
+  } | null;
 };
 
 export type Page<T> = { items: T[]; total: number };

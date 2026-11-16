@@ -156,6 +156,22 @@ def fetch_news_cmd(args: argparse.Namespace) -> int:
     return 0
 
 
+def fetch_economy_cmd(args: argparse.Namespace) -> int:
+    """Refresh the committed World Bank snapshot (SUG-58); the running app refreshes its own copy daily."""
+    import json
+
+    import httpx
+
+    from .services import economy_service
+    with httpx.Client(timeout=30, headers={"User-Agent": "BonikBondhu-economy/1.0"}) as client:
+        data = economy_service.collect(client)
+    economy_service.SNAPSHOT.parent.mkdir(parents=True, exist_ok=True)
+    economy_service.SNAPSHOT.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    for i in data["indicators"]:
+        print(f"{i['year']} {i['key']:<15} {i['value']:>6}  {i['label']}")
+    return 0 if len(data["indicators"]) == len(economy_service.INDICATORS) else 1
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.cli", description="Bonik Bondhu admin commands")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -187,6 +203,9 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("fetch-news", help="collect recent news for owners' areas from a news search (SUG-45)")
     p.add_argument("--dry-run", action="store_true", help="print what would be saved")
     p.set_defaults(func=fetch_news_cmd)
+
+    p = sub.add_parser("fetch-economy", help="refresh the World Bank snapshot app/data/worldbank_bgd.json (SUG-58)")
+    p.set_defaults(func=fetch_economy_cmd)
 
     args = parser.parse_args(argv)
     return args.func(args)

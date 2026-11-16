@@ -27,7 +27,7 @@ from ..core.rate_limit import SlidingWindowLimiter
 from ..models import (
     AuditLog, BusinessProfile, Consent, FinancialAssessment, FinancingRequest, LenderReview, LenderReviewEvent, User,
 )
-from . import consent_service, snapshot_service
+from . import consent_service, economy_service, snapshot_service
 
 CaseFilter = Literal["pending", "active", "closed"]
 access_request_limiter = SlidingWindowLimiter(limit=20, window_seconds=3600)  # 20/hour/officer (SUG-05 family)
@@ -216,6 +216,8 @@ def case_file(db: Session, lender: LenderContext, cid: uuid.UUID, request: Reque
         "snapshot": rep.snapshot if rep else None,
         "review": _review_out(db, rv) if rv else None,
         "cib_notice_key": "debt.cib",
+        # public World Bank figures, not the owner's data (outside the snapshot and its hash) — SUG-58
+        "economy_context": economy_service.context(),
         "banner_key": "lender.decision_banner" if rv and rv.decision else None,
     }
 

@@ -1,0 +1,37 @@
+{
+  "source": {
+    "name": "World Bank Open Data",
+    "url": "https://data.worldbank.org/country/bangladesh"
+  },
+  "country": "Bangladesh",
+  "indicators": [
+    {
+      "code": "FP.CPI.TOTL.ZG",
+      "key": "inflation",
+      "label": "Inflation, consumer prices (annual %)",
+      "year": 2025,
+      "value": "8.8"
+    },
+    {
+      "code": "FR.INR.LEND",
+      "key": "lending_rate",
+      "label": "Lending interest rate (%)",
+      "year": 2025,
+      "value": "8.6"
+    },
+    {
+      "code": "NY.GDP.MKTP.KD.ZG",
+      "key": "gdp_growth",
+      "label": "GDP growth (annual %)",
+      "year": 2025,
+      "value": "3.5"
+    },
+    {
+      "code": "FS.AST.PRVT.GD.ZS",
+      "key": "private_credit",
+      "label": "Domestic credit to private sector (% of GDP)",
+      "year": 2025,
+      "value": "34.5"
+    }
+  ]
+}

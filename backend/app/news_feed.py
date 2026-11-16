@@ -206,6 +206,11 @@ def start_daily(hours: int) -> None:
                 log.info("news fetch done", extra={"inserted": r.inserted, "updated": r.updated, "skipped": r.skipped})
             except Exception:  # never kill the thread; the next run retries
                 log.exception("news fetch failed")
+            try:  # SUG-58: yearly World Bank figures; a failure keeps the last values
+                from .services import economy_service
+                economy_service.refresh()
+            except Exception:
+                log.exception("economy refresh failed")
             time.sleep(hours * 3600)
 
     threading.Thread(target=loop, name="news-daily", daemon=True).start()

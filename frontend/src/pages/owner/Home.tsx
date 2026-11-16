@@ -7,6 +7,7 @@ import { api } from "../../api/client";
 import type { Page, Summary, Transaction, TxnType } from "../../api/types";
 import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
+import { EconomyCard } from "../../components/Economy";
 import { ErrorBanner, Loading, PageShell } from "../../components/PageShell";
 import { StatusBanner } from "../../components/StatusBanner";
 import type { Lang } from "../../i18n";
@@ -143,6 +144,7 @@ export function Home() {
           {t("home.path_b")}
         </Button>
       </div>
+      <EconomyCard />
     </PageShell>
   );
 }

@@ -52,6 +52,17 @@ try {
   await shot("02-shop-ready");
   step("D1: finder → use the safest schedule → check → ready for lender review");
 
+  // F2: World Bank inflation what-if on the result, economy card on Home
+  await page.getByRole("button", { name: /^Risks/ }).click();
+  await text("If prices keep rising at last year's inflation");
+  await text("Based on World Bank data");
+  await shot("02b-inflation-whatif");
+  await page.getByRole("link", { name: "Home" }).click();
+  await text("Bangladesh economy (World Bank)");
+  await text("not live, and not about your business");
+  await shot("02c-home-economy");
+  step("F2: inflation what-if on the Risks tab; World Bank figures on Home with year and source");
+
   await wizard("Rahim Rice Farm", 1);
   await text("Example: buy urea, seed and diesel for the Boro season"); // F0: farm examples for a farm
   await wizard("Rahim Rice Farm", 5);

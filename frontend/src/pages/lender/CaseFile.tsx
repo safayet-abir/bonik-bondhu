@@ -10,6 +10,7 @@ import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
 import { Chips } from "../../components/Chips";
 import { DemoBadge } from "../../components/DemoBadge";
+import { EconomyFigures } from "../../components/Economy";
 import { ErrorBanner, Loading } from "../../components/PageShell";
 import { StatusBanner } from "../../components/StatusBanner";
 import type { Lang } from "../../i18n";
@@ -342,7 +343,12 @@ export function CaseFile() {
             <span className="basis-full text-bb-muted">{t("lender.hash_meaning")}</span>
           </Card>
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
-            <div className="flex flex-col gap-4"><Sections s={c.snapshot.sections as S} /></div>
+            <div className="flex flex-col gap-4">
+              <Sections s={c.snapshot.sections as S} />
+              {c.economy_context ? (
+                <Section title={t("eco.title")}><EconomyFigures ctx={c.economy_context} /></Section>
+              ) : null}
+            </div>
             <div className="flex flex-col gap-4"><ReviewPanel c={c} onSaved={load} /></div>
           </div>
         </>

@@ -8,6 +8,7 @@ import type { Assessment, NewsSignal, Scenario } from "../../api/types";
 import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
 import { DemoBadge } from "../../components/DemoBadge";
+import { InflationWhatIf } from "../../components/Economy";
 import { EmptyState } from "../../components/EmptyState";
 import { ErrorBanner } from "../../components/PageShell";
 import type { Lang } from "../../i18n";
@@ -102,6 +103,7 @@ export function RisksTab({ a, lang }: { a: Assessment; lang: Lang }) {
   return (
     <>
       <p className="rounded-lg bg-bb-primary-soft px-3 py-2 text-small font-semibold text-bb-primary">{t("scn.whatif")}</p>
+      <InflationWhatIf rid={a.financing_request_id} />
       {shown.map((s) => (
         <Card key={s.id} className="flex flex-col gap-2">
           <p className="flex items-start gap-2 font-semibold">

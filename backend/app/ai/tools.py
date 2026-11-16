@@ -24,8 +24,8 @@ from ..engine.concentration import pct
 from ..engine.money import ZERO, money
 from ..engine.schedules import horizon_end
 from ..services import (
-    assessment_service, debt_service, financing_service, forecast_service, ledger_service, season_service,
-    summary_service, supplier_service,
+    assessment_service, debt_service, economy_service, financing_service, forecast_service, ledger_service,
+    season_service, summary_service, supplier_service,
 )
 from ..services.snapshot_service import _scrub, name_patterns, supplier_labels
 
@@ -91,6 +91,10 @@ SPECS = {
     "get_supplier_dependency": _spec("get_supplier_dependency", "Share of purchases per supplier (labels only)."),
     "get_news_signals": _spec("get_news_signals", "News from our list that may affect this business, with source."),
     "get_season_summary": _spec("get_season_summary", "Current crop season: costs, income range, break-even (farm only)."),
+    "get_economy_context": _spec("get_economy_context", "Bangladesh yearly economy figures from the World Bank "
+                                 "(inflation, lending interest rate, GDP growth, private credit), with year and "
+                                 "source; plus, if a financing check can run, what happens if prices keep rising "
+                                 "at last year's inflation."),
     "get_help": _spec("get_help", "Plain explanation of a term or screen.",
                       {"topic": {"type": "string", "enum": [h["key"] for h in HELP]}}),
 }
@@ -238,6 +242,33 @@ class Toolbox:
         if not seasons:
             return {"status": "no_season", "screen": "Seasons"}
         return season_service.summary(self.db, self.p, seasons[0].id).model_dump(mode="json")
+
+    def _get_economy_context(self) -> dict:
+        ctx = economy_service.context()
+        out = {"source": ctx["source"]["name"], "country": ctx["country"],
+               "figures": [{"name": i["label"], "year": i["year"], "value_pct": i["value"]} for i in ctx["indicators"]],
+               "label": "yearly national figures, not live and not about this business"}
+        r, _ = self._latest()
+        w = economy_service.inflation_whatif(self.db, self.p, r, self.today) if r is not None else None
+        if w is not None:
+            out["inflation_whatif"] = {"price_rise_pct": w["price_rise_pct"], "days": w["days"],
+                                       "covered": w["result"]["covered"],
+                                       "label": "what-if only, does not change the result"}
+        return out
+
+    def _get_economy_context(self) -> dict:
+        ctx = economy_service.context()
+        out = {"source": ctx["source"]["name"], "country": ctx["country"],
+               "figures": [{"key": i["key"], "name": i["label"], "year": i["year"], "value_pct": i["value"]}
+                           for i in ctx["indicators"]],
+               "label": "yearly national figures, not live and not about this business"}
+        r, _ = self._latest()
+        w = economy_service.inflation_whatif(self.db, self.p, r, self.today) if r is not None else None
+        if w is not None:
+            out["inflation_whatif"] = {"price_rise_pct": w["price_rise_pct"], "days": w["days"],
+                                       "covered": w["result"]["covered"],
+                                       "label": "what-if only, does not change the result"}
+        return out
 
     def _get_help(self, topic: str = "") -> dict:
         h = next((x for x in HELP if x["key"] == topic), None)

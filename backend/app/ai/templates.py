@@ -9,11 +9,11 @@ from .grounding import BN_DIGITS
 from .tools import Toolbox
 
 QUICK = ("next_week_installments", "money_this_month", "forecast_status", "assessment_status",
-         "supplier_dependency", "news_latest")
+         "supplier_dependency", "news_latest", "economy")
 TOOL_FOR = {"get_upcoming_installments": "next_week_installments", "get_money_summary": "money_this_month",
             "get_latest_forecast": "forecast_status", "get_latest_assessment": "assessment_status",
             "get_scenarios": "assessment_status", "get_supplier_dependency": "supplier_dependency",
-            "get_news_signals": "news_latest"}
+            "get_news_signals": "news_latest", "get_economy_context": "economy"}
 TITLES = {
     "next_week_installments": ("আগামী ৭ দিনের কিস্তি", "Installments in the next 7 days"),
     "money_this_month": ("এই মাসের টাকার হিসাব", "Money this month"),
@@ -21,6 +21,7 @@ TITLES = {
     "assessment_status": ("আমার অর্থায়ন যাচাইয়ের ফল", "My financing check"),
     "supplier_dependency": ("সরবরাহকারীর উপর নির্ভরতা", "Supplier dependency"),
     "news_latest": ("আমার এলাকার খবর", "News for my area"),
+    "economy": ("দেশের অর্থনীতির অবস্থা", "Bangladesh economy"),
 }
 STATUS = {
     "ready_for_lender_review": ("আপনার প্রস্তাব ঋণদাতার পর্যালোচনার জন্য তৈরি",
@@ -152,4 +153,25 @@ def answer(key: str, tb: Toolbox, lang: str) -> str:
             if tags:
                 lines[-1] += f" [{', '.join(tags)}]"
         return "\n".join(lines)
+    if key == "economy":
+        d = tb.data("get_economy_context")
+        if d.get("error"):
+            return "এখন তথ্য পাওয়া যাচ্ছে না।" if bn else "This information is not available now."
+        names = {"inflation": ("মূল্যস্ফীতি", "Inflation"), "lending_rate": ("ঋণের সুদের হার", "Lending interest rate"),
+                 "gdp_growth": ("জিডিপি প্রবৃদ্ধি", "GDP growth"),
+                 "private_credit": ("বেসরকারি খাতে ঋণ (জিডিপির %)", "Credit to private sector (% of GDP)")}
+        parts = [f"{names.get(f['key'], (f['name'], f['name']))[0 if bn else 1]} {_n(f['value_pct'], lang)}% "
+                 f"({_n(f['year'], lang)})" for f in d["figures"]]
+        text = ("বাংলাদেশ, বিশ্বব্যাংকের তথ্য: " if bn else "Bangladesh, World Bank data: ") + "; ".join(parts) + "।" * bn + "." * (not bn)
+        w = d.get("inflation_whatif")
+        if w:
+            if bn:
+                text += (f" দাম গত বছরের হারে বাড়লে (আগামী {_n(w['days'], lang)} দিনে প্রায় {_n(w['price_rise_pct'], lang)}%) "
+                         + ("আপনার কিস্তি এখনও মেলে।" if w["covered"] else "কোনো কিস্তির দিনে টাকা কম পড়তে পারে।"))
+            else:
+                text += (f" If prices keep rising at last year's rate (about {w['price_rise_pct']}% over the next "
+                         f"{w['days']} days), " + ("your repayments still fit." if w["covered"]
+                                                   else "cash may run short on a due date."))
+        note = " এগুলো বছরের জাতীয় হিসাব, আপনার ব্যবসার নয়।" if bn else " These are yearly national figures, not about your business."
+        return text + note
     return ""
