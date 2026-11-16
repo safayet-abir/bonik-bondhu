@@ -2,6 +2,7 @@ import "@fontsource/noto-sans-bengali/400.css";
 import "@fontsource/noto-sans-bengali/600.css";
 import "@fontsource/noto-sans/400.css";
 import "@fontsource/noto-sans/600.css";
+import "@fontsource-variable/anek-bangla/wdth.css";
 import "./styles/tokens.css";
 import "./i18n";
 

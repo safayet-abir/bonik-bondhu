@@ -13,6 +13,7 @@ import { StatusBanner } from "../../components/StatusBanner";
 import type { Lang } from "../../i18n";
 import { formatDate } from "../../lib/dates";
 import { STATUS_KEY, STATUS_TONE, fixLink } from "../../lib/financing";
+import { Balance } from "../../components/Balance";
 import { formatAmount, formatNumber, formatTaka } from "../../lib/format";
 import { useActiveProfile } from "../../state/ActiveProfile";
 import { NewsTab, RisksTab } from "./AssessmentRisks";
@@ -219,6 +220,12 @@ export function Assessment() {
       {tab === "how" ? <HowTab a={a} lang={lang} /> : tab === "risks" ? <RisksTab a={a} lang={lang} />
         : tab === "news" ? <NewsTab a={a} lang={lang} profileId={p.id} onChanged={load} /> : (
         <>
+          {/* the result weighed on the shop's balance: cash side down = fits, payment side down = does not */}
+          <div className="rounded-bb bg-bb-wall px-10 pt-3">
+            <Balance className="mx-auto max-w-[280px]" label={t(STATUS_KEY[a.status])} settleFrom={0}
+                     left={a.status === "ready_for_lender_review" ? 14 : 10}
+                     right={a.status === "not_affordable_base_case" ? 14 : 10} unit={4} />
+          </div>
           <StatusBanner tone={STATUS_TONE[a.status]} title={t(STATUS_KEY[a.status])}>{t("asm.not_approval")}</StatusBanner>
 
           {a.missing_items.length > 0 ? (

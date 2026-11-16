@@ -10,7 +10,7 @@ import { StatusBanner } from "./StatusBanner";
 export function PageShell({ title, back, children }: { title?: string; back?: string; children: ReactNode }) {
   const { t } = useTranslation();
   return (
-    <main className="mx-auto flex w-full max-w-[480px] flex-col gap-4 px-4 py-6">
+    <main className="bb-settle-in mx-auto flex w-full max-w-[480px] flex-col gap-4 px-4 py-6">
       {back ? (
         <Link to={back} className="-mb-2 flex min-h-12 items-center gap-1 self-start text-bb-primary">
           <ArrowLeft aria-hidden className="size-5" />

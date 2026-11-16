@@ -1,22 +1,34 @@
-/* Design tokens — UI spec §2 (SUG-17, approved 14 Nov 2026). */
+/* Design tokens. World: "Daripalla" — the bazaar counter's brass balance (surface brief, SUG-59).
+   Distemper-teal wall, polished brass, cast-iron ink, enamel-white plates, enamel red only for a shortfall.
+   Token names are unchanged from UI spec §2 so every screen inherits the world. */
 @import "tailwindcss";
 
 @theme {
-  --color-bb-primary: #0b6b53;
-  --color-bb-primary-dark: #084c3b;
-  --color-bb-primary-soft: #e3f1ec;
-  --color-bb-bg: #f6f7f5;
+  /* the world's inks */
+  --color-bb-wall: #1e6f66;      /* distemper-teal wall — the committed field */
+  --color-bb-wall-deep: #14504a; /* shadowed wall, pressed states */
+  --color-bb-brass: #e2b54f;     /* polished brass — scale, the one action (3.1:1 against the wall) */
+  --color-bb-brass-deep: #8a6214;/* brass as text on white (5.2:1) */
+  --color-bb-iron: #14201d;      /* cast-iron ink */
+  --color-bb-enamel: #f6f8f5;    /* enamel plate */
+
+  /* roles (names kept from UI spec §2) */
+  --color-bb-primary: #1e6f66;
+  --color-bb-primary-dark: #14504a;
+  --color-bb-primary-soft: #e1eeeb;
+  --color-bb-bg: #eef3f1;
   --color-bb-surface: #ffffff;
-  --color-bb-text: #1c2321;
-  --color-bb-muted: #5b6661;
-  --color-bb-border: #dde2df;
+  --color-bb-text: #14201d;
+  --color-bb-muted: #4f5e59;
+  --color-bb-border: #d3deda;
   --color-bb-success: #1e7b34;
-  --color-bb-warning: #975a00; /* P7 a11y: #b26a00 was 3.9:1 on bg (WCAG AA needs 4.5); now 5.2:1 */
-  --color-bb-danger: #b42318;
+  --color-bb-warning: #975a00;
+  --color-bb-danger: #c2362b;    /* enamel red — shortfalls only */
   --color-bb-info: #1f5fa8;
   --color-bb-demo: #6b4fa1;
 
   --font-sans: "Noto Sans Bengali", "Noto Sans", system-ui, sans-serif;
+  --font-display: "Anek Bangla Variable", "Noto Sans Bengali", "Noto Sans", sans-serif;
 
   /* Type scale: 13 caption · 14 small · 16 body · 18 card title · 22 screen title · 28 key amount */
   --text-caption: 13px;
@@ -25,8 +37,11 @@
   --text-card: 18px;
   --text-title: 22px;
   --text-amount: 28px;
+  --text-h3: 20px;
 
   --radius-bb: 8px;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1); /* the balance's own swing is a damped spring in Balance.tsx */
 }
 
 html {
@@ -35,6 +50,11 @@ html {
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.6; /* Bangla conjuncts need height */
+  caret-color: var(--color-bb-wall);
+  accent-color: var(--color-bb-wall);
+  -webkit-tap-highlight-color: transparent;
+  scrollbar-color: color-mix(in oklab, var(--color-bb-wall) 55%, transparent) transparent;
+  scrollbar-width: thin;
 }
 
 body {
@@ -43,6 +63,98 @@ body {
   background: var(--color-bb-bg);
 }
 
+::selection {
+  background: var(--color-bb-brass);
+  color: var(--color-bb-iron);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-bb-brass-deep);
+  outline-offset: 2px;
+}
+
+/* on the teal wall the deep brass disappears; polished brass keeps 3:1 */
+.bg-bb-wall :focus-visible,
+.bg-bb-wall-deep :focus-visible {
+  outline-color: var(--color-bb-brass);
+}
+
+a {
+  text-underline-offset: 3px;
+}
+
+/* stamped headings: screen titles read like the weights' cast lettering */
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-stretch: 92%;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
 .tabular {
   font-variant-numeric: tabular-nums;
+}
+
+/* the loan-amount slider on the welcome scale: an iron rail and a brass weight you slide */
+.bb-range {
+  appearance: none;
+  width: 100%;
+  height: 48px;
+  background: transparent;
+  cursor: pointer;
+}
+.bb-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-bb-iron);
+}
+.bb-range::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-bb-iron);
+}
+.bb-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 34px;
+  height: 30px;
+  margin-top: -12px;
+  border-radius: 6px 6px 3px 3px;
+  background: var(--color-bb-brass);
+  border: 2px solid var(--color-bb-iron);
+  box-shadow: 0 4px 10px -4px rgb(0 0 0 / 0.55);
+}
+.bb-range::-moz-range-thumb {
+  width: 30px;
+  height: 26px;
+  border-radius: 6px 6px 3px 3px;
+  background: var(--color-bb-brass);
+  border: 2px solid var(--color-bb-iron);
+  box-shadow: 0 4px 10px -4px rgb(0 0 0 / 0.55);
+}
+
+/* the one page-level motion in the app: a screen settles in from just below (Operate register, short) */
+@keyframes bb-settle-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.bb-settle-in {
+  animation: bb-settle-in 260ms var(--ease-out-expo) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
 }
