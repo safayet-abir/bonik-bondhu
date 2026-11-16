@@ -9,7 +9,7 @@ see "Live verification" at the end.
 | Task | Status | Evidence / what is left |
 |---|---|---|
 | P7-T01 i18n | ✔ | parity 818 keys; native review done by the team (`review/bn_review_.csv`, 75 corrections applied 16 Nov, placeholders checked) |
-| P7-T02 accessibility & mobile | partly | all walkthroughs run at 360 px; inputs have labels (scripts select by label); 48 px targets used in components. **No dedicated contrast/screen-reader audit yet** |
+| P7-T02 accessibility & mobile | ✔ automated (16 Nov) · phone check by team | Live URL, Bangla UI, 12 screens: **axe-core WCAG 2.1 A/AA = 0 violations**; reflow at 320 px = 0 px sideways scroll everywhere; keyboard order follows the screen, focus ring on every stop. Fixed: inputs had only a 1 px border on focus (now 2 px ring), header overflowed 11 px at 320 px, faded (opacity) closed/inactive cards fell below 4.5:1. Known P2: at 200 % zoom (180 px) money rows on Home/Entries/wizard/result scroll 8–44 px sideways; the native date field's inner segments show no ring. TalkBack + low-cost Android Bangla rendering still need a person (review/README.md) |
 | P7-T03 tests | ✔ local | 248 backend tests incl. SEC-01..20, the 18-case DB constraint script (`tests/db/test_constraints.py`) and a route-guard audit; deployed DB ☐ |
 | P7-T04 security checklist | see below | team sign-off |
 | P7-T05 deploy | ✔ 16 Nov | Render Blueprint from `feature/p7`; Neon at `0001_initial (head)`, 24 tables; `seed-demo` + `import-news` (7 events, 0 rejected) + `fetch-news` |
