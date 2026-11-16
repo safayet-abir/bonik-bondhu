@@ -23,7 +23,7 @@ export function Field({ label, hint, errorKey, className = "", ...rest }: Props)
         {...rest}
         aria-invalid={errorKey ? true : undefined}
         aria-describedby={describedBy}
-        className={`h-12 rounded-bb border bg-bb-surface px-3 text-body outline-none focus:border-bb-primary ${
+        className={`h-12 rounded-bb border bg-bb-surface px-3 text-body outline-none focus:border-bb-primary focus-visible:ring-2 focus-visible:ring-bb-primary ${
           errorKey ? "border-bb-danger" : "border-bb-border"
         }`}
       />

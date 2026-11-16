@@ -30,8 +30,9 @@ function OwnerChrome() {
   return (
     <div className="flex min-h-dvh flex-col pb-16">
       <header className="sticky top-0 z-10 border-b border-bb-border bg-bb-surface">
-        <div className="mx-auto flex max-w-[480px] items-center gap-2 px-4 py-2">
-          <Link to="/profiles" className="flex min-h-12 flex-1 items-center gap-2 font-semibold"
+        {/* a11y reflow: the name truncates (min-w-0); at 200 % zoom the badge/language wrap to a second line */}
+        <div className="mx-auto flex max-w-[480px] flex-wrap items-center gap-2 px-4 py-2">
+          <Link to="/profiles" className="flex min-h-12 min-w-0 flex-1 items-center gap-2 font-semibold"
                 aria-label={t("profiles.switch")}>
             <ProfileIcon type={p.activity_type} className="size-5 text-bb-primary" />
             <span className="truncate">{p.display_name}</span>

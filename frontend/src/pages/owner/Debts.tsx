@@ -110,7 +110,7 @@ function DebtCard({ d, onClose }: { d: Debt; onClose: (d: Debt) => void }) {
   const lang = i18n.language as Lang;
   const closed = d.status === "closed";
   return (
-    <Card className={`flex flex-col gap-2 ${closed ? "opacity-70" : ""}`}>
+    <Card className="flex flex-col gap-2">
       <div className="flex items-start justify-between gap-2">
         <p className="flex items-center gap-2 font-semibold">
           <Landmark aria-hidden className="size-5 text-bb-primary" />

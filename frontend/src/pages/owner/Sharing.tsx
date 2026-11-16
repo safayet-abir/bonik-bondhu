@@ -295,7 +295,7 @@ export function Sharing() {
         <>
           <h2 className="font-semibold">{t("share.closed")}</h2>
           {closed.map((c) => (
-            <Card key={c.id} className="flex flex-col gap-1 opacity-80">
+            <Card key={c.id} className="flex flex-col gap-1">
               {head(c)}
               <p className="text-small">{t(`consent.status.${c.is_expired && c.status === "approved" ? "expired" : c.status}`)}</p>
               {c.decision ? <Activity c={c} /> : null}

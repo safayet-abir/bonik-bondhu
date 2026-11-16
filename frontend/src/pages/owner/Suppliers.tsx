@@ -167,7 +167,7 @@ export function Suppliers() {
                                  district: s.district ?? "", upazila: s.upazila ?? "",
                                  share: s.declared_purchase_share_pct?.replace(/\.00$/, "") ?? "" }} />
       ) : (
-        <Card key={s.id} className={`flex flex-col gap-1 ${s.is_active ? "" : "opacity-70"}`}>
+        <Card key={s.id} className="flex flex-col gap-1">
           <div className="flex items-start justify-between gap-2">
             <p className="flex items-center gap-2 font-semibold">
               <Truck aria-hidden className="size-5 text-bb-primary" />
