@@ -151,6 +151,8 @@ def test_at23_lender_reads_only_approved_sections(shared) -> None:
     assert snap["schema"] == "bb-report-v1" and snap["is_demo"] is True
     assert set(snap["sections"]) == {"profile_summary", "financing_request", "obligations"}
     assert "supplier_risk" not in json.dumps(snap)
+    # SUG-58: public World Bank figures beside the snapshot, never inside it (the hash covers owner data only)
+    assert len(case["economy_context"]["indicators"]) == 4 and "economy" not in json.dumps(snap)
     blob = json.dumps(case, ensure_ascii=False)
     assert not any(n in blob for n in SUPPLIER_NAMES)  # SEC-12
     assert "phone" not in blob and "@demo.invalid" not in blob
