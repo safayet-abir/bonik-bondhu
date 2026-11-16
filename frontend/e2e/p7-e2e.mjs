@@ -32,7 +32,7 @@ const api = async (method, path, data) => {
 
 async function register(name, phone, pw) {
   await page.goto(base);
-  await page.getByRole("button", { name: "EN" }).click();
+  await page.getByRole("button", { name: /^English/ }).click(); // welcome screen: "English" or "English ✓"
   await page.getByRole("button", { name: "Create a new account" }).click();
   await page.getByLabel("Full name").fill(name);
   await page.getByLabel("Mobile number").fill(phone);
@@ -52,14 +52,14 @@ try {
   await page.getByRole("button", { name: "দোকান" }).click();
   await page.getByRole("button", { name: "সংরক্ষণ করুন" }).click();
   await page.getByText("টাকার হিসাব রাখি").waitFor();
-  await page.getByRole("button", { name: "EN" }).click();
+  await page.getByRole("button", { name: "EN", exact: true }).click();
   const pid = page.url().match(/\/p\/([^/]+)\//)[1];
   step("registered, logged in, shop profile created");
 
   for (const [name, goods, district, upazila] of [["Supplier North (E2E)", "rice, oil", "Gazipur", "Kaliakair"],
                                                     ["Supplier South (E2E)", "lentils", "Dhaka", "Savar"]]) {
     await page.goto(`${base}/p/${pid}/suppliers`);
-    await page.getByRole("button", { name: "EN" }).click(); // a reload restores the saved language
+    await page.getByRole("button", { name: "EN", exact: true }).click(); // a reload restores the saved language
     await page.getByRole("button", { name: "Add supplier" }).click();
     await page.getByLabel("Supplier name").fill(name);
     await page.getByLabel("What do they supply?").fill(goods);
@@ -159,22 +159,26 @@ try {
   await page.getByRole("button", { name: "Log in" }).click();
   await page.waitForURL(/\/(profiles|p\/)/);
   await page.goto(`${base}/profiles`);
-  await page.getByText("Selina Tailoring", { exact: true }).click();
+  // on a slow host the first click can land while the list re-renders: retry until the profile opens
+  for (let i = 0; i < 3 && !/\/p\/[^/]+\/home/.test(page.url()); i++) {
+    await page.getByText("Selina Tailoring", { exact: true }).click();
+    await page.waitForURL(/\/p\/[^/]+\/home/, { timeout: 10_000 }).catch(() => {});
+  }
   await page.waitForURL(/\/p\/[^/]+\/home/);
-  await page.getByRole("button", { name: "EN" }).click();
+  await page.getByRole("button", { name: "EN", exact: true }).click();
   const sid = page.url().match(/\/p\/([^/]+)\//)[1];
   const rid = (await api("GET", `/profiles/${sid}/financing-requests`)).items[0].id;
   // D4's terms are empty, so the wizard's Check button is (rightly) disabled; run the check via the API
   const aid = (await api("POST", `/profiles/${sid}/financing-requests/${rid}/assessments`, {})).id;
   await page.goto(`${base}/p/${sid}/assessment/${aid}`);
-  await page.getByRole("button", { name: "EN" }).first().click();
+  await page.getByRole("button", { name: "EN", exact: true }).first().click();
   await text("Tell us about your current loans (or say you have none)");
   await text("Record at least 4 weeks of sales and costs");
   await shot("e2e4-01-d4-missing");
   step("D4: check lists the missing information");
 
   await page.goto(`${base}/p/${sid}/financing/${rid}/step/1`); // step 1: "Next" saves (PATCH) → 401
-  await page.getByRole("button", { name: "EN" }).first().click();
+  await page.getByRole("button", { name: "EN", exact: true }).first().click();
   await ctx.clearCookies(); // the session ends while the owner is in the wizard
   await page.getByRole("button", { name: "Next" }).click();
   await page.waitForURL(/\/login$/);

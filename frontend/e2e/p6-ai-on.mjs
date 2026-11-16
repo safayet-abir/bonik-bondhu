@@ -22,11 +22,11 @@ const page = await browser.newPage({ viewport: { width: 360, height: 760 }, ...r
 const shot = (name) => page.screenshot({ path: join(shots, `${name}.png`), fullPage: true });
 const text = (s, opts = {}) => page.getByText(s, { exact: false }).first().waitFor(opts);
 const get = async (path) => (await page.request.get(`${base}/api/v1${path}`)).json();
-const en = () => page.getByRole("button", { name: "EN" }).click();
+const en = () => page.getByRole("button", { name: "EN", exact: true }).click();
 
 try {
   await page.goto(`${base}/login`);
-  if (await page.getByRole("button", { name: "EN" }).isVisible()) await en();
+  if (await page.getByRole("button", { name: "EN", exact: true }).isVisible()) await en();
   await page.getByLabel(/Mobile number|মোবাইল নম্বর/).fill("01900000001");
   await page.getByLabel(/Password|পাসওয়ার্ড/).fill(demoPw);
   await page.getByRole("button", { name: /^(Log in|লগ ইন)$/ }).click();

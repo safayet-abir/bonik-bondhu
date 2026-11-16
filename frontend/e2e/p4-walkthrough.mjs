@@ -25,20 +25,20 @@ const tab = (name) => page.getByRole("button", { name }).click();
 
 async function login(phone, password) {
   await page.goto(`${base}/login`);
-  if (await page.getByRole("button", { name: "EN" }).isVisible()) await page.getByRole("button", { name: "EN" }).click();
+  if (await page.getByRole("button", { name: "EN", exact: true }).isVisible()) await page.getByRole("button", { name: "EN", exact: true }).click();
   await page.getByLabel(/Mobile number|মোবাইল নম্বর/).fill(phone);
   await page.getByLabel(/Password|পাসওয়ার্ড/).fill(password);
   await page.getByRole("button", { name: /^(Log in|লগ ইন)$/ }).click();
   await page.waitForURL(/\/(profiles|p\/)/);
   await page.waitForLoadState("networkidle");
-  await page.getByRole("button", { name: "EN" }).click();
+  await page.getByRole("button", { name: "EN", exact: true }).click(); // not "Expense"
 }
 
 async function openProfile(name) {
   await page.goto(`${base}/profiles`);
   await page.getByText(name, { exact: true }).click();
   await page.waitForURL(/\/p\/[^/]+\/home/);
-  await page.getByRole("button", { name: "EN" }).click();
+  await page.getByRole("button", { name: "EN", exact: true }).click();
 }
 
 async function checkFirstRequest() {
@@ -56,7 +56,7 @@ try {
 
   // ------------------------------------------------------------ SCR-O08 dependency
   await page.goto(page.url().replace(/\/home$/, "/suppliers"));
-  await page.getByRole("button", { name: "EN" }).click();
+  await page.getByRole("button", { name: "EN", exact: true }).click();
   await text("Who you buy from");
   await text("65% · Tk 4,88,800");
   await text("25% · Tk 1,88,000");

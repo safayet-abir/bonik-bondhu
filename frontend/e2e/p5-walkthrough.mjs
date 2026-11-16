@@ -30,13 +30,13 @@ const see = (page, s) => page.getByText(s).first().waitFor();
 
 async function login(page, phone) {
   await page.goto(`${base}/login`);
-  if (await page.getByRole("button", { name: "EN" }).isVisible()) await page.getByRole("button", { name: "EN" }).click();
+  if (await page.getByRole("button", { name: "EN", exact: true }).isVisible()) await page.getByRole("button", { name: "EN", exact: true }).click();
   await page.getByLabel(/Mobile number|মোবাইল নম্বর/).fill(phone);
   await page.getByLabel(/Password|পাসওয়ার্ড/).fill(demoPw);
   await page.getByRole("button", { name: /^(Log in|লগ ইন)$/ }).click();
   await page.waitForURL(/\/(profiles|p\/|lender\/)/);
   await page.waitForLoadState("networkidle");
-  if (await page.getByRole("button", { name: "EN" }).isVisible()) await page.getByRole("button", { name: "EN" }).click();
+  if (await page.getByRole("button", { name: "EN", exact: true }).isVisible()) await page.getByRole("button", { name: "EN", exact: true }).click();
 }
 
 try {
@@ -56,7 +56,7 @@ try {
   await A.goto(`${base}/profiles`);
   await A.getByText("Rahim Store", { exact: true }).click();
   await A.waitForURL(/\/p\/[^/]+\/home/);
-  await A.getByRole("button", { name: "EN" }).click();
+  await A.getByRole("button", { name: "EN", exact: true }).click();
   const pid = A.url().match(/\/p\/([^/]+)/)[1];
   await A.getByRole("link", { name: "Financing" }).click();
   await A.getByRole("link", { name: /DEMO/ }).first().click();
@@ -66,7 +66,7 @@ try {
   await A.waitForURL(/\/assessment\//);
   await see(A, "Ready for lender review");
   await A.goto(`${base}/p/${pid}/sharing`);
-  await A.getByRole("button", { name: "EN" }).click();
+  await A.getByRole("button", { name: "EN", exact: true }).click();
   await see(A, "7KQ2M-9XA4P");
   await see(A, "DEMO Bank Ltd (fictional)");
   await A.getByRole("button", { name: "Allow" }).click();
