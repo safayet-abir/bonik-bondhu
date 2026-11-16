@@ -116,7 +116,8 @@ function ProfileMiniForm({ onDone }: { onDone: () => void }) {
         <Field label={t("profile.upazila")} value={upazila} onChange={(e) => setUpazila(e.target.value)} errorKey={fields.upazila} />
       </div>
       <Field label={t("profile.category")} value={category} onChange={(e) => setCategory(e.target.value)}
-             hint={t("fin.category_hint")} errorKey={fields.business_category} />
+             hint={t(p.activity_type === "crop_farm" ? "fin.category_hint.farm" : "fin.category_hint")}
+             errorKey={fields.business_category} />
       <AmountInput label={t("fin.household")} value={household} onChange={setHousehold}
                    hint={t("fin.household_hint")} errorKey={fields.household_withdrawal_monthly} />
       <Button variant="secondary" busy={busy} onClick={() => void save()}>{t("common.save")}</Button>
@@ -185,7 +186,7 @@ function StepPurpose({ req, onCreated, setReq, next }: Partial<StepProps> & { on
       <AmountInput label={t("fin.amount")} value={amount} onChange={setAmount} hint={t("fin.amount_hint")}
                    errorKey={fields.requested_amount} />
       <Field label={t("fin.purpose")} value={purpose} maxLength={500} onChange={(e) => setPurpose(e.target.value)}
-             hint={t("fin.purpose_hint")} errorKey={fields.purpose_text} />
+             hint={t(isFarm ? "fin.purpose_hint.farm" : "fin.purpose_hint")} errorKey={fields.purpose_text} />
       <div className="flex flex-col gap-1">
         <span className="font-semibold">{t("fin.category")}</span>
         <Chips label={t("fin.category")} value={category} onChange={setCategory}
@@ -389,7 +390,8 @@ function StepItems({ req, setReq, next }: StepProps) {
       <Card key={formKey} className="flex flex-col gap-3">
         <p className="font-semibold">{t("fin.add_item")}</p>
         <Field label={t("fin.item_name")} value={name} maxLength={120} onChange={(e) => setName(e.target.value)}
-               hint={t("fin.item_name_hint")} errorKey={fields.item_name} />
+               hint={t(p.activity_type === "crop_farm" ? "fin.item_name_hint.farm" : "fin.item_name_hint")}
+               errorKey={fields.item_name} />
         <div className="grid grid-cols-2 gap-3">
           <AmountInput label={t("fin.quantity")} value={qty} onChange={setQty} errorKey={fields.quantity} />
           <Field label={t("fin.unit")} value={unit} maxLength={20} onChange={(e) => setUnit(e.target.value)}
@@ -404,7 +406,8 @@ function StepItems({ req, setReq, next }: StepProps) {
         <Field label={t("fin.price_date")} type="date" value={priceDate} max={todayDhaka()}
                onChange={(e) => setPriceDate(e.target.value)} errorKey={fields.price_date} />
         <Field label={t("fin.price_note")} value={note} maxLength={200} onChange={(e) => setNote(e.target.value)}
-               hint={t("fin.price_note_hint")} errorKey={fields.price_source_note} />
+               hint={t(p.activity_type === "crop_farm" ? "fin.price_note_hint.farm" : "fin.price_note_hint")}
+               errorKey={fields.price_source_note} />
         <Button variant="secondary" busy={busy} icon={<PlusCircle aria-hidden className="size-5" />} onClick={() => void add()}>
           {t("fin.add_item")}
         </Button>
@@ -523,6 +526,85 @@ function StepLoans({ next }: StepProps) {
 }
 
 // ------------------------------------------------------------------ step 5
+type FitOption = {
+  label: "safest" | "fastest" | "smallest_installment" | "closest";
+  schedule_type: "equal_installments" | "single_payment"; installment_count: number | null;
+  installment_frequency: "weekly" | "monthly" | null; first_due_date: string; last_due_date: string;
+  installment_amount: string; total_repayment: string; margin: string; shortfall: string;
+};
+type FitResult = {
+  blocked_by: string[]; options: FitOption[]; closest: FitOption | null; tried: number; fit_count: number;
+  margin_kind: "surplus_at_due_date" | "lowest_balance_above_reserve";
+};
+
+/** Repayment Fit Finder (SUG-56): the server tries many schedules through the same check as the result
+ *  screen and shows up to three that fit. The owner picks; it stays their own proposal. */
+function FitFinder({ url, save, onUse }: { url: string; save: () => Promise<boolean>; onUse: (o: FitOption) => Promise<void> }) {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language as Lang;
+  const [res, setRes] = useState<FitResult | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<unknown>(null);
+
+  async function find() {
+    setBusy(true);
+    setError(null);
+    try {
+      await save(); // the reserve and interest typed below are part of the check
+      setRes(await api<FitResult>(`${url}/schedule-options`));
+    } catch (err) {
+      setError(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const describe = (o: FitOption) => o.schedule_type === "single_payment"
+    ? t("fit.single", { amount: formatTaka(o.total_repayment, lang), date: formatDate(o.first_due_date, lang) })
+    : t(`fit.equal.${o.installment_frequency}`, {
+        n: formatNumber(String(o.installment_count), lang), amount: formatTaka(o.installment_amount, lang),
+        first: formatDate(o.first_due_date, lang), last: formatDate(o.last_due_date, lang) });
+
+  return (
+    <Card className="flex flex-col gap-3">
+      <p className="font-semibold">{t("fit.title")}</p>
+      <p className="text-small text-bb-muted">{t("fit.intro")}</p>
+      <Button variant="secondary" busy={busy} icon={<Sparkles aria-hidden className="size-5" />} onClick={() => void find()}>
+        {t("fit.find")}
+      </Button>
+      <ErrorBanner error={error} />
+      {res && res.blocked_by.length > 0 ? (
+        <StatusBanner tone="warning" title={t("fit.blocked")}>
+          <ul className="list-disc pl-5">{res.blocked_by.map((m) => <li key={m}>{t(`missing.${m}`)}</li>)}</ul>
+        </StatusBanner>
+      ) : null}
+      {res && res.blocked_by.length === 0 && res.options.length === 0 ? (
+        <StatusBanner tone="warning" title={t("fit.none")}>
+          {res.closest ? (
+            <p>{t("fit.closest", { plan: describe(res.closest), amount: formatTaka(res.closest.shortfall, lang) })}</p>
+          ) : null}
+          <p>{t("fit.none_next")}</p>
+        </StatusBanner>
+      ) : null}
+      {res?.options.map((o) => (
+        <div key={o.label} className="flex flex-col gap-2 rounded-bb border border-bb-border p-3">
+          <p className="font-semibold text-bb-primary">{t(`fit.label.${o.label}`)}</p>
+          <p>{describe(o)}</p>
+          <p className="text-small text-bb-muted">
+            {t(`fit.margin.${res.margin_kind}`, { amount: formatTaka(o.margin, lang) })}
+          </p>
+          <Button variant="secondary" icon={<CheckCircle2 aria-hidden className="size-5" />} onClick={() => void onUse(o)}>
+            {t("fit.use")}
+          </Button>
+        </div>
+      ))}
+      {res && res.options.length > 0 ? (
+        <p className="text-small text-bb-muted">{t("fit.note", { tried: formatNumber(String(res.tried), lang) })}</p>
+      ) : null}
+    </Card>
+  );
+}
+
 function StepTerms({ req, setReq }: StepProps) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as Lang;
@@ -560,11 +642,29 @@ function StepTerms({ req, setReq }: StepProps) {
     }
   }
 
+  async function applyOption(o: FitOption) {
+    setRunError(null);
+    try {
+      setReq(await api<FinancingRequest>(`/profiles/${p.id}/financing-requests/${req.id}`, {
+        method: "PATCH",
+        body: { schedule_type: o.schedule_type, installment_count: o.installment_count ?? 1,
+                installment_frequency: o.installment_frequency, first_due_date: o.first_due_date },
+      }));
+      setType(o.schedule_type);
+      setCount(o.installment_count ? String(o.installment_count) : "");
+      if (o.installment_frequency) setFreq(o.installment_frequency);
+      setFirst(o.first_due_date);
+    } catch (err) {
+      setRunError(err);
+    }
+  }
+
   const rows = req.preview.installments;
   return (
     <>
       <StatusBanner tone="info" title={t("fin.proposal_banner")} />
       <ErrorBanner error={error ?? runError} />
+      <FitFinder url={`/profiles/${p.id}/financing-requests/${req.id}`} save={save} onUse={applyOption} />
       <div className="flex flex-col gap-1">
         <span className="font-semibold">{t("fin.schedule")}</span>
         <Chips label={t("fin.schedule")} value={type} onChange={setType}

@@ -54,6 +54,17 @@ see "Live verification" at the end.
 | SEC-01..SEC-20 pass | ✔ local | pytest (248) |
 | DB constraint tests on deployed DB | ✔ by migration | Neon runs the same migration (`alembic current` = `0001_initial (head)`, 24 tables). `pytest tests/db` is **never** pointed at Neon: the test suite drops the schema |
 
+## Plan Ultra progress (`docs/05_Development/BONIK_BONDHU_PLAN_ULTRA.md`, deadline 20 Nov)
+
+| Phase | Status | Evidence |
+|---|---|---|
+| F0 examples per profile | ✔ 16 Nov | `*.farm` hint keys; checked in `frontend/e2e/ultra-fit.mjs` |
+| F1 Repayment Fit Finder | ✔ 16 Nov | `engine/schedule_search.py`, `GET …/schedule-options`, wizard step 5 card; `tests/api/test_fit_finder.py` (6 tests: every option passes the unchanged assessment; D2 nothing fits; D4 blocked; other owner 404); browser `ultra-fit.mjs`; 254 backend tests |
+| F2 World Bank context | ☐ | |
+| F3 Look and motion | ☐ | |
+| F4 Supply Graph · F5 Applicant details · F6 Benchmark Proof · F7 News NLP · F8 Statement import | ☐ | cut order in the plan §8 |
+| F9 Story, docs, recording, merge | ☐ | |
+
 ## Live verification (16 Nov 2026, https://bonik-bondhu.onrender.com)
 
 - Health `{"status":"ok","db":"ok","llm":"configured"}`.

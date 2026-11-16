@@ -74,7 +74,8 @@ export function ProfileCreate() {
         <Field label={t("profile.upazila")} value={upazila} onChange={(e) => setUpazila(e.target.value)}
                hint={t("profile.upazila_hint")} errorKey={fields.upazila} />
         <Field label={t("profile.category")} value={category} onChange={(e) => setCategory(e.target.value)}
-               hint={t("profile.category_hint")} errorKey={fields.business_category} />
+               hint={t(type === "crop_farm" ? "profile.category_hint.farm" : "profile.category_hint")}
+               errorKey={fields.business_category} />
         <Button type="submit" full busy={busy}>
           {t("common.save")}
         </Button>

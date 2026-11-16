@@ -61,6 +61,13 @@ def parse_purpose(rid: uuid.UUID, profile: OwnedProfile, user: OwnerUser, db: Db
     return {"items": [financing_service.item_out(i) for i in items], "note_key": "fin.ai_items_confirm"}
 
 
+@router.get(BASE + "/{rid}/schedule-options")
+def schedule_options(rid: uuid.UUID, profile: OwnedProfile, db: DbSession) -> dict:
+    """Repayment Fit Finder (SUG-56): schedules that pass the same check as the assessment. Read-only."""
+    r = financing_service.get(db, profile, rid)
+    return assessment_service.schedule_options(db, profile, r, forecast_service.resolve_as_of(None))
+
+
 @router.post(BASE + "/{rid}/assessments", status_code=status.HTTP_201_CREATED, response_model=AssessmentOut)
 def run_assessment(rid: uuid.UUID, profile: OwnedProfile, db: DbSession, body: AsOfIn | None = None) -> AssessmentOut:
     as_of = forecast_service.resolve_as_of(body.as_of_date if body else None)

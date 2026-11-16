@@ -20,6 +20,7 @@ from sqlalchemy.orm import Session
 from ..config import get_settings
 from ..core.errors import not_found
 from ..engine import baseline as bl
+from ..engine import schedule_search
 from ..engine.crop import crop_check
 from ..engine.funding import Gap, funding_gap
 from ..engine.money import ZERO, money
@@ -223,6 +224,63 @@ def _farm_check(db: Session, profile: BusinessProfile, r: FinancingRequest, seas
                                          remaining=remaining, start=start, debts_due=debts_due, reserve=reserve,
                                          repayment=repayment, harvest=harvest, due=due,
                                          hh_to_harvest=hh_to_harvest, hh_after=hh_after)}
+
+
+# --------------------------------------------------------------------------- Repayment Fit Finder (SUG-56)
+# Missing items that are about the schedule itself: the finder exists to fix exactly these.
+FIT_IGNORES = {"terms_incomplete", "term_beyond_forecast_horizon", "repayment_due_before_expected_harvest"}
+
+
+def schedule_options(db: Session, profile: BusinessProfile, r: FinancingRequest, as_of: date) -> dict:
+    """Read-only. Tries candidate schedules through the SAME checks `evaluate` uses and returns up to three
+    that fit. Nothing is saved; the owner copies one into their own proposal (DEC-28 stays)."""
+    ev = evaluate(db, profile, r, as_of)
+    blocked = [m for m in ev.missing if m not in FIT_IGNORES]
+    interest = r.interest_fees_total or ZERO
+    reserve = r.minimum_cash_reserve or ZERO
+    is_farm = profile.activity_type == "crop_farm"
+    out = {"as_of_date": as_of.isoformat(), "blocked_by": blocked, "options": [], "closest": None, "tried": 0,
+           "fit_count": 0, "requested_amount": _s(r.requested_amount), "interest_fees_counted": _s(interest),
+           "reserve_counted": _s(reserve),
+           "margin_kind": "surplus_at_due_date" if is_farm else "lowest_balance_above_reserve"}
+    if blocked:
+        return out
+    start = start_balance(r)
+    household = profile.household_withdrawal_monthly or ZERO
+    if is_farm:
+        season = _season(db, profile, r)
+        items = financing_service.counted_items(financing_service.list_items(db, profile, r))
+        candidates = schedule_search.farm_candidates(as_of, season.expected_harvest_date)
+
+        def check(rows):
+            res, _ = _farm_check(db, profile, r, season, items, list(rows), as_of, start, reserve, household)
+            surplus, pre = Decimal(res["surplus_or_shortfall"]), Decimal(res["pre_harvest_shortfall"])
+            return res["covered"] and pre == 0, surplus, max(-surplus, pre, ZERO)
+    else:
+        existing = debt_service.obligation_rows(db, profile, as_of, horizon_end(as_of))
+        candidates = schedule_search.shop_candidates(as_of)
+
+        def check(rows):
+            c = shop_due_date_checks(as_of, ev.baseline, start, reserve, household, existing, rows)
+            worst = max((Decimal(x["shortfall_vs_reserve"]) for x in c["checks"]), default=ZERO)
+            return (not c["any_shortfall"] and not c["beyond_horizon"],
+                    Decimal(c["min_balance_after_payment"]) - reserve, worst)
+
+    results = schedule_search.search(r.requested_amount, interest, candidates, check)
+    chosen, closest = schedule_search.pick(results)
+
+    def row(label: str, x: schedule_search.Result) -> dict:
+        kind, n, freq, first = x.candidate
+        return {"label": label, "schedule_type": kind, "installment_count": n if kind == "equal_installments" else None,
+                "installment_frequency": freq if kind == "equal_installments" else None,
+                "first_due_date": first.isoformat(), "last_due_date": x.last_due.isoformat(),
+                "installment_amount": _s(x.rows[0][1]), "total_repayment": _s(sum((a for _, a in x.rows), ZERO)),
+                "margin": _s(x.margin), "shortfall": _s(x.shortfall)}
+
+    out.update(tried=len(results), fit_count=sum(x.fits for x in results),
+               options=[row(label, x) for label, x in chosen],
+               closest=row("closest", closest) if closest is not None else None)
+    return out
 
 
 def _inputs(db: Session, profile: BusinessProfile, r: FinancingRequest, items, baseline, season, as_of) -> dict:

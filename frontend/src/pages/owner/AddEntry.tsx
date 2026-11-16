@@ -222,7 +222,7 @@ export function AddEntry() {
         ) : null}
 
         <Field label={t("entry.note")} value={note} maxLength={300} onChange={(e) => setNote(e.target.value)}
-               hint={t("entry.note_hint")} errorKey={fields.note} />
+               hint={t(isFarm ? "entry.note_hint.farm" : "entry.note_hint")} errorKey={fields.note} />
 
         {duplicate ? (
           <StatusBanner tone="warning" title={t("entry.duplicate")}>
