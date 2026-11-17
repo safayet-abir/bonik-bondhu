@@ -23,7 +23,8 @@ from ..core.clock import utcnow
 from ..models import (
     BusinessProfile, FarmingSeason, FinancialAssessment, FinancingRequest, ForecastRun, RiskScenario, Transaction,
 )
-from . import assessment_service, debt_service, financing_service, season_service, summary_service, supplier_service
+from . import (assessment_service, debt_service, financing_service, graph_service, season_service, summary_service,
+               supplier_service)
 
 SCHEMA = "bb-report-v1"
 SECTIONS = ("profile_summary", "money_summary", "forecast", "financing_request", "obligations", "supplier_risk",
@@ -224,7 +225,8 @@ def build(db: Session, profile: BusinessProfile, sections: list[str], r: Financi
         "forecast": lambda: _forecast(db, a),
         "financing_request": lambda: _financing(db, profile, r, a, labels),
         "obligations": lambda: _obligations(db, profile),
-        "supplier_risk": lambda: _supplier_risk(conc, labels),
+        "supplier_risk": lambda: {**_supplier_risk(conc, labels),
+                                  "graph": graph_service.supply_graph(db, profile, as_of, outside=True)},
         "news_signals": lambda: _news(db, profile, as_of, names),
         "season_summary": lambda: _season(db, profile, r),
         "transaction_list": lambda: _transactions(db, profile, as_of, labels),

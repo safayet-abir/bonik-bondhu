@@ -3,13 +3,13 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Query, status
 
 from ..core.clock import today
-from ..core.deps import OwnedProfile
+from ..core.deps import OwnedProfile, ShopProfile
 from ..db import DbSession
 from ..schemas.supplier import ConcentrationOut, SupplierCreate, SupplierList, SupplierOut, SupplierPatch
-from ..services import supplier_service
+from ..services import graph_service, supplier_service
 
 router = APIRouter(prefix="/profiles/{pid}/suppliers", tags=["suppliers"])
 
@@ -37,3 +37,16 @@ concentration_router = APIRouter(prefix="/profiles/{pid}", tags=["suppliers"])
 def supplier_concentration(profile: OwnedProfile, db: DbSession) -> ConcentrationOut:
     """API #24 (FR-SUP-03..06). Window ends yesterday (Asia/Dhaka)."""
     return supplier_service.concentration_out(supplier_service.concentration(db, profile, today()))
+
+
+@concentration_router.get("/supply-graph")
+def supply_graph(profile: OwnedProfile, db: DbSession) -> dict:
+    """Plan Ultra F4: business → suppliers → areas / goods → news, with the purchase share through each node."""
+    return graph_service.supply_graph(db, profile, today())
+
+
+@concentration_router.get("/supply-graph/whatif")
+def supply_graph_whatif(profile: ShopProfile, db: DbSession, node: str = Query(max_length=300),
+                        days: int = 7) -> dict:
+    """If supply through `node` stops for 7 or 14 days, on the latest check's inputs. Read-only, never stored."""
+    return graph_service.whatif(db, profile, node, days, today())

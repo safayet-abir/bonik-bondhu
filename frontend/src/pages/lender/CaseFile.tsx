@@ -10,6 +10,7 @@ import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
 import { Chips } from "../../components/Chips";
 import { DemoBadge } from "../../components/DemoBadge";
+import { GraphView, type SupplyGraphData } from "../../components/SupplyGraph";
 import { EconomyFigures } from "../../components/Economy";
 import { ErrorBanner, Loading } from "../../components/PageShell";
 import { StatusBanner } from "../../components/StatusBanner";
@@ -184,6 +185,16 @@ function Sections({ s }: { s: S }) {
           {s.supplier_risk.high_dependency ? <p className="font-semibold text-bb-warning">{t("supplier.high_dep", { pct: num(s.supplier_risk.top_share_pct) })}</p> : null}
           {s.supplier_risk.note_key ? <p className="text-small">{t(s.supplier_risk.note_key)}</p> : null}
           <p className="text-small text-bb-muted">{t(`lender.basis.${s.supplier_risk.basis}`)} · {t("lender.names_hidden")}</p>
+          {s.supplier_risk.graph ? (
+            <div className="flex flex-col gap-1">
+              <p className="font-semibold">{t("graph.title")}</p>
+              <div className="overflow-x-auto rounded-xl border-2 border-bb-border p-2" tabIndex={0} role="region"
+                   aria-label={t("graph.title")}>
+                <GraphView g={s.supplier_risk.graph as SupplyGraphData} selected={null} />
+              </div>
+              <p className="text-caption text-bb-muted">{t("graph.legend")} · {t("graph.not_network")}</p>
+            </div>
+          ) : null}
         </Section>
       ) : null}
       {s.news_signals ? (

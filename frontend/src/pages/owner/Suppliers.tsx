@@ -1,6 +1,9 @@
-import { AlertTriangle, Info, Lock, Pencil, PlusCircle, Truck } from "lucide-react";
+import { AlertTriangle, ChevronRight, Info, Lock, Network, Pencil, PlusCircle, Truck } from "lucide-react";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
+
+import { IconTile } from "../../components/Brand";
 
 import { api, ApiError, type FieldErrors } from "../../api/client";
 import type { Concentration, Page, Supplier } from "../../api/types";
@@ -158,6 +161,17 @@ export function Suppliers() {
       )}
       {!items && !error ? <Loading /> : null}
       {conc && editing === null ? <Dependency c={conc} lang={lang} /> : null}
+      {editing === null ? (
+        <Link to={`/p/${p.id}/supply-graph`}
+              className="bb-hard-sm flex min-h-16 items-center gap-3 rounded-xl bg-bb-surface px-4 transition-transform duration-100 hover:-translate-y-0.5">
+          <IconTile icon={Network} tone="sky" />
+          <span className="flex flex-1 flex-col">
+            <span className="font-semibold">{t("graph.title")}</span>
+            <span className="text-small text-bb-muted">{t("graph.link_hint")}</span>
+          </span>
+          <ChevronRight aria-hidden className="size-5 text-bb-muted" />
+        </Link>
+      ) : null}
       {items && items.length === 0 && editing !== "new" ? (
         <EmptyState icon={<Truck className="size-10" />} message={t("supplier.add_prompt")} />
       ) : null}

@@ -29,6 +29,7 @@ import { Profiles } from "./pages/owner/Profiles";
 import { Sharing } from "./pages/owner/Sharing";
 import { Summary } from "./pages/owner/Summary";
 import { Suppliers } from "./pages/owner/Suppliers";
+import { SupplyGraph } from "./pages/owner/SupplyGraph";
 import { GuestOnly, RequireRole } from "./state/Guards";
 
 // Routes per TRD §3. Only screens with working endpoints exist (MP §17 rule 10);
@@ -49,6 +50,7 @@ export const router = createBrowserRouter([
       { path: "entries/:tid", element: <EntryDetail /> },
       { path: "summary", element: <Summary /> },
       { path: "suppliers", element: <Suppliers /> },
+      { path: "supply-graph", element: <SupplyGraph /> },
       { path: "debts", element: <Debts /> },
       { path: "seasons/new", element: <SeasonForm /> },
       { path: "seasons/:sid", element: <SeasonDetail /> },
