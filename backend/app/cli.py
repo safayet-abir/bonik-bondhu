@@ -23,7 +23,7 @@ from pathlib import Path
 
 from sqlalchemy import func, select, update
 
-from . import demo
+from . import demo, demo_extra
 from .config import get_settings
 from .core.audit import audit
 from .core.clock import today, utcnow
@@ -109,8 +109,15 @@ def seed_demo_cmd(args: argparse.Namespace) -> int:
         if demo.demo_present(conn):
             sys.exit("DEMO data (or a user with a DEMO phone) already exists. Run reset-demo instead.")
         n = demo.seed(conn, pw)
-    print(f"DEMO data seeded ({n} demo users; password = DEMO_PASSWORD). All data is fictional.")
+        extra = demo_extra.seed_extra(db, pw)
+    print(f"DEMO data seeded ({n} + {len(demo_extra.EXTRA_PHONES)} demo users; password = DEMO_PASSWORD). All data is fictional.")
+    _print_extra(extra)
     return 0
+
+
+def _print_extra(extra: dict[str, str]) -> None:
+    for name, st in extra.items():
+        print(f"  {name}: {st}")
 
 
 def reset_demo_cmd(args: argparse.Namespace) -> int:
@@ -119,8 +126,10 @@ def reset_demo_cmd(args: argparse.Namespace) -> int:
         conn = db.connection()
         demo.reset(conn)
         n = demo.seed(conn, pw)
+        extra = demo_extra.seed_extra(db, pw)
         audit(db, "admin.reset_demo", actor_role="admin", entity_type="demo")
-    print(f"DEMO data deleted and re-seeded ({n} demo users). Audit rows are kept.")
+    print(f"DEMO data deleted and re-seeded ({n} + {len(demo_extra.EXTRA_PHONES)} demo users). Audit rows are kept.")
+    _print_extra(extra)
     return 0
 
 
