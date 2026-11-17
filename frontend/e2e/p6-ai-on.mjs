@@ -26,10 +26,10 @@ const en = () => page.getByRole("button", { name: "EN", exact: true }).click();
 
 try {
   await page.goto(`${base}/login`);
-  if (await page.getByRole("button", { name: "EN", exact: true }).isVisible()) await en();
+  await en(); // waits for the switch (isVisible() did not wait, so a slow live page stayed in Bangla)
   await page.getByLabel(/Mobile number|মোবাইল নম্বর/).fill("01900000001");
   await page.getByLabel(/Password|পাসওয়ার্ড/).fill(demoPw);
-  await page.getByRole("button", { name: /^(Log in|লগ ইন)$/ }).click();
+  await page.getByRole("button", { name: /^(Log in|লগ ইন|লগইন করুন)$/ }).click();
   await page.waitForURL(/\/(profiles|p\/)/);
   await page.goto(`${base}/profiles`);
   await page.getByText("Rahim Store", { exact: true }).click();
