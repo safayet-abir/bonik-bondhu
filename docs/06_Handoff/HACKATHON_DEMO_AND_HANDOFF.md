@@ -21,6 +21,7 @@ Fill the "Status on demo day" column only with what the team has verified in P7.
 | Summary, forecast baseline | Working (estimate, not validated on BD data) | ✔ local (D1 golden, E2E-1) · deployed ☐ |
 | Funding gap, due-date check, crop check, statuses | Working, golden-tested | ✔ local (D1–D4 golden via API) · deployed ☐ |
 | Supplier concentration + delay/price scenarios | Working; severities are **assumptions** | ✔ local (D1/D3 golden, E2E-1 Risks tab) · deployed ☐ |
+| Supply graph (Plan Ultra F4) | Working: one business's own suppliers → areas / goods → news, share of purchases per node; shop what-if reuses the supplier-delay scenario (what-if only). **Not** a network across businesses, no graph learning | ✔ local (unit + API tests, golden D1 delay reproduced, `e2e/f4-graph.mjs`) · deployed ✔ 17 Nov (f4-graph on live) |
 | News signals | Working rule matching on a **curated** list + a daily automatic news search (labelled "collected automatically — not checked by a person", SUG-45); DEMO events **fictional** | ✔ local · deployed ☐ |
 | Consent, snapshot hash, lender review, revoke/expiry | Working | ✔ local (E2E-3 = p5 walkthrough, SEC-08..13) · deployed ☐ |
 | Receipt photo → draft → confirm | Working if AI on; accuracy = measured E2 numbers only | ✔ local with Gemini (p6-ai-on). E2: 19/20 fully correct on **20 synthetic receipts** after tuning on the same set (17/20 before) — no real receipts measured |

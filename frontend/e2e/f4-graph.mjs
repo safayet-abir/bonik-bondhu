@@ -55,7 +55,7 @@ try {
 
   await page.goto(`${base}/p/${farm}/supply-graph`);
   await en();
-  await page.getByRole("button", { name: /^Rice/ }).click();
+  await page.getByRole("button", { name: "Rice 0%", exact: true }).click(); // live news headlines can start with "Rice"
   await text("None of your purchases come through here");
   if (await page.getByRole("button", { name: "Stops 7 days" }).count()) throw new Error("farm must not offer the shop what-if");
   await shot("02-farm-graph");

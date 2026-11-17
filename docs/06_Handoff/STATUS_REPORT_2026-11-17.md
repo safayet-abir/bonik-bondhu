@@ -153,7 +153,18 @@ on real Bangladeshi data. Scenario sizes are assumptions. AI accuracy numbers ar
 receipts are synthetic. Auto-collected news is not checked by a person. The free Gemini tier may use data (only
 DEMO data is sent in demos). No phone verification, no CIB check, no real lending.
 
-## 9. What comes next (approved Plan Ultra order, deadline 20 Nov)
+## 9. Update later on 17 Nov — Plan Ultra F4 Supply graph DONE and live (`cf19352`)
 
-F4 Supply Graph → F5 Applicant details → F6 Benchmark Proof → F7 News NLP (F8 statement import dropped first);
+Suppliers → **Supply graph** shows the business's own suppliers, the areas they sit in, the goods they supply and the
+news that touches them; every node shows the share of the last 8 weeks' purchases that passes through it. A shop
+can ask "what if supply from here stops for 7 or 14 days?" — the existing supplier-delay scenario answers on the
+latest check's inputs (what-if only, never stored, never changes the result). Lenders see the same graph in the
+case file with Supplier 1/2/3 labels. Verified: 5 unit + 5 API tests (the Kaliakair node reproduces the golden D1
+delay: short by Tk 9,376.90 on day 7), browser walkthrough `e2e/f4-graph.mjs` local and live, axe 0 on the new
+pages, backend **274 passed**, all other E2E suites green. Limits: one business only (not a network), farm graphs
+have no purchase what-if.
+
+## 10. What comes next (approved Plan Ultra order, deadline 20 Nov)
+
+F5 Applicant details → F6 Benchmark Proof → F7 News NLP (F8 statement import dropped first);
 F9 story, deck, recording and merge to `main` on 19–20 Nov (owner approval before the merge).
