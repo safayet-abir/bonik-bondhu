@@ -5,7 +5,9 @@ import { Link } from "react-router";
 
 import { api } from "../../api/client";
 import type { LenderCase, Page } from "../../api/types";
+import { IconTile } from "../../components/Brand";
 import { Chips } from "../../components/Chips";
+import { PAIR } from "../../components/Frame";
 import { DemoBadge } from "../../components/DemoBadge";
 import { EmptyState } from "../../components/EmptyState";
 import { ErrorBanner, Loading } from "../../components/PageShell";
@@ -58,7 +60,13 @@ export function Cases() {
                 const readable = c.status === "approved" && !c.is_expired;
                 return (
                   <tr key={c.consent_id} className="border-t border-bb-border">
-                    <td className="p-3">
+                    <td className="p-3"><div className="flex items-center gap-3">
+                      {/* shop or farm at a glance: the same tile the owner sees in their own app */}
+                      {c.applicant ? (() => {
+                        const k = PAIR[c.applicant.activity_type === "shop" ? 0 : 1];
+                        return <IconTile icon={k.icon} tone={k.tone} size="sm" />;
+                      })() : null}
+                      <span>
                       {c.applicant ? (
                         readable ? (
                           <Link to={`/lender/cases/${c.consent_id}`} className="font-semibold text-bb-primary underline">
@@ -68,7 +76,8 @@ export function Cases() {
                       ) : <span className="text-bb-muted">{t("lender.awaiting_owner")}</span>}
                       {c.applicant?.is_demo ? <> <DemoBadge /></> : null}
                       {c.applicant ? <span className="block text-small text-bb-muted">{t(`profile.type.${c.applicant.activity_type}`)}</span> : null}
-                    </td>
+                      </span>
+                    </div></td>
                     <td className="tabular p-3">{c.requested_amount ? formatTaka(c.requested_amount, lang) : "—"}</td>
                     <td className="p-3 text-small">{c.assessment_status ? t(STATUS_KEY[c.assessment_status]) : "—"}</td>
                     <td className="p-3">{t(`consent.status.${c.is_expired ? "expired" : c.status}`)}</td>

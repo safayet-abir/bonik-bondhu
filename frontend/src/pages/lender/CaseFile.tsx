@@ -323,7 +323,8 @@ export function CaseFile() {
 
   const blocked = error instanceof ApiError && error.status === 403;
   return (
-    <LenderShell title={c?.snapshot.sections.profile_summary ? (c.snapshot.sections.profile_summary as S).display_name : t("lender.case_file")}>
+    <LenderShell title={c?.snapshot.sections.profile_summary ? (c.snapshot.sections.profile_summary as S).display_name : t("lender.case_file")}
+                 kind={(c?.snapshot.sections.profile_summary as S | undefined)?.activity_type}>
       {blocked ? (
         <StatusBanner tone="danger" title={t((error as ApiError).messageKey)}>{t("lender.access_ended")}</StatusBanner>
       ) : <ErrorBanner error={error} />}

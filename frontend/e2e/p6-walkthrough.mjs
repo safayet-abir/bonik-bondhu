@@ -63,7 +63,7 @@ try {
   await readAi.click();
   await page.waitForURL(/entries\/new/);
   await text("AI is not available right now");
-  await text("Please type the entry yourself. The photo stays attached.");
+  await text("Please type the entry yourself, looking at the photo."); // SUG-52: the photo is not kept after saving
   await page.getByRole("img", { name: "Receipt photo" }).waitFor();
   await page.getByRole("button", { name: "Stock purchase (cash)" }).click();
   await page.getByLabel("Amount (Tk)").fill("1234");
@@ -74,7 +74,7 @@ try {
   if (list.items[0].evidence_state !== "document_attached" || list.items[0].amount !== "1234.00") {
     throw new Error("photo was not attached to the saved entry");
   }
-  step("photo kept as evidence; AI off falls back to the manual form");
+  step("AI off falls back to the manual form beside the photo");
 
   // Advisor with AI off: help menu with answers from the records
   await page.getByRole("link", { name: "Advisor" }).click();

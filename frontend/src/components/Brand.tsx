@@ -19,7 +19,7 @@ export function Logo({ tone = "wall", to, className = "" }: { tone?: "wall" | "l
         <span lang="bn" className={`font-display text-[1.35rem] font-semibold ${tone === "wall" ? "text-white" : "text-bb-iron"}`}>
           বণিক বন্ধু
         </span>
-        <span lang="en" className={`mt-1 text-[0.62rem] font-semibold tracking-[0.24em] ${tone === "wall" ? "text-bb-brass" : "text-bb-primary"}`}>
+        <span lang="en" className={`mt-1 text-[0.62rem] font-semibold tracking-[0.24em] ${tone === "wall" ? "text-[#d6ece8]" : "text-bb-primary"}`}>{/* wall mist: brass is only 3.1:1 at this size */}
           BONIK BONDHU
         </span>
       </span>

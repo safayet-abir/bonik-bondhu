@@ -3,16 +3,20 @@ import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { NavLink, useNavigate } from "react-router";
 
-import { Logo } from "../../components/Brand";
+import { IconTile, Logo } from "../../components/Brand";
 import { Button } from "../../components/Button";
-import { SignBand } from "../../components/Frame";
+import { PAIR, SignBand } from "../../components/Frame";
 import { DemoBadge } from "../../components/DemoBadge";
 import { LanguageSwitch } from "../../components/LanguageSwitch";
 import { useAuth } from "../../state/Auth";
 
 /** Lender portal frame (UI spec §4.3): Cases · Request access · Logout.
  *  Desktop-first; no entry, farm or owner screens exist here (FR-LEN-07). */
-export function LenderShell({ title, children }: { title: string; children: ReactNode }) {
+export function LenderShell({ title, kind, children }: {
+  title: string; kind?: "shop" | "crop_farm"; children: ReactNode;
+}) {
+  // a case of one kind shows that world (shop or field); lists show both side by side
+  const pair = kind ? PAIR[kind === "shop" ? 0 : 1] : null;
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { me, logout } = useAuth();
@@ -41,8 +45,13 @@ export function LenderShell({ title, children }: { title: string; children: Reac
         </div>
       </header>
       <main className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6">
-        <SignBand section="lender" className="rounded-2xl bb-hard">
+        <SignBand section="lender" photo={pair?.photo} className="rounded-2xl bb-hard">
           <div className="flex min-h-24 flex-col justify-center gap-1 px-6 py-5">
+            {pair ? (
+              <p className="flex items-center gap-2 self-start rounded-xl bg-bb-iron/60 py-1 pl-1 pr-3 font-semibold">
+                <IconTile icon={pair.icon} tone={pair.tone} size="sm" />{t(pair.label)}
+              </p>
+            ) : null}
             <h1 className="text-[1.75rem] font-semibold leading-tight">{title}</h1>
             <p className="text-[#e6efec]">{t("scene.lender.line")}</p>
           </div>

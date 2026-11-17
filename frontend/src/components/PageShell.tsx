@@ -16,7 +16,7 @@ export function PageShell({ title, back, aside, children }: {
 }) {
   const { t } = useTranslation();
   const framed = useContext(FrameContext) !== null;
-  const section = useSection();
+  const { section, farm } = useSection();
   // A titled screen opens on a strip of the shop wall — its name painted like a signboard, the section's photo
   // behind it — and the content hangs below as enamel plates. Untitled screens (Home) start on the plates.
   const shell = (
@@ -27,7 +27,7 @@ export function PageShell({ title, back, aside, children }: {
         </div>
       ) : null}
       {title || back ? (
-        <SignBand section={section} photoClass={framed ? "" : "lg:hidden"}
+        <SignBand section={section} farm={farm} photoClass={framed ? "" : "lg:hidden"}
                   className={framed ? "lg:mt-6 lg:rounded-2xl lg:bb-hard" : "lg:rounded-2xl lg:bb-hard"}>
           <div className="mx-auto flex max-w-[480px] flex-col gap-1 px-4 pb-5 pt-3 lg:max-w-none lg:px-6 lg:pb-6 lg:pt-4">
             {back ? (
@@ -48,7 +48,7 @@ export function PageShell({ title, back, aside, children }: {
       </main>
     </>
   );
-  return framed ? shell : <GuestFrame section={section}>{shell}</GuestFrame>;
+  return framed ? shell : <GuestFrame>{shell}</GuestFrame>;
 }
 
 /** Page-level error: translated message + small error code for support (UI spec §8). */

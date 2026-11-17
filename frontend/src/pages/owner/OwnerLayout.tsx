@@ -1,4 +1,5 @@
 import { ChevronDown, HandCoins, Home, List, Menu, MessageCircle, Sprout, type LucideIcon } from "lucide-react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, NavLink, Outlet, useLocation } from "react-router";
 
@@ -21,6 +22,7 @@ function OwnerChrome() {
   const base = `/p/${p.id}`;
   const farm = p.activity_type === "crop_farm";
   const section = sectionFor(useLocation().pathname, farm);
+  const where = useMemo(() => ({ section, farm }), [section, farm]);
   const nav: { to: string; icon: LucideIcon; label: string; tone: Tone }[] = [
     farm
       ? { to: `${base}/home`, icon: Sprout, label: t("nav.seasons"), tone: "leaf" }
@@ -33,7 +35,7 @@ function OwnerChrome() {
   // Phones: header, the page, a bottom tab bar. Wide screens (≥1024): the same nav becomes a column of colour
   // tiles on the left; ≥1280 adds the section's scene panel on the right so the screen is never empty.
   return (
-    <FrameContext.Provider value={section}>
+    <FrameContext.Provider value={where}>
       <div className="flex min-h-dvh flex-col pb-16 lg:pb-0">
         <header className="sticky top-0 z-10 bg-bb-wall text-white shadow-[0_6px_14px_-10px_rgb(0_0_0/0.6)]">
           {/* a11y reflow: the name truncates (min-w-0); at 200 % zoom the badge/language wrap to a second line */}
@@ -74,7 +76,7 @@ function OwnerChrome() {
             <Outlet />
           </div>
           <div className="hidden xl:block xl:pt-6">
-            <ScenePanel key={section} section={section} />
+            <ScenePanel key={section} section={section} farm={farm} />
           </div>
         </div>
       </div>
