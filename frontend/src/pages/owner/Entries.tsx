@@ -99,7 +99,7 @@ export function Entries() {
         <EmptyState icon={<FileText className="size-10" />} message={t("entries.empty")} />
       ) : null}
       {items && items.length > 0 ? (
-        <ul className="divide-y divide-bb-border rounded-bb border border-bb-border bg-bb-surface">
+        <ul className="divide-y divide-bb-border rounded-xl bb-hard-sm bg-bb-surface">
           {items.map((tx) => <EntryRow key={tx.id} tx={tx} to={`/p/${p.id}/entries/${tx.id}`} />)}
         </ul>
       ) : null}

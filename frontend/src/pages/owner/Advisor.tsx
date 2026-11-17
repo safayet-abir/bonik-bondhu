@@ -82,7 +82,7 @@ export function Advisor() {
           {msgs.map((m, i) => (
             <li key={i} className={m.role === "user"
               ? "max-w-[85%] self-end rounded-bb bg-bb-primary p-3 text-white"
-              : "max-w-[90%] self-start rounded-bb border border-bb-border bg-bb-surface p-3"}>
+              : "max-w-[90%] self-start rounded-xl bb-hard-sm bg-bb-surface p-3"}>
               {/* plain text only: replies are never rendered as HTML */}
               <p className="whitespace-pre-line">{m.text}</p>
               {m.role === "assistant" && m.mode ? (
@@ -108,7 +108,7 @@ export function Advisor() {
         <section className="flex flex-col gap-2">
           <h2 className="font-semibold">{t("advisor.topics")}</h2>
           {help.items.map((h) => (
-            <details key={h.key} className="rounded-bb border border-bb-border bg-bb-surface px-3">
+            <details key={h.key} className="rounded-xl bb-hard-sm bg-bb-surface px-3">
               <summary className="flex min-h-12 cursor-pointer items-center font-semibold">{lang === "bn" ? h.title_bn : h.title_en}</summary>
               <p className="pb-3 text-small">{lang === "bn" ? h.body_bn : h.body_en}</p>
             </details>

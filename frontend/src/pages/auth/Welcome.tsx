@@ -1,10 +1,11 @@
-import { Check, Landmark, LogIn, NotebookPen, Scale, Share2, UserPlus } from "lucide-react";
+import { Check, Landmark, LogIn, NotebookPen, Scale, Share2, Sprout, Store, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 import { getHealth, type Health } from "../../api/client";
-import { Balance, BalanceMark } from "../../components/Balance";
+import { Balance } from "../../components/Balance";
+import { IconTile, Logo, Photo, PhotoCredit } from "../../components/Brand";
 import { DemoBadge } from "../../components/DemoBadge";
 import { LanguageSwitch } from "../../components/LanguageSwitch";
 import type { Lang } from "../../i18n";
@@ -56,6 +57,11 @@ export function Welcome() {
   const installment = Math.round(amount / INSTALLMENTS);
   const fits = installment <= WEEKLY_FREE_CASH;
   const taka = (n: number) => formatTaka(String(n), lang);
+  const audiences = [
+    { photo: "shop-keraniganj" as const, icon: Store, tone: "teal" as const, title: t("land.aud_shop"), text: t("land.aud_shop_text") },
+    { photo: "harvest-carry" as const, icon: Sprout, tone: "leaf" as const, title: t("land.aud_farm"), text: t("land.aud_farm_text") },
+    { photo: "bazaar-spices" as const, icon: Landmark, tone: "sky" as const, title: t("land.lenders"), text: t("land.lenders_text") },
+  ];
   const steps = [
     { icon: NotebookPen, title: t("land.step1"), text: t("land.step1_text") },
     { icon: Scale, title: t("land.step2"), text: t("land.step2_text") },
@@ -65,13 +71,7 @@ export function Welcome() {
   return (
     <main className="min-h-dvh bg-bb-wall text-white">
       <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 pt-4 sm:px-8">
-        <p className="flex items-center gap-2">
-          <BalanceMark className="size-9 shrink-0" />
-          <span className="flex flex-col leading-tight">
-            <span lang="bn" className="font-display text-title font-semibold">বণিক বন্ধু</span>
-            <span lang="en" className="text-caption text-[#d6ece8]">Bonik Bondhu</span>
-          </span>
-        </p>
+        <Logo />
         <LanguageSwitch large tone="wall" />
       </header>
 
@@ -129,6 +129,27 @@ export function Welcome() {
         </div>
       </section>
 
+      {/* who it is for: real bazaar and field photos (credited), one colour each */}
+      <section className="bg-bb-bg text-bb-iron">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-8">
+          <h2 className="text-[1.75rem] font-semibold sm:text-[2.25rem]">{t("land.for_who")}</h2>
+          <ul className="mt-8 grid gap-7 md:grid-cols-3">
+            {audiences.map(({ photo, icon, tone, title, text }) => (
+              <li key={photo} className="bb-hard flex flex-col overflow-hidden rounded-2xl bg-bb-surface">
+                <div className="aspect-[4/3] overflow-hidden border-b-2 border-bb-iron"><Photo slug={photo} /></div>
+                <div className="flex flex-1 flex-col gap-2 p-5">
+                  <span className="flex items-center gap-3 font-display text-card font-semibold">
+                    <IconTile icon={icon} tone={tone} />{title}
+                  </span>
+                  <p className="flex-1 text-bb-muted">{text}</p>
+                  <PhotoCredit slug={photo} className="text-bb-muted" />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       <section className="bg-bb-wall-deep">
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-8">
           <h2 className="text-title font-semibold">{t("land.how")}</h2>
@@ -152,18 +173,30 @@ export function Welcome() {
             ))}
           </ol>
 
-          <div className="mt-10 flex flex-col gap-2 rounded-bb bg-bb-enamel p-5 text-bb-iron sm:flex-row sm:items-center sm:gap-6">
-            <Landmark aria-hidden className="size-8 shrink-0 text-bb-wall" />
-            <p className="flex flex-col">
-              <span className="font-display text-card font-semibold">{t("land.lenders")}</span>
-              <span className="text-bb-muted">{t("land.lenders_text")}</span>
-            </p>
-          </div>
+        </div>
+      </section>
 
-          <p className="mt-10 font-display text-card font-semibold">{t("land.never")}</p>
-          <p className="mt-2 flex items-center gap-2 text-caption text-[#d6ece8]" aria-live="polite">
-            <span aria-hidden className={`inline-block size-2 rounded-full ${statusOk ? "bg-bb-brass" : "bg-bb-danger"}`} />
-            {t("system.status")}: {statusText}
+      {/* the promise on the field: the last thing a visitor reads, with the one action again */}
+      <section className="relative isolate overflow-hidden bg-bb-iron">
+        <span className="absolute inset-0 -z-10">
+          <Photo slug="paddy-path" decorative drift />
+          <span className="absolute inset-0 bg-gradient-to-r from-bb-iron via-bb-iron/85 to-bb-iron/40" />
+        </span>
+        <div className="mx-auto flex max-w-6xl flex-col items-start gap-5 px-4 py-16 sm:px-8 sm:py-24">
+          <Logo />
+          <p className="max-w-[22ch] font-display text-[1.9rem] font-semibold leading-tight sm:text-[2.6rem]">{t("land.never")}</p>
+          {/* a link (not a second button with the hero's name): it is navigation, and keeps one "create" button per page */}
+          <Link to="/register"
+                className="bb-hard inline-flex min-h-14 items-center gap-2 rounded-xl bg-bb-brass px-6 text-card font-semibold text-bb-iron transition-transform duration-100 active:translate-x-px active:translate-y-px">
+            <UserPlus aria-hidden className="size-5" />{t("welcome.create_account")}
+          </Link>
+          <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-caption text-[#d6ece8]">
+            <span className="flex items-center gap-2" aria-live="polite">
+              <span aria-hidden className={`inline-block size-2 rounded-full ${statusOk ? "bg-bb-brass" : "bg-bb-danger"}`} />
+              {t("system.status")}: {statusText}
+            </span>
+            <PhotoCredit slug="paddy-path" />
+            <a href="/photos/CREDITS.md" className="underline-offset-2 hover:underline">{t("brand.credits")}</a>
           </p>
         </div>
       </section>

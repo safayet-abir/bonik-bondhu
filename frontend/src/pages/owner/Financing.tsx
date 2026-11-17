@@ -36,7 +36,7 @@ export function Financing() {
       </Button>
       {!items && !error ? <Loading /> : null}
       {items && items.length > 0 ? (
-        <ul className="divide-y divide-bb-border rounded-bb border border-bb-border bg-bb-surface">
+        <ul className="divide-y divide-bb-border rounded-xl bb-hard-sm bg-bb-surface">
           {items.map((r) => {
             const a = r.latest_assessment;
             const to = a && !a.is_stale ? `${base}/assessment/${a.id}` : `${base}/financing/${r.id}/step/${a ? 5 : 2}`;

@@ -1,23 +1,35 @@
 import { ArrowLeft } from "lucide-react";
-import type { ReactNode } from "react";
+import { useContext, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import { ApiError } from "../api/client";
+import { Logo } from "./Brand";
+import { FrameContext, GuestFrame, SignBand, useSection } from "./Frame";
 import { StatusBanner } from "./StatusBanner";
 
-/** Centred 480 px mobile column (UI spec §2.3, §4.5). `back` = parent screen. */
+/** Centred 480 px mobile column (UI spec §2.3, §4.5). `back` = parent screen.
+ *  Inside the owner frame the column sits between the side nav and the scene panel; outside it (login,
+ *  register, choose business, not found) the screen gets the guest split-screen with the bazaar photo. */
 export function PageShell({ title, back, aside, children }: {
   title?: string; back?: string; aside?: ReactNode; children: ReactNode;
 }) {
   const { t } = useTranslation();
-  // A titled screen opens on a strip of the shop wall — its name painted like a signboard — and the content
-  // hangs below as enamel plates (world "Daripalla"). Untitled screens (Home) start straight on the plates.
-  return (
+  const framed = useContext(FrameContext) !== null;
+  const section = useSection();
+  // A titled screen opens on a strip of the shop wall — its name painted like a signboard, the section's photo
+  // behind it — and the content hangs below as enamel plates. Untitled screens (Home) start on the plates.
+  const shell = (
     <>
+      {!framed ? (
+        <div className="bg-bb-wall px-4 pt-3 lg:hidden">
+          <div className="mx-auto max-w-[480px]"><Logo to="/" /></div>
+        </div>
+      ) : null}
       {title || back ? (
-        <div className="bg-bb-wall text-white">
-          <div className="mx-auto flex max-w-[480px] flex-col gap-1 px-4 pb-5 pt-3">
+        <SignBand section={section} photoClass={framed ? "" : "lg:hidden"}
+                  className={framed ? "lg:mt-6 lg:rounded-2xl lg:bb-hard" : "lg:rounded-2xl lg:bb-hard"}>
+          <div className="mx-auto flex max-w-[480px] flex-col gap-1 px-4 pb-5 pt-3 lg:max-w-none lg:px-6 lg:pb-6 lg:pt-4">
             {back ? (
               <Link to={back} className="-ml-1 flex min-h-12 items-center gap-1 self-start px-1 text-[#d6ece8] hover:text-white">
                 <ArrowLeft aria-hidden className="size-5" />
@@ -29,13 +41,14 @@ export function PageShell({ title, back, aside, children }: {
               {aside}
             </div>
           </div>
-        </div>
+        </SignBand>
       ) : null}
-      <main className={`bb-settle-in mx-auto flex w-full max-w-[480px] flex-col gap-4 px-4 pb-6 ${title || back ? "pt-5" : "pt-6"}`}>
+      <main className={`bb-settle-in mx-auto flex w-full max-w-[480px] flex-col gap-4 px-4 pb-6 lg:max-w-none lg:px-0 ${title || back ? "pt-5" : "pt-6"}`}>
         {children}
       </main>
     </>
   );
+  return framed ? shell : <GuestFrame section={section}>{shell}</GuestFrame>;
 }
 
 /** Page-level error: translated message + small error code for support (UI spec §8). */

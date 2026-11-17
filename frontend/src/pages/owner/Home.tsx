@@ -5,6 +5,7 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router";
 
 import { api } from "../../api/client";
 import type { Page, Summary, Transaction, TxnType } from "../../api/types";
+import { IconTile, type Tone } from "../../components/Brand";
 import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
 import { EconomyCard } from "../../components/Economy";
@@ -22,6 +23,9 @@ import { EntryRow } from "./Entries";
 
 type Data = { today: Summary; month: Summary; recent: Transaction[] };
 const QUICK: TxnType[] = ["sale_cash", "sale_credit", "purchase_cash", "operating_expense"];
+const QUICK_TONE: Partial<Record<TxnType, Tone>> = {
+  sale_cash: "leaf", sale_credit: "turmeric", purchase_cash: "sky", operating_expense: "chili",
+};
 
 /** /p/:pid/home — shop home (SCR-O03) or farm home (SCR-F01). */
 export function ProfileHome() {
@@ -93,7 +97,7 @@ export function Home() {
             scene: <div className="mx-auto w-[62%]"><Balance left={12} right={10} settleFrom={10} label={t("home.path_b")} /></div> },
         ].map(({ key, onClick, icon: Icon, scene }, i) => (
           <button key={key} type="button" onClick={onClick} style={{ animationDelay: `${i * 90}ms` }}
-                  className="bb-settle-in group flex flex-col overflow-hidden rounded-bb border border-bb-border bg-bb-surface text-left shadow-[0_2px_8px_-4px_rgb(20_32_29/0.18)] transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-px">
+                  className="bb-settle-in group flex flex-col overflow-hidden rounded-xl bb-hard-sm bg-bb-surface text-left transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-px">
             <span className="block bg-bb-wall px-4 pt-3">{scene}</span>
             <span className="flex flex-col gap-1 p-4">
               <span className="flex items-center gap-2 font-display text-card font-semibold">
@@ -121,8 +125,8 @@ export function Home() {
           {QUICK.map((ty) => {
             const Icon = TXN_ICON[ty];
             return (
-              <Button key={ty} variant="secondary" onClick={() => add(ty)}
-                      icon={<Icon aria-hidden className={`size-5 ${ty === "sale_cash" ? "text-bb-success" : ""}`} />}>
+              <Button key={ty} variant="secondary" onClick={() => add(ty)} className="justify-start text-bb-iron"
+                      icon={<IconTile icon={Icon} tone={QUICK_TONE[ty] ?? "teal"} size="sm" />}>
                 {t(`txn.${ty}`)}
               </Button>
             );
@@ -131,7 +135,7 @@ export function Home() {
       </section>
       <section className="flex flex-col gap-2">
         <h2 className="font-semibold">{t("home.recent")}</h2>
-        <ul className="divide-y divide-bb-border rounded-bb border border-bb-border bg-bb-surface">
+        <ul className="divide-y divide-bb-border rounded-xl bb-hard-sm bg-bb-surface">
           {data.recent.map((tx) => <EntryRow key={tx.id} tx={tx} to={`/p/${p.id}/entries/${tx.id}`} />)}
         </ul>
         <Link to={`/p/${p.id}/summary`} className="text-center font-semibold text-bb-primary underline">

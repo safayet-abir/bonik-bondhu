@@ -332,7 +332,7 @@ function StepItems({ req, setReq, next }: StepProps) {
     <>
       <ErrorBanner error={error} />
       {req.items.length > 0 ? (
-        <ul className="divide-y divide-bb-border rounded-bb border border-bb-border bg-bb-surface">
+        <ul className="divide-y divide-bb-border rounded-xl bb-hard-sm bg-bb-surface">
           {req.items.map((i) => (
             <li key={i.id} className="flex items-start gap-2 p-3">
               <div className="flex flex-1 flex-col">

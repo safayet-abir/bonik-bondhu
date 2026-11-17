@@ -156,7 +156,7 @@ export function SeasonDetail() {
         <h2 className="font-semibold">{t("season.plan")}</h2>
         {season.cost_items.length === 0 ? <p className="text-small text-bb-muted">{t("season.plan_empty")}</p> : null}
         {season.cost_items.length > 0 ? (
-          <ul className="divide-y divide-bb-border rounded-bb border border-bb-border bg-bb-surface">
+          <ul className="divide-y divide-bb-border rounded-xl bb-hard-sm bg-bb-surface">
             {season.cost_items.map((i) => {
               const fullyPaid = Number(i.paid_total) >= Number(i.total_cost) && Number(i.total_cost) > 0;
               return (
@@ -207,7 +207,7 @@ export function SeasonDetail() {
       <section className="flex flex-col gap-2">
         <h2 className="font-semibold">{t("season.actual")}</h2>
         {entries.length === 0 ? <p className="text-small text-bb-muted">{t("season.actual_empty")}</p> : (
-          <ul className="divide-y divide-bb-border rounded-bb border border-bb-border bg-bb-surface">
+          <ul className="divide-y divide-bb-border rounded-xl bb-hard-sm bg-bb-surface">
             {entries.map((tx) => <EntryRow key={tx.id} tx={tx} to={`/p/${p.id}/entries/${tx.id}`} />)}
           </ul>
         )}

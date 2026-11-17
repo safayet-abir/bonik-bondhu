@@ -84,7 +84,7 @@ export function Photo() {
         <img src={preview} alt={t("photo.preview")} className="max-h-80 w-full rounded-bb border border-bb-border object-contain" />
       ) : null}
       <p className="text-small text-bb-muted">{t("photo.hint")}</p>
-      <label className="flex items-start gap-3 rounded-bb border border-bb-border bg-bb-surface p-3">
+      <label className="flex items-start gap-3 rounded-xl bb-hard-sm bg-bb-surface p-3">
         <input type="checkbox" className="mt-1 size-5 shrink-0" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
         <span>
           {t("photo.ai_consent")}

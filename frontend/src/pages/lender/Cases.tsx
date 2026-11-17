@@ -40,7 +40,7 @@ export function Cases() {
       {!cases && !error ? <Loading /> : null}
       {cases && cases.length === 0 ? <EmptyState icon={<Inbox className="size-10" />} message={t("lender.no_cases")} /> : null}
       {cases && cases.length > 0 ? (
-        <div className="overflow-x-auto rounded-bb border border-bb-border bg-bb-surface">
+        <div className="overflow-x-auto rounded-xl bb-hard-sm bg-bb-surface">
           <table className="w-full min-w-[720px] text-left">
             <thead className="text-small text-bb-muted">
               <tr>

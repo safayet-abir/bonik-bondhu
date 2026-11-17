@@ -38,6 +38,15 @@
   --text-amount: 28px;
   --text-h3: 20px;
 
+  /* bazaar colours (design round 3): one per section, used on icon tiles and scene panels only.
+     Each pair = soft ground + strong ink (ink ≥ 4.5:1 on its ground). */
+  --color-tile-chili: #fde3df;    --color-tile-chili-ink: #a8261c;
+  --color-tile-turmeric: #fcefc2; --color-tile-turmeric-ink: #7a4f00;
+  --color-tile-leaf: #e0f1d6;     --color-tile-leaf-ink: #2c6420;
+  --color-tile-sky: #dbeaf8;      --color-tile-sky-ink: #1b5596;
+  --color-tile-plum: #ebe2f6;     --color-tile-plum-ink: #5e4392;
+  --color-tile-teal: #dcefeb;     --color-tile-teal-ink: #17585a;
+
   --radius-bb: 8px;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1); /* the balance's own swing is a damped spring in Balance.tsx */
@@ -157,6 +166,33 @@ h2 {
 .bb-write {
   stroke-dasharray: 100;
   animation: bb-write 520ms var(--ease-out-expo) both;
+}
+
+/* scene photos drift very slowly (design round 3); the reduced-motion rule below stops it */
+@keyframes bb-drift {
+  from { transform: scale(1.02) translate(0, 0); }
+  to { transform: scale(1.1) translate(-1.5%, -1%); }
+}
+.bb-drift {
+  animation: bb-drift 26s ease-in-out infinite alternate;
+}
+
+/* a tip card swaps in */
+@keyframes bb-fade {
+  from { opacity: 0; transform: translateX(8px); }
+}
+.bb-fade {
+  animation: bb-fade 240ms var(--ease-out-expo) both;
+}
+
+/* the hard iron drop used on tiles, framed photos and the logo (stays still on press: translate instead) */
+@utility bb-hard {
+  border: 2px solid var(--color-bb-iron);
+  box-shadow: 4px 4px 0 0 var(--color-bb-iron);
+}
+@utility bb-hard-sm {
+  border: 2px solid var(--color-bb-iron);
+  box-shadow: 2px 2px 0 0 var(--color-bb-iron);
 }
 
 @media (prefers-reduced-motion: reduce) {

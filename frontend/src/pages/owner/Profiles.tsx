@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router";
 
 import { api } from "../../api/client";
 import type { Profile } from "../../api/types";
+import { Photo } from "../../components/Brand";
 import { Button } from "../../components/Button";
 import { DemoBadge } from "../../components/DemoBadge";
 import { LanguageSwitch } from "../../components/LanguageSwitch";
@@ -45,9 +46,15 @@ export function Profiles() {
           <li key={p.id}>
             <Link
               to={`/p/${p.id}/home`}
-              className="flex min-h-16 items-center gap-3 rounded-bb border border-bb-border bg-bb-surface p-4"
+              className="flex min-h-16 items-center gap-3 overflow-hidden rounded-xl bb-hard-sm bg-bb-surface pr-4 transition-transform duration-100 hover:-translate-y-0.5"
             >
-              <ProfileIcon type={p.activity_type} className="size-6 text-bb-primary" />
+              {/* the business's own world: a shop front or a paddy field */}
+              <span className="relative h-20 w-24 shrink-0 border-r-2 border-bb-iron">
+                <Photo slug={p.activity_type === "shop" ? "shop-keraniganj" : "paddy-path"} decorative />
+                <span className="absolute bottom-1.5 left-1.5 flex size-8 items-center justify-center rounded-md bg-bb-surface/95 text-bb-primary">
+                  <ProfileIcon type={p.activity_type} className="size-5" />
+                </span>
+              </span>
               <span className="flex-1">
                 <span className="block font-semibold">{p.display_name}</span>
                 <span className="text-small text-bb-muted">{t(`profile.type.${p.activity_type}`)}</span>

@@ -315,8 +315,21 @@ Plain, heavy and unmistakable; label plus optional icon, never icon alone.
 
 ### Don't:
 - **Don't** use enamel red for anything but a shortfall, an error or a destructive act.
-- **Don't** add a second accent, a gradient field, or a chart library; the only gradient is the brass on the balance itself.
-- **Don't** use hard offset shadows or long floating shadows; plates rest on the wall.
+- **Don't** use a bazaar tile colour as a page field or for text outside its own tile; no chart library; gradients only as the teal/iron fade that keeps text readable over a photo.
+- **Don't** use long soft floating shadows; edges are the 2 px iron line with a hard 2–4 px drop (round 3).
 - **Don't** set small text in polished brass on the teal wall (about 3.1:1); use white, wall mist, or deep brass on white.
-- **Don't** animate anything beyond the balance's swing, the 260 ms settle-in and 150 ms colour/press transitions.
+- **Don't** animate anything beyond the balance's swing, the settle-in, the slow photo drift, the tip fade and short press transitions.
+
+## Round 3 — "the whole bazaar" (17 Nov 2026, owner brief; supersedes conflicting rules above)
+
+- **Logo:** `public/brand/logo-mark.svg` (teal tile, iron edge + hard shadow, brass balance: taka coins left, rice sheaf
+  right, beam level). Wordmark in Anek Bangla + letter-spaced "BONIK BONDHU". Poster PNGs beside it.
+- **Photos:** real Bangladesh bazaar/field photos (Wikimedia Commons, CC BY / BY-SA, credited on screen and in
+  `public/photos/CREDITS.md`). Each app section has one (`SCENES` in `src/components/Frame.tsx`); no photos of children.
+- **Frame:** phones keep the 480 px column; ≥1024 px left nav of colour tiles; ≥1280 px right scene panel (photo,
+  caption, tips, promise). Guest screens get a photo split screen. Title bands carry the section photo behind a teal fade.
+- **Bazaar tiles:** six soft-ground/strong-ink pairs (`--color-tile-*`, all ≥ 5.8:1) — chili, turmeric, leaf, sky,
+  plum, teal — only inside icon tiles and the tip card. One tone per section.
+- **Edges:** cards, lists, buttons and tiles use `bb-hard-sm` (2 px iron + 2 px hard drop); hero pieces `bb-hard` (4 px).
+  Buttons sink into their shadow when pressed.
 - **Don't** let a design element suggest approval, a score or a lender offer; the balance shows fit against the owner's own cash, nothing more.
