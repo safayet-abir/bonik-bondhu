@@ -32,48 +32,54 @@ function OwnerChrome() {
     { to: `${base}/advisor`, icon: MessageCircle, label: t("nav.advisor"), tone: "plum" },
     { to: `${base}/more`, icon: Menu, label: t("nav.more"), tone: "sky" },
   ];
-  // Phones: header, the page, a bottom tab bar. Wide screens (≥1024): the same nav becomes a column of colour
-  // tiles on the left; ≥1280 adds the section's scene panel on the right so the screen is never empty.
+  // Phones: teal header, the page, the section's photo + tips under it, a teal tab bar of colour tiles — the page
+  // sits inside the shop wall, never on a bare white sheet. Tablets (≥768): the same nav becomes a column of tiles
+  // on the left. Desktops (≥1280): the photo + tips move into a sticky panel on the right.
   return (
     <FrameContext.Provider value={where}>
-      <div className="flex min-h-dvh flex-col pb-16 lg:pb-0">
+      <div className="flex min-h-dvh flex-col pb-[76px] md:pb-0">
         <header className="sticky top-0 z-10 bg-bb-wall text-white shadow-[0_6px_14px_-10px_rgb(0_0_0/0.6)]">
           {/* a11y reflow: the name truncates (min-w-0); at 200 % zoom the badge/language wrap to a second line */}
-          <div className="mx-auto flex max-w-[480px] flex-wrap items-center gap-2 px-4 py-2 lg:max-w-[1400px] lg:gap-4 lg:px-8">
-            <span className="mr-4 hidden lg:block"><Logo to={`${base}/home`} /></span>
-            <Link to="/profiles" className="flex min-h-12 min-w-0 flex-1 items-center gap-2 font-display text-card font-semibold lg:flex-none lg:rounded-xl lg:bg-bb-wall-deep lg:px-3"
+          <div className="mx-auto flex max-w-[480px] flex-wrap items-center gap-2 px-4 py-2 md:max-w-[1400px] md:gap-4 md:px-6 lg:px-8">
+            <span className="mr-2 hidden md:block lg:mr-4"><Logo to={`${base}/home`} /></span>
+            <Link to="/profiles" className="flex min-h-12 min-w-0 flex-1 items-center gap-2 font-display text-card font-semibold md:flex-none md:rounded-xl md:bg-bb-wall-deep md:px-3"
                   aria-label={t("profiles.switch")}>
               <ProfileIcon type={p.activity_type} className="size-5 shrink-0 text-bb-brass" />
               <span className="truncate">{p.display_name}</span>
               <ChevronDown aria-hidden className="size-4 shrink-0 text-[#d6ece8]" />
             </Link>
-            <span className="hidden flex-1 lg:block" />
+            <span className="hidden flex-1 md:block" />
             {p.is_demo ? <DemoBadge /> : null}
             <LanguageSwitch tone="wall" />
           </div>
         </header>
-        <div className="flex-1 lg:mx-auto lg:grid lg:w-full lg:max-w-[1400px] lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-8 lg:px-8 xl:grid-cols-[220px_minmax(0,600px)_minmax(0,1fr)]">
-          <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-bb-border bg-bb-surface lg:sticky lg:top-20 lg:order-first lg:self-start lg:border-0 lg:bg-transparent lg:pt-6">
-            <ul className="mx-auto grid h-16 max-w-[480px] grid-cols-5 lg:flex lg:h-auto lg:flex-col lg:gap-2">
-              {nav.map(({ to, icon: Icon, label, tone }) => (
+        <div className="flex-1 md:mx-auto md:grid md:w-full md:max-w-[1400px] md:grid-cols-[200px_minmax(0,1fr)] md:gap-6 md:px-6 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-8 lg:px-8 xl:grid-cols-[220px_minmax(0,600px)_minmax(0,1fr)]">
+          <nav className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-bb-iron bg-bb-wall md:sticky md:top-20 md:order-first md:self-start md:border-0 md:bg-transparent md:pt-6">
+            <ul className="mx-auto grid h-[76px] max-w-[480px] grid-cols-5 md:flex md:h-auto md:flex-col md:gap-2">
+              {nav.map(({ to, icon, label, tone }) => (
                 <li key={to}>
                   <NavLink to={to} end
                            className={({ isActive }) =>
-                             `relative flex h-full flex-col items-center justify-center text-caption transition-colors duration-150 lg:min-h-14 lg:flex-row lg:justify-start lg:gap-3 lg:rounded-xl lg:border-2 lg:px-2.5 lg:text-body lg:before:hidden ${
+                             `group relative flex h-full flex-col items-center justify-center gap-1 text-caption transition-colors duration-150 md:min-h-14 md:flex-row md:justify-start md:gap-3 md:rounded-xl md:border-2 md:px-2.5 md:text-body md:before:hidden ${
                                isActive
-                                 ? "font-semibold text-bb-primary before:absolute before:inset-x-4 before:top-0 before:h-[3px] before:rounded-b before:bg-bb-brass lg:bb-hard-sm lg:bg-bb-surface lg:text-bb-iron"
-                                 : "text-bb-muted lg:border-transparent lg:text-bb-text lg:hover:bg-bb-surface"
+                                 ? "font-semibold text-white before:absolute before:inset-x-3 before:top-0 before:h-1 before:rounded-b before:bg-bb-brass md:bb-hard-sm md:bg-bb-surface md:text-bb-iron"
+                                 : "text-[#d6ece8] md:border-transparent md:text-bb-text md:hover:bg-bb-surface"
                              }`}>
-                    <Icon aria-hidden className="size-5 lg:hidden" />
-                    <span className="hidden lg:inline-flex"><IconTile icon={Icon} tone={tone} size="sm" /></span>
+                    {/* the same colour tile on every screen size; the open tab's tile stands up a little on phones */}
+                    <span className="transition-transform duration-150 group-aria-[current=page]:-translate-y-0.5 md:group-aria-[current=page]:translate-y-0">
+                      <IconTile icon={icon} tone={tone} size="sm" />
+                    </span>
                     {label}
                   </NavLink>
                 </li>
               ))}
             </ul>
           </nav>
-          <div className="min-w-0 lg:pb-12">
+          <div className="min-w-0 md:pb-12">
             <Outlet />
+            <div className="mx-auto max-w-[480px] px-4 pb-6 pt-2 md:max-w-none md:px-0 xl:hidden">
+              <ScenePanel key={section} section={section} farm={farm} compact />
+            </div>
           </div>
           <div className="hidden xl:block xl:pt-6">
             <ScenePanel key={section} section={section} farm={farm} />

@@ -113,7 +113,7 @@ export function Home() {
   }
 
   return (
-    <PageShell>
+    <PageShell title={t("scene.home.title")}>
       {notice ? <StatusBanner tone="success" title={t(notice)} /> : null}
       <div className="grid grid-cols-2 gap-3">
         <InOut title={t("period.today")} s={data.today} lang={lang} />
@@ -125,7 +125,7 @@ export function Home() {
           {QUICK.map((ty) => {
             const Icon = TXN_ICON[ty];
             return (
-              <Button key={ty} variant="secondary" onClick={() => add(ty)} className="justify-start text-bb-iron"
+              <Button key={ty} variant="secondary" onClick={() => add(ty)} className="justify-start px-3 text-left text-bb-iron"
                       icon={<IconTile icon={Icon} tone={QUICK_TONE[ty] ?? "teal"} size="sm" />}>
                 {t(`txn.${ty}`)}
               </Button>

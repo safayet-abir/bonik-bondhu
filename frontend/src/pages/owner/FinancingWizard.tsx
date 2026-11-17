@@ -1,4 +1,4 @@
-import { CheckCircle2, ClipboardCheck, Copy, Landmark, PlusCircle, Sparkles, Trash2 } from "lucide-react";
+import { Check, CheckCircle2, ClipboardCheck, Copy, Landmark, PlusCircle, Sparkles, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router";
@@ -721,17 +721,29 @@ function StepTerms({ req, setReq }: StepProps) {
 // ------------------------------------------------------------------ shell
 const STEP_TITLES = ["fin.step1", "fin.step2", "fin.step3", "fin.step4", "fin.step5"];
 
+/** Five numbered steps on a line: done steps carry a tick on leaf green, the open step is brass and larger,
+ *  the rest wait in white. The words above stay the accessible text; the row is decoration. */
 function Progress({ n }: { n: number }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as Lang;
   return (
-    <div className="flex flex-col gap-1">
-      <p className="text-small text-bb-muted">
+    <div className="flex flex-col gap-2">
+      <p className="text-small font-semibold text-bb-muted">
         {t("fin.step_of", { n: formatNumber(String(n), lang), total: formatNumber("5", lang) })}
       </p>
-      <div className="flex gap-1" aria-hidden>
-        {[1, 2, 3, 4, 5].map((i) => <div key={i} className={`h-2 flex-1 rounded-full ${i <= n ? "bg-bb-primary" : "bg-bb-border"}`} />)}
-      </div>
+      <ol className="flex items-center" aria-hidden>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <li key={i} className={`flex items-center ${i < 5 ? "flex-1" : ""}`}>
+            <span className={`flex shrink-0 items-center justify-center rounded-full font-display font-semibold ${
+              i < n ? "bb-hard-sm size-9 bg-tile-leaf text-tile-leaf-ink"
+              : i === n ? "bb-hard-sm size-11 bg-bb-brass text-bb-iron"
+              : "size-9 border-2 border-bb-border bg-bb-surface text-bb-muted"}`}>
+              {i < n ? <Check className="size-5" strokeWidth={3} /> : formatNumber(String(i), lang)}
+            </span>
+            {i < 5 ? <span className={`mx-1 h-1 flex-1 rounded-full ${i < n ? "bg-tile-leaf-ink" : "bg-bb-border"}`} /> : null}
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { NavLink, useNavigate } from "react-router";
 
 import { IconTile, Logo } from "../../components/Brand";
 import { Button } from "../../components/Button";
-import { PAIR, SignBand } from "../../components/Frame";
+import { PAIR, ScenePanel, SignBand } from "../../components/Frame";
 import { DemoBadge } from "../../components/DemoBadge";
 import { LanguageSwitch } from "../../components/LanguageSwitch";
 import { useAuth } from "../../state/Auth";
@@ -57,6 +57,10 @@ export function LenderShell({ title, kind, children }: {
           </div>
         </SignBand>
         {children}
+        {/* the desk's own corner: the case's world + the lender's rules, so short lists never end on blank paper */}
+        <div className="mt-4">
+          <ScenePanel section="lender" farm={false} photo={pair?.photo} compact />
+        </div>
       </main>
     </div>
   );

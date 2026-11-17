@@ -92,24 +92,50 @@ export function SignBand({ section, farm = false, photo, photoClass = "", classN
             {PAIR.map((p) => <span key={p.photo} className="h-full flex-1"><Photo slug={p.photo} decorative /></span>)}
           </span>
         ) : <Photo slug={photo ?? sc.photo} decorative />}
-        <span className="absolute inset-0 bg-gradient-to-r from-bb-wall from-40% via-bb-wall/90 to-bb-wall/70" />
+        <span className="absolute inset-0 bg-gradient-to-r from-bb-wall from-30% via-bb-wall/85 to-bb-wall/55" />
       </span>
       {children}
     </div>
   );
 }
 
+/** Phones and tablets, screens for everyone (sign in, register, choose business): the logo over a shop and a
+ *  field side by side, named — the same promise the desktop split screen makes. */
+export function GuestHero() {
+  const { t } = useTranslation();
+  return (
+    <div className="relative isolate h-44 overflow-hidden bg-bb-wall text-white sm:h-56 lg:hidden">
+      <span className="absolute inset-0 -z-10 flex">
+        {PAIR.map((p) => <span key={p.photo} className="h-full flex-1"><Photo slug={p.photo} decorative drift /></span>)}
+        <span className="absolute inset-0 bg-gradient-to-b from-bb-wall/85 via-bb-wall/25 to-bb-wall" />
+      </span>
+      <div className="mx-auto flex h-full max-w-[480px] flex-col justify-between px-4 pb-2 pt-3">
+        <Logo to="/" />
+        <ul className="flex flex-wrap gap-2">
+          {PAIR.map((p) => (
+            <li key={p.label} className="flex items-center gap-2 rounded-xl bg-bb-iron/75 py-1 pl-1 pr-3 text-small font-semibold">
+              <IconTile icon={p.icon} tone={p.tone} size="sm" />{t(p.label)}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 /** Desktop side panel (≥1280 px): the section's photo, a line about what this part does, tips you can page
  *  through, and the promise. Only words — never numbers that look like data. */
-export function ScenePanel({ section, farm }: Where) {
+export function ScenePanel({ section, farm, compact, photo }: Where & { compact?: boolean; photo?: PhotoSlug }) {
   const { t, i18n } = useTranslation();
   const [tip, setTip] = useState(0);
-  const s = sceneOf(section, farm);
+  const s = { ...sceneOf(section, farm), ...(photo ? { photo } : {}) };
   const n = (v: number) => (i18n.language === "bn" ? toBanglaDigits(String(v)) : String(v));
+  // compact = under the page on phones and tablets (photo above the tips; side by side from 640 px)
   return (
-    <aside aria-label={t("scene.aside")} className="sticky top-24 flex flex-col gap-5 pb-10">
+    <aside aria-label={t("scene.aside")}
+           className={compact ? "grid gap-4 sm:grid-cols-2 sm:items-stretch" : "sticky top-24 flex flex-col gap-5 pb-10"}>
       <figure className="bb-hard relative overflow-hidden rounded-2xl bg-bb-iron">
-        <div className="aspect-[4/5] max-h-[48vh] w-full overflow-hidden">
+        <div className={`w-full overflow-hidden ${compact ? "aspect-[4/3] sm:aspect-auto sm:h-full sm:min-h-64" : "aspect-[4/5] max-h-[48vh]"}`}>
           <Photo slug={s.photo} drift />
         </div>
         <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bb-iron via-bb-iron/80 to-transparent p-5 pt-20 text-white">
@@ -142,7 +168,7 @@ export function ScenePanel({ section, farm }: Where) {
         </div>
       </section>
 
-      <p className="flex items-center gap-2.5 text-small font-semibold text-bb-muted">
+      <p className={`flex items-center gap-2.5 text-small font-semibold text-bb-muted ${compact ? "sm:col-span-2" : ""}`}>
         <img src="/brand/logo-mark.svg" alt="" className="size-7" />
         {t("land.never")}
       </p>
