@@ -379,7 +379,7 @@ export type Summary = {
 };
 
 export type SectionKey = "profile_summary" | "money_summary" | "forecast" | "financing_request" | "obligations" |
-  "supplier_risk" | "news_signals" | "season_summary" | "transaction_list" | "applicant_details";
+  "supplier_risk" | "news_signals" | "season_summary" | "transaction_list";
 export type ConsentStatus = "requested" | "approved" | "declined" | "revoked";
 export type ReviewStatus = "under_review" | "info_requested" | "decision_recorded";
 // ---------------------------------------------------------------- P6 AI
@@ -484,7 +484,3 @@ export type EconomyWhatIf = {
 };
 
 export type Page<T> = { items: T[]; total: number };
-
-export type ApplicantDetailsOut = {
- full_legal_name: string | null; address: string | null; nominee_name: string | null; nominee_relation: string | null; trade_licence: string | null; years_in_business: number | null; nid_masked: string | null; has_date_of_birth: boolean; declared_at: string | null; label_key: string; completeness: { completed: number; total: number; percent: number; missing: string[] };
-};

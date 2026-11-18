@@ -31,7 +31,7 @@ export function setSessionExpiredHandler(fn: () => void): void {
   onSessionExpired = fn;
 }
 
-type Method = "PUT" | "GET" | "POST" | "PATCH" | "DELETE";
+type Method = "GET" | "POST" | "PATCH" | "DELETE";
 
 type Options = {
   method?: Method;

@@ -3,7 +3,7 @@ import type { SectionKey } from "../api/types";
 
 export const SECTION_ORDER: SectionKey[] = [
   "profile_summary", "money_summary", "forecast", "financing_request", "obligations", "supplier_risk",
-  "news_signals", "season_summary", "transaction_list", "applicant_details",
+  "news_signals", "season_summary", "transaction_list",
 ];
 
 /** "7KQ2M9XA4P" -> "7KQ2M-9XA4P" (display only; dashes are ignored on input). */

@@ -23,12 +23,12 @@ from ..core.clock import utcnow
 from ..models import (
     BusinessProfile, FarmingSeason, FinancialAssessment, FinancingRequest, ForecastRun, RiskScenario, Transaction,
 )
-from . import (applicant_service, assessment_service, debt_service, financing_service, graph_service, season_service, summary_service,
+from . import (assessment_service, debt_service, financing_service, graph_service, season_service, summary_service,
                supplier_service)
 
 SCHEMA = "bb-report-v1"
 SECTIONS = ("profile_summary", "money_summary", "forecast", "financing_request", "obligations", "supplier_risk",
-            "news_signals", "season_summary", "transaction_list", "applicant_details")
+            "news_signals", "season_summary", "transaction_list")
 REQUIRED = ("profile_summary", "financing_request")
 SHOP_ONLY = ("forecast",)
 FARM_ONLY = ("season_summary",)
@@ -220,7 +220,6 @@ def build(db: Session, profile: BusinessProfile, sections: list[str], r: Financi
     as_of = a.as_of_date
     conc, labels, names = supplier_labels(db, profile, as_of)
     builders = {
-        "applicant_details": lambda: applicant_service.snapshot(db, profile),
         "profile_summary": lambda: _profile(profile),
         "money_summary": lambda: _money(db, profile, as_of),
         "forecast": lambda: _forecast(db, a),

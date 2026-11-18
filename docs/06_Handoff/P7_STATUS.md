@@ -82,11 +82,3 @@ see "Live verification" at the end.
   keep Bangladeshi publishers / headlines naming Bangladesh only (SUG-54); the bad row was removed from Neon
   together with one proposed scenario on an E2E test account.
 - First request after the free host sleeps shows Render's "waking up" page (~1 min) — open the URL before the demo.
-
-
-## F5 update ? 18 Nov 2026
-
-F4 is implemented (the older combined F4?F8 unchecked row above is stale).
-F5 implementation and isolated demo are complete; see F5_VALIDATION_2026-11-18.md
-and F5_RECOVERY.md. This does not mark F5 as deployed to Render/Neon.
-F6/F7 remain unimplemented, F8 remains dropped. No main merge performed.

@@ -7,7 +7,6 @@ import { Link } from "react-router";
 
 import { api, ApiError } from "../../api/client";
 import type { ConsentActivity, ConsentList, ConsentRow, FinancingRequest, Page, SectionKey } from "../../api/types";
-import { ApplicantDetails } from "../../components/ApplicantDetails";
 import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
 import { Chips } from "../../components/Chips";
@@ -89,7 +88,7 @@ function ApproveSheet({ c, list, requests, onDone, onCancel }: {
   const p = useActiveProfile();
   const required = list.required_sections;
   const [sections, setSections] = useState<SectionKey[]>(
-    sortSections([...new Set([...required, ...c.requested_sections.filter((s) => list.allowed_sections.includes(s) && s !== "applicant_details")])]));
+    sortSections([...new Set([...required, ...c.requested_sections.filter((s) => list.allowed_sections.includes(s))])]));
   const [rid, setRid] = useState(requests[0]?.id ?? "");
   const [days, setDays] = useState("14");
   const [busy, setBusy] = useState(false);
@@ -244,7 +243,6 @@ export function Sharing() {
   return (
     <PageShell title={t("share.title")} back={`/p/${p.id}/more`}>
       <ShareCode />
-      <ApplicantDetails key={p.id} />
       <ErrorBanner error={error} />
       {!list && !error ? <Loading /> : null}
 

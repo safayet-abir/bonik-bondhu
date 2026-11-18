@@ -24,7 +24,7 @@ type S = Record<string, any>;
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <Card className="flex min-w-0 flex-col gap-2">
+    <Card className="flex flex-col gap-2">
       <h2 className="font-semibold">{title}</h2>
       {children}
     </Card>
@@ -76,7 +76,6 @@ function FinancingSection({ fr }: { fr: S }) {
       ]} />
       {fr.over_request_explanation ? <p className="text-small">“{fr.over_request_explanation}”</p> : null}
       {fr.items?.length ? (
-        <div className="overflow-x-auto" role="region" aria-label={t("section.financing_request")} tabIndex={0}>
         <table className="w-full text-small">
           <thead className="text-bb-muted"><tr><th className="text-left font-normal">{t("lender.item")}</th>
             <th className="text-right font-normal">{t("lender.qty")}</th><th className="text-right font-normal">{t("lender.total")}</th>
@@ -88,7 +87,6 @@ function FinancingSection({ fr }: { fr: S }) {
               <td className="pl-2">{t(`price_source.${i.price_source_type}`)}{i.price_date ? ` · ${day(i.price_date)}` : ""}</td>
             </tr>))}</tbody>
         </table>
-        </div>
       ) : null}
       <div className="rounded-lg bg-bb-bg p-3 text-small">
         <p className="font-semibold">{t("fin.proposal_banner")}</p>
@@ -216,21 +214,6 @@ function Sections({ s }: { s: S }) {
                      [t("lender.planned_cost"), tk(s.season_summary.planned_cost_total)], [t("lender.paid_cost"), tk(s.season_summary.paid_cost_total)],
                      [t("season.break_even"), tk(s.season_summary.break_even_price_per_kg)], [t("season.loan_cover_title"), tk(s.season_summary.loan_cover_price_per_kg)]]} />
           <p className="text-small text-bb-muted">{t("lender.owner_estimates")}</p>
-        </Section>
-      ) : null}
-      {s.applicant_details ? (
-        <Section title={t("section.applicant_details")}>
-          <p className="text-small font-semibold">{t("applicant.declared")}</p>
-          <dl className="flex flex-col gap-2 break-words text-small">
-            {(["full_legal_name", "date_of_birth", "nid_number", "address", "nominee_name", "nominee_relation",
-              "trade_licence", "years_in_business"] as const).map((key) => (
-              <div key={key}>
-                <dt className="text-bb-muted">{t(`applicant.${key}`)}</dt>
-                <dd>{s.applicant_details[key] == null ? "—" : key === "date_of_birth"
-                  ? day(s.applicant_details[key]) : String(s.applicant_details[key])}</dd>
-              </div>
-            ))}
-          </dl>
         </Section>
       ) : null}
       {s.transaction_list ? (
@@ -371,8 +354,8 @@ export function CaseFile() {
             </span>
             <span className="basis-full text-bb-muted">{t("lender.hash_meaning")}</span>
           </Card>
-          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
-            <div className="flex min-w-0 flex-col gap-4">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
+            <div className="flex flex-col gap-4">
               <Sections s={c.snapshot.sections as S} />
               {c.economy_context ? (
                 <Section title={t("eco.title")}><EconomyFigures ctx={c.economy_context} /></Section>
