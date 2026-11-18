@@ -153,3 +153,15 @@ Every screen carries DEMO labels; nothing here represents a real borrower or len
 - [ ] Backup recording available offline
 - [ ] Timer rehearsal ≤ 8 minutes total (shop + farm + lender)
 - [ ] One team member assigned to answer "what is not built yet" using backlog IDs
+
+
+## F5 applicant details ? implementation, 18 Nov 2026
+
+Owner Sharing has a three-step optional identity form with a completeness bar.
+NID and date of birth stay masked outside the explicitly approved snapshot.
+The lender case shows the owner-declared, unverified identity section only with
+consent. This is not NID verification, KYC certification or a lending decision.
+NID is stored as text without separate field encryption. Demo data is fictional.
+See F5_RECOVERY.md for release gates and the migration-compatible recovery path.
+Live release status is recorded separately; implementation alone is not proof
+of deployment. No extra farmer types, bank onboarding or F6/F7 were added.

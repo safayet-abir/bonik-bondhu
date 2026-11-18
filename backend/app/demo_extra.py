@@ -15,6 +15,8 @@ Farms:   Rokeya Sobji Khet (leased land, winter vegetables, stuck mid-season; sh
 Lenders: DEMO Shonali Samity (fictional) — local installment lender · DEMO Krishi o Babsa Bank (fictional)."""
 from __future__ import annotations
 
+from sqlalchemy import text
+
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 
@@ -311,4 +313,13 @@ def seed_extra(db: Session, password: str) -> dict[str, str]:
             "Boro input loan — may we see your season plan? (DEMO)", approve=False)
 
     db.flush()
+    # F5: fictional declarations only; no real applicant identity is seeded.
+    db.execute(text("""INSERT INTO applicant_details
+        (profile_id, full_legal_name, date_of_birth, nid_number, address, nominee_name, nominee_relation, years_in_business)
+        SELECT id, display_name || ' (DEMO)', DATE '1990-01-01',
+               (1990000000000 + row_number() OVER (ORDER BY id))::text,
+               'Fictional address (DEMO)', 'Nominee (DEMO)', 'Sibling (DEMO)', 5
+        FROM business_profiles WHERE is_demo
+        ON CONFLICT (profile_id) DO NOTHING"""))
+
     return status

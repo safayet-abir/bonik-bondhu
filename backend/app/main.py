@@ -53,11 +53,12 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,
         allow_credentials=True,
-        allow_methods=["GET", "POST", "PATCH", "DELETE"],
+        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
         allow_headers=["Content-Type", CSRF_HEADER],
     )
 
-    for router in (health.router, auth.router, profiles.router, transactions.router, suppliers.router,
+    from .api import applicant
+    for router in (applicant.router, health.router, auth.router, profiles.router, transactions.router, suppliers.router,
                    suppliers.concentration_router, debts.router, seasons.router, forecasts.router,
                    financing.router, scenarios.router, news.router, consents.router, lender.router,
                    documents.router, advisor.router):

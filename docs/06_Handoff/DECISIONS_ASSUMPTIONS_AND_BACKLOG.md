@@ -249,3 +249,24 @@ These fill gaps the sources do not settle. Each is cautious (can only make a res
 | BL-18 | Synthetic 1,000-shop simulator calibrated to World Bank surveys | S1 §9.2 | Research track |
 | BL-19 | Admin web UI (accounts, audit search) | S1 §2 | Later |
 | BL-20 | Secondary LLM provider (e.g. Groq) adapter | MP §11 | If reliability requires |
+
+
+## SUG-63 ? F5 applicant details (18 Nov 2026)
+
+Owner authorized F5 implementation, tests, demo and a recoverable deployment.
+Implement the approved handoff's option (b): NID is TEXT without application-level
+field encryption. No claim about provider encryption or production compliance.
+The owner UI explains storage and separate consent. Real-person deployment still
+requires GAP-10/privacy review. No identity data is added to AI tools or logs.
+
+GET/PUT return only the last four NID digits and a birth-date-present flag;
+private fields are replacement-only and omitted values are preserved. Partial
+entry is allowed; all seven required fields are needed only when the owner opts
+into applicant_details. Trade licence is optional. The checkbox is off by default
+even when the lender requested it. Existing snapshots and assessments stay fixed.
+Demo values are fictional and explicitly labelled.
+
+Schema recovery: freeze schema_0001.sql, add 0002 and keep a schema-compatible
+recovery commit (92d2faf) with the old UI/API. Child declarations follow a profile
+delete (demo reset compatibility). Populated schema downgrade is refused. Never
+run destructive pytest/reset-demo against Neon for this task.
