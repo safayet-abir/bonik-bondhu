@@ -90,3 +90,13 @@ F4 is implemented (the older combined F4?F8 unchecked row above is stale).
 F5 implementation and isolated demo are complete; see F5_VALIDATION_2026-11-18.md
 and F5_RECOVERY.md. This does not mark F5 as deployed to Render/Neon.
 F6/F7 remain unimplemented, F8 remains dropped. No main merge performed.
+
+
+### F5 live release verified ? 18 Nov 2026
+
+F5 is now live on feature/p7 at 41b61fe. Neon migration 0002 applied; private
+backup archive verified, public smoke checks passed, existing business/financial
+records and report fingerprints unchanged. Source, recovery and live-branch CI
+all passed. Recovery branch recovery/f5-ready-20261118 (a7e05da) is prepared.
+See F5_VALIDATION_2026-11-18.md for the exact boundaries and verification.
+This supersedes the preceding implementation-only deployment note.

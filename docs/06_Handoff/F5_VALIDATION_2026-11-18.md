@@ -32,7 +32,10 @@ verify NIDs, lend or approve credit. Real-person use still needs the privacy rev
 ## Executed validation
 
 All data-affecting tests used a newly initialized PostgreSQL 16 cluster bound to
-127.0.0.1:15432. Neither the existing development/test databases nor Neon were used.
+127.0.0.1:15432. No data-affecting test or write targeted the existing development/test databases or Neon.
+A read-only capability check on the configured local test role preceded creation
+of the separate disposable cluster. Neon was accessed later only for the owner-authorized
+private backup and read-only release verification.
 
 | Check | Result |
 |---|---|
@@ -52,7 +55,7 @@ Existing browser-suite screenshots were suppressed. F5 screenshots mask the NID.
 AI-on external-provider evaluation was not repeated: F5 adds no AI capability and
 no provider credentials were used. Docker build is left to GitHub CI (no local Docker).
 
-## Live release boundary
+## Pre-release checkpoint (superseded by release record below)
 
 No push to `feature/p7`, main merge, live reset, Neon migration, or live data write
 was performed. A localhost demo runs at port 18080; recovery demo at 18081.
@@ -68,3 +71,48 @@ For an application regression, revert only the F5 feature commit while retaining
 Do not blindly roll back to f3dc8fc after 0002: its startup cannot resolve 0002.
 Do not downgrade a populated live database or restore a backup merely for a UI bug.
 A database restore is a separate recovery action and can lose later writes.
+
+
+## Later release verification ? F5 is LIVE
+
+Release code: `41b61fe06f58ec0b6ca7e8f9c31f1f945c88f403` on `feature/p7`.
+URL: https://bonik-bondhu.onrender.com/
+Main was not merged. Source work continued in the isolated F5 worktree; original
+user modifications were not overwritten. Post-release documentation is committed
+on feature/f5-applicant without causing another live deployment.
+
+The owner explicitly allowed the existing configured Neon connection for private
+backup and release work only. A pre-release custom archive was saved outside all
+Git worktrees with Windows ACL access restricted to the owner and SYSTEM. Full
+archive decoding was verified into a null sink. Real production records were NOT
+restored into the trust-authenticated localhost demo cluster. The earlier complete
+restore drill used only fictional demo records. No configuration values, backup
+content, hashes of user credentials or personal records were published.
+
+Prepared emergency branch: `recovery/f5-ready-20261118`, commit
+`a7e05daf08f343a505c9ddc42e2470d8228dbc86`. Its tree exactly matches `92d2faf`
+(the old app with both migrations). It is an append-only revert of the F5 feature
+commit, so it can fast-forward the current release branch without rewriting Git
+history. This retains applicant data and the 0002 revision. It has NOT been used
+on live because release verification passed. If more commits land on feature/p7,
+rebuild/review the revert on that new head; never force-push this checkpoint.
+
+Verified after Render changed over:
+- HTTP 200 for the public SPA and health; database status ok.
+- Live JS SHA-256 matches the tested local release bundle exactly.
+- F5 public route exists and anonymous GET returns 401 AUTH_REQUIRED.
+- Neon revision is 0002_applicant_details; applicant table and both new consent
+  allowlists are present.
+- Transactions, debts, financing requests, shared reports and business profiles
+  match private pre-release fingerprints. No reset or reseed was run on live.
+
+CI passed for all three jobs (backend, frontend, Docker) on each:
+- F5 source: https://github.com/safayet-abir/bonik-bondhu/actions/runs/44245040205
+- Prepared recovery: https://github.com/safayet-abir/bonik-bondhu/actions/runs/44246316384
+- Live branch: https://github.com/safayet-abir/bonik-bondhu/actions/runs/44246744264
+
+Limit: authenticated owner/lender end-to-end tests were executed on isolated
+fictional demo data, not on live accounts. No discovered demo credentials were
+used to log into production. No real-user identity data was used for testing.
+F6/F7, institution self-registration and additional farm types remain out of scope.
+The NID plaintext-storage/privacy-review limitation above still applies.

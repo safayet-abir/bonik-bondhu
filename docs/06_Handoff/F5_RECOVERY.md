@@ -24,3 +24,18 @@ fresh migration, populated 0001 upgrade, and recovery startup on a 0002 database
 Do not reset live demo data or run the destructive pytest fixtures against Neon.
 The health endpoint tests connectivity only; validate the sharing workflow too.
 Do not merge main as part of F5. Never push unrelated dirty files.
+
+
+## Tested live-release recovery checkpoint
+
+F5 release: 41b61fe (feature/p7), verified live 18 Nov 2026.
+Prepared append-only recovery: a7e05da on recovery/f5-ready-20261118; its tree
+exactly matches 92d2faf and its backend/frontend/Docker CI passed. As long as the
+live head is 41b61fe, advancing to a7e05da is a normal fast-forward revert, with
+no database downgrade and no force push. If live advances, prepare a new revert
+on that head instead. The original 0001-only build is not the recovery target.
+
+A private pre-release Neon archive exists outside Git with owner/SYSTEM-only
+Windows ACLs and verified archive decoding. Real production data was not restored
+into the local test cluster. The successful restore/startup drill used DEMO data.
+No rollback was needed for the verified F5 deployment.
