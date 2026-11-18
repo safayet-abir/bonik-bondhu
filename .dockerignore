@@ -7,3 +7,7 @@ frontend/dist
 **/uploads
 **/e2e-shots*
 .git
+
+**/*.env.local
+**/.env.*
+!**/.env.example

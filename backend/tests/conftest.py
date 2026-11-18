@@ -32,7 +32,7 @@ os.environ.setdefault("SECRET_SALT", "test-salt")
 get_settings.cache_clear()
 
 TABLES = (
-    "ai_interactions, audit_logs, lender_review_events, lender_reviews, shared_reports, "
+    "applicant_details, ai_interactions, audit_logs, lender_review_events, lender_reviews, shared_reports, "
     "consents, risk_scenarios, news_events, financial_assessments, forecast_runs, "
     "financing_request_items, financing_requests, transactions, extraction_drafts, "
     "debt_facilities, documents, season_cost_items, farming_seasons, suppliers, "

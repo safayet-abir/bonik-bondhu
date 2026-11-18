@@ -16,7 +16,7 @@ down_revision = None
 branch_labels = None
 depends_on = None
 
-SCHEMA_SQL = Path(__file__).resolve().parents[2] / "db" / "schema.sql"
+SCHEMA_SQL = Path(__file__).resolve().parents[2] / "db" / "schema_0001.sql"
 
 # Reverse FK order; used only by downgrade.
 TABLES = [

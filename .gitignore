@@ -26,3 +26,7 @@ uploads/
 Thumbs.db
 .idea/
 .vscode/
+
+# Private environment variants
+.env.*
+!.env.example

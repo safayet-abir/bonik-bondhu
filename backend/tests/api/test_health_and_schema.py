@@ -1,5 +1,5 @@
 """P0-T04/T05: /health against the migrated test DB; migration creates the
-24 tables and the audit append-only trigger."""
+25 tables and the audit append-only trigger."""
 from __future__ import annotations
 
 import pytest
@@ -13,7 +13,7 @@ EXPECTED_TABLES = {
     "financing_requests", "financing_request_items", "forecast_runs",
     "financial_assessments", "news_events", "risk_scenarios", "consents",
     "shared_reports", "lender_reviews", "lender_review_events", "audit_logs",
-    "ai_interactions",
+    "ai_interactions", "applicant_details",
 }
 
 
@@ -23,7 +23,7 @@ def test_health_ok(client) -> None:
     assert r.json() == {"status": "ok", "db": "ok", "llm": "disabled"}
 
 
-def test_migration_creates_24_tables(migrated_db: str) -> None:
+def test_migration_creates_25_tables(migrated_db: str) -> None:
     engine = create_engine(migrated_db)
     with engine.connect() as conn:
         rows = conn.execute(text(
